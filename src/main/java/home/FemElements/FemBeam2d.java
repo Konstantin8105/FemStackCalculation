@@ -1,78 +1,55 @@
 package home.FemElements;
 
-public class FemBeam2d {
+import home.Other.FemPoint;
+import jama.Matrix;
 
-    public final int number;
-    final FemPoint pi;
-    final FemPoint pj;
-    public final double E;
-    public final double A;
-    public final double J;
+public class FemBeam2d extends FemElement {
+    private final double elacity;
+    private final double area;
+    private final double momentInertia;
 
-    FemBeam2d(int number_, FemPoint pi_, FemPoint pj_, double E_, double A_, double J_) {
-        number = number_;
-        pi = pi_;
-        pj = pj_;
-        E = E_;
-        A = A_;
-        J = J_;
+    public FemBeam2d(double elacity, double area, double momentInertia, FemPoint[] point) {
+        super(point);
+        this.elacity = elacity;
+        this.area = area;
+        this.momentInertia = momentInertia;
     }
 
-    public double Lij() {//Length
-        return Math.sqrt((pi.getX() - pj.getX()) * (pi.getX() - pj.getX()) + (pi.getY() - pj.getY()) * (pi.getY() - pj.getY()));
+    @Override
+    protected int getAmountAxes() {
+        return 6;
     }
 
-    public double[] Vij() {//Vector cosinus
-        double Vij[] = new double[4];
-        Vij[0] = (pj.getX() - pi.getX()) / Lij();        //LambdaXX0
-        Vij[1] = (pj.getY() - pi.getY()) / Lij();        //LambdaXY0
-        Vij[2] = -(pj.getY() - pi.getY()) / Lij();    //LambdaYX0
-        Vij[3] = (pj.getX() - pi.getX()) / Lij();        //LambdaYY0
-        return Vij;
+    @Override
+    public Matrix getTr() {
+        double lambda_xx = (point[1].getX() - point[0].getX()) / getLength();
+        double lambda_xy = (point[1].getY() - point[0].getY()) / getLength();
+        return new Matrix(new double[][]{
+                {+lambda_xx, -lambda_xy, 0, 0, 0, 0},
+                {+lambda_xy, +lambda_xx, 0, 0, 0, 0},
+                {0, 0, 1, 0, 0, 0},
+                {0, 0, 0, +lambda_xx, -lambda_xy, 0},
+                {0, 0, 0, +lambda_xy, +lambda_xx, 0},
+                {0, 0, 0, 0, 0, 1}
+        });
     }
 
-    public double[][] Tr() {//matrix
-        double[][] Tr = new double[6][6];
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < 6; j++)
-                Tr[i][j] = 0f;
-        double[] Vij = Vij();
-        Tr[0][0] = Tr[3][3] = Vij[0];
-        Tr[0][1] = Tr[3][4] = Vij[1];
-        Tr[1][0] = Tr[4][3] = Vij[2];
-        Tr[1][1] = Tr[4][4] = Vij[3];
-        Tr[2][2] = Tr[5][5] = 1.f;
-        return Tr;
-    }
-
-    public double[][] Tr_1() {//matrix
-        double[][] Tr_1 = new double[6][6];
-        double[][] Tr = Tr();
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < 6; j++)
-                Tr_1[i][j] = Tr[j][i];
-        return Tr_1;
-    }
-
-    // FE compress-tension-bending
-    double[][] Kr() {
-        double[][] Stiff = new double[6][6];
-        double l = Lij();
-        double EFl = E * A / l;
-        double EJ = E * J;
-        for (int i = 0; i < 6; i++)
-            for (int j = 0; j < 6; j++)
-                Stiff[i][j] = 0;
-        Stiff[0][0] = Stiff[3][3] = EFl;
-        Stiff[1][1] = Stiff[4][4] = 12 * EJ / (float) Math.pow(l, 3);
-        Stiff[2][2] = Stiff[5][5] = 4 * EJ / l;
-        Stiff[1][2] = Stiff[2][1] = 6 * EJ / (float) Math.pow(l, 2);
-        Stiff[4][5] = Stiff[5][4] = -6 * EJ / (float) Math.pow(l, 2);
-        Stiff[0][3] = Stiff[3][0] = -EFl;
-        Stiff[1][4] = Stiff[4][1] = -12 * EJ / (float) Math.pow(l, 3);
-        Stiff[1][5] = Stiff[5][1] = 6 * EJ / (float) Math.pow(l, 2);
-        Stiff[2][4] = Stiff[4][2] = -6 * EJ / (float) Math.pow(l, 2);
-        Stiff[2][5] = Stiff[5][2] = 2 * EJ / l;
-        return Stiff;
+    @Override
+    public Matrix getStiffenerMatrix() {
+        double[][] stiffener = new double[6][6];
+        double l = getLength();
+        double EFL = elacity * area / getLength();
+        double EJ = elacity * momentInertia;
+        stiffener[0][0] = stiffener[3][3] = +EFL;
+        stiffener[0][3] = stiffener[3][0] = -EFL;
+        stiffener[1][1] = stiffener[4][4] = 12.0 * EJ / Math.pow(l, 3);
+        stiffener[2][2] = stiffener[5][5] = 4.00 * EJ / l;
+        stiffener[1][2] = stiffener[2][1] = 6.00 * EJ / Math.pow(l, 2);
+        stiffener[1][5] = stiffener[5][1] = 6.00 * EJ / Math.pow(l, 2);
+        stiffener[4][5] = stiffener[5][4] = -6.0 * EJ / Math.pow(l, 2);
+        stiffener[2][4] = stiffener[4][2] = -6.0 * EJ / Math.pow(l, 2);
+        stiffener[1][4] = stiffener[4][1] = -12. * EJ / Math.pow(l, 3);
+        stiffener[2][5] = stiffener[5][2] = 2.00 * EJ / l;
+        return new Matrix(stiffener);
     }
 }

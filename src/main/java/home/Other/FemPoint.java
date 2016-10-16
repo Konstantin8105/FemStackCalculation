@@ -1,4 +1,6 @@
-package home.FemElements;
+package home.Other;
+
+import java.util.Arrays;
 
 public class FemPoint {
 
@@ -9,8 +11,7 @@ public class FemPoint {
     }
 
     private final int number;
-    private final int numberGlobalAxeX;
-    private final int numberGlobalAxeY;
+    private final int[] numberGlobalAxe = new int[3];
     private final double x;
     private final double y;
 
@@ -18,8 +19,9 @@ public class FemPoint {
         this.number = number;
         this.x = x;
         this.y = y;
-        numberGlobalAxeX = getGlobalNumber();
-        numberGlobalAxeY = getGlobalNumber();
+        for (int i = 0; i < numberGlobalAxe.length; i++) {
+            numberGlobalAxe[i] = getGlobalNumber();
+        }
     }
 
     public double getX() {
@@ -30,22 +32,17 @@ public class FemPoint {
         return y;
     }
 
-    public int getNumberGlobalAxeX() {
-        return numberGlobalAxeX;
-    }
-
-    public int getNumberGlobalAxeY() {
-        return numberGlobalAxeY;
-    }
-
     @Override
     public String toString() {
         return "FemPoint{" +
                 "number=" + number +
-                ", numberGlobalAxeX=" + numberGlobalAxeX +
-                ", numberGlobalAxeY=" + numberGlobalAxeY +
+                ", numberGlobalAxe=" + Arrays.toString(numberGlobalAxe) +
                 ", x=" + x +
                 ", y=" + y +
                 '}';
+    }
+
+    public int[] getNumberGlobalAxe() {
+        return numberGlobalAxe;
     }
 }
