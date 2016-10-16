@@ -1,6 +1,5 @@
 package home.FemElements;
 
-import home.MKEPoint;
 import jama.Matrix;
 
 public class FemTruss2d extends FemElement {
@@ -10,7 +9,7 @@ public class FemTruss2d extends FemElement {
     private int SIZE_OF_AXES = 4;
 
 
-    public FemTruss2d(double elacity, double area, MKEPoint[] point) {
+    public FemTruss2d(double elacity, double area, FemPoint[] point) {
         this.elacity = elacity;
         this.area = area;
         this.point = point;

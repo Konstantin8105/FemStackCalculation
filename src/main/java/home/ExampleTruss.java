@@ -1,45 +1,44 @@
 package home;
 
-import home.FemElements.FemElement;
-import home.FemElements.FemTruss2d;
+import home.FemElements.*;
 import jama.Matrix;
 
 public class ExampleTruss {
     public static void main(String[] args) {
-        MKEPoint[] mkePoints = new MKEPoint[]{
-                new MKEPoint(0, 0, 0),
-                new MKEPoint(1, 0, 1.2),
-                new MKEPoint(2, 0.4, 0),
-                new MKEPoint(3, 0.4, 0.6),
-                new MKEPoint(4, 0.8, 0),
+        FemPoint[] femPoints = new FemPoint[]{
+                new FemPoint(0, 0, 0),
+                new FemPoint(1, 0, 1.2),
+                new FemPoint(2, 0.4, 0),
+                new FemPoint(3, 0.4, 0.6),
+                new FemPoint(4, 0.8, 0),
         };
 
         FemElement[] lines = new FemTruss2d[]{
-                new FemTruss2d(2e11, 40e-4, new MKEPoint[]{mkePoints[0], mkePoints[1]}),
-                new FemTruss2d(2e11, 64e-4, new MKEPoint[]{mkePoints[0], mkePoints[2]}),
-                new FemTruss2d(2e11, 60e-4, new MKEPoint[]{mkePoints[0], mkePoints[3]}),
-                new FemTruss2d(2e11, 60e-4, new MKEPoint[]{mkePoints[1], mkePoints[3]}),
-                new FemTruss2d(2e11, 40e-4, new MKEPoint[]{mkePoints[2], mkePoints[3]}),
-                new FemTruss2d(2e11, 64e-4, new MKEPoint[]{mkePoints[2], mkePoints[4]}),
-                new FemTruss2d(2e11, 60e-4, new MKEPoint[]{mkePoints[3], mkePoints[4]})
+                new FemTruss2d(2e11, 40e-4, new FemPoint[]{femPoints[0], femPoints[1]}),
+                new FemTruss2d(2e11, 64e-4, new FemPoint[]{femPoints[0], femPoints[2]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[0], femPoints[3]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[1], femPoints[3]}),
+                new FemTruss2d(2e11, 40e-4, new FemPoint[]{femPoints[2], femPoints[3]}),
+                new FemTruss2d(2e11, 64e-4, new FemPoint[]{femPoints[2], femPoints[4]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[3], femPoints[4]})
         };
 
         Force[] forces = new Force[]{
-                new Force(mkePoints[1], -70000, 0),
-                new Force(mkePoints[3], 42000, 0),
+                new Force(femPoints[1], -70000, 0),
+                new Force(femPoints[3], 42000, 0),
         };
 
         Support[] supports = new Support[]{
-                new Support(mkePoints[0], true, true),
-                new Support(mkePoints[2], false, true),
-                new Support(mkePoints[4], false, true),
+                new Support(femPoints[0], true, true),
+                new Support(femPoints[2], false, true),
+                new Support(femPoints[4], false, true),
         };
 
         //=========================//
-        calculate(mkePoints,lines,forces,supports);
+        calculate(femPoints,lines,forces,supports);
     }
 
-    private static void calculate(MKEPoint[] mkePoints, FemElement[] lines, Force[] forces, Support[] supports) {
+    private static void calculate(FemPoint[] femPoints, FemElement[] lines, Force[] forces, Support[] supports) {
         for (FemElement line1 : lines) {
             line1.getStiffenerMatrix().print(10, 2);
             line1.getTr().print(10, 2);
@@ -47,7 +46,7 @@ public class ExampleTruss {
             System.out.println("--------------");
         }
 
-        Matrix A = generateMatrixCompliance(mkePoints, lines);
+        Matrix A = generateMatrixCompliance(femPoints, lines);
         A.print(3, 1);
 
         Matrix Kok = generateMatrixQuasiStiffener(lines);
@@ -56,7 +55,7 @@ public class ExampleTruss {
         Matrix Ko = (A.transpose().times(Kok)).times(A);
         Ko.print(10, 1);
 
-        Matrix displacementVector = generateDisplacementMatrix(mkePoints, forces);
+        Matrix displacementVector = generateDisplacementMatrix(femPoints, forces);
         displacementVector.print(10, 1);
 
         Matrix K = generateMatrixStiffener(Ko, supports);
@@ -87,33 +86,33 @@ public class ExampleTruss {
     private static Matrix generateMatrixStiffener(Matrix ko, Support[] supports) {
         for (Support support : supports) {
             int size = ko.getArray().length;
-            if (support.supportByX) {
+            if (support.isSupportByX()) {
                 for (int i = 0; i < size; i++) {
-                    ko.getArray()[i][support.getMkePoint().getNumberGlobalAxeX()] = 0;
+                    ko.getArray()[i][support.getFemPoint().getNumberGlobalAxeX()] = 0;
                 }
                 for (int i = 0; i < size; i++) {
-                    ko.getArray()[support.getMkePoint().getNumberGlobalAxeX()][i] = 0;
+                    ko.getArray()[support.getFemPoint().getNumberGlobalAxeX()][i] = 0;
                 }
-                ko.getArray()[support.getMkePoint().getNumberGlobalAxeX()][support.getMkePoint().getNumberGlobalAxeX()] = 1;
+                ko.getArray()[support.getFemPoint().getNumberGlobalAxeX()][support.getFemPoint().getNumberGlobalAxeX()] = 1;
             }
-            if (support.supportByY) {
+            if (support.isSupportByY()) {
                 for (int i = 0; i < size; i++) {
-                    ko.getArray()[i][support.getMkePoint().getNumberGlobalAxeY()] = 0;
+                    ko.getArray()[i][support.getFemPoint().getNumberGlobalAxeY()] = 0;
                 }
                 for (int i = 0; i < size; i++) {
-                    ko.getArray()[support.getMkePoint().getNumberGlobalAxeY()][i] = 0;
+                    ko.getArray()[support.getFemPoint().getNumberGlobalAxeY()][i] = 0;
                 }
-                ko.getArray()[support.getMkePoint().getNumberGlobalAxeY()][support.getMkePoint().getNumberGlobalAxeY()] = 1;
+                ko.getArray()[support.getFemPoint().getNumberGlobalAxeY()][support.getFemPoint().getNumberGlobalAxeY()] = 1;
             }
         }
         return ko;
     }
 
-    private static Matrix generateDisplacementMatrix(MKEPoint[] mkePoints, Force[] forces) {
-        double[][] displacementVector = new double[mkePoints.length * 2][1];
+    private static Matrix generateDisplacementMatrix(FemPoint[] femPoints, Force[] forces) {
+        double[][] displacementVector = new double[femPoints.length * 2][1];
         for (Force force : forces) {
-            displacementVector[force.getMkePoint().getNumberGlobalAxeX()][0] = force.getFx();
-            displacementVector[force.getMkePoint().getNumberGlobalAxeY()][0] = force.getFy();
+            displacementVector[force.getFemPoint().getNumberGlobalAxeX()][0] = force.getFx();
+            displacementVector[force.getFemPoint().getNumberGlobalAxeY()][0] = force.getFy();
         }
         return new Matrix(displacementVector);
     }
@@ -140,7 +139,7 @@ public class ExampleTruss {
         return new Matrix(kok);
     }
 
-    private static Matrix generateMatrixCompliance(MKEPoint[] mkePoints, FemElement[] lines) {
+    private static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) {
         //Y0
         //...^
         //...|
@@ -155,7 +154,7 @@ public class ExampleTruss {
             }
         }
 
-        double[][] a = new double[lines.length * 4][2 * mkePoints.length];
+        double[][] a = new double[lines.length * 4][2 * femPoints.length];
 
         for (FemElement line : lines) {
             int row;

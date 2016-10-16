@@ -1,6 +1,6 @@
-package home;
+package home.FemElements;
 
-public class MKEPoint {
+public class FemPoint {
 
     static private int global_number = 0;
 
@@ -13,7 +13,7 @@ public class MKEPoint {
     private int numberGlobalAxeY;
     private double x, y;
 
-    public MKEPoint(int number, double x, double y) {
+    public FemPoint(int number, double x, double y) {
         this.number = number;
         this.x = x;
         this.y = y;
@@ -39,7 +39,7 @@ public class MKEPoint {
 
     @Override
     public String toString() {
-        return "MKEPoint{" +
+        return "FemPoint{" +
                 "number=" + number +
                 ", numberGlobalAxeX=" + numberGlobalAxeX +
                 ", numberGlobalAxeY=" + numberGlobalAxeY +

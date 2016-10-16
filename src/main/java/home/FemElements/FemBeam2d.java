@@ -1,16 +1,14 @@
 package home.FemElements;
 
-import home.MKEPoint;
-
 public class FemBeam2d {
 
     public int number;
-    MKEPoint pi, pj;
+    FemPoint pi, pj;
     public double E;
     public double A;
     public double J;
 
-    FemBeam2d(int number_, MKEPoint pi_, MKEPoint pj_, double E_, double A_, double J_) {
+    FemBeam2d(int number_, FemPoint pi_, FemPoint pj_, double E_, double A_, double J_) {
         number = number_;
         pi = pi_;
         pj = pj_;

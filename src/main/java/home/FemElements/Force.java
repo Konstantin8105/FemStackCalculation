@@ -1,18 +1,18 @@
-package home;
+package home.FemElements;
 
 public class Force {
-    private MKEPoint mkePoint;
+    private FemPoint femPoint;
     private double fx;
     private double fy;
 
-    public Force(MKEPoint mkePoint, double fx, double fy) {
-        this.mkePoint = mkePoint;
+    public Force(FemPoint femPoint, double fx, double fy) {
+        this.femPoint = femPoint;
         this.fx = fx;
         this.fy = fy;
     }
 
-    public MKEPoint getMkePoint() {
-        return mkePoint;
+    public FemPoint getFemPoint() {
+        return femPoint;
     }
 
     public double getFx() {

@@ -1,18 +1,18 @@
-package home;
+package home.FemElements;
 
 public class Support {
-    MKEPoint mkePoint;
+    FemPoint femPoint;
     boolean supportByX;
     boolean supportByY;
 
-    public Support(MKEPoint mkePoint, boolean supportByX, boolean supportByY) {
-        this.mkePoint = mkePoint;
+    public Support(FemPoint femPoint, boolean supportByX, boolean supportByY) {
+        this.femPoint = femPoint;
         this.supportByX = supportByX;
         this.supportByY = supportByY;
     }
 
-    public MKEPoint getMkePoint() {
-        return mkePoint;
+    public FemPoint getFemPoint() {
+        return femPoint;
     }
 
     public boolean isSupportByX() {

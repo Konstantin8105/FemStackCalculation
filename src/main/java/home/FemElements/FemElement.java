@@ -1,6 +1,5 @@
 package home.FemElements;
 
-import home.MKEPoint;
 import jama.Matrix;
 
 public abstract class FemElement {
@@ -15,7 +14,7 @@ public abstract class FemElement {
     protected Matrix displacementInLocalSystem;
     protected Matrix internalForce;
     protected int axes[];
-    protected MKEPoint point[];
+    protected FemPoint point[];
 
     abstract public Matrix getTr();
 
@@ -29,7 +28,7 @@ public abstract class FemElement {
         return axes;
     }
 
-    public MKEPoint[] getPoint() {
+    public FemPoint[] getPoint() {
         return point;
     }
 
