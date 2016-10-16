@@ -11,6 +11,10 @@ public abstract class FemElement {
         return global_number++;
     }
 
+    public static void dropNumeration() {
+        global_number = 0;
+    }
+
     private Matrix displacementInGlobalSystem;
     private Matrix displacementInLocalSystem;
     private Matrix internalForce;
@@ -68,8 +72,16 @@ public abstract class FemElement {
         for (int i = 0; i < localDisplacement.length; i++) {
             temp[i][0] = localDisplacement[i];
         }
+        for (int i = 0; i < 2; i++) {
+            double[] displacementPointInGlobalSystem = new double[getAmountAxes()/2];
+            for (int j = 0; j < getAmountAxes()/2; j++) {
+                displacementPointInGlobalSystem[j] = localDisplacement[j+i*getAmountAxes()/2];
+            }
+            point[i].setGlobalDisplacement(displacementPointInGlobalSystem);
+        }
         displacementInGlobalSystem = new Matrix(temp);
         displacementInLocalSystem = getTr().times(displacementInGlobalSystem);
         internalForce = getStiffenerMatrix().times(displacementInLocalSystem);
     }
+
 }

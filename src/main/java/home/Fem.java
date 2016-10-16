@@ -15,7 +15,11 @@ public class Fem {
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
 
-    public static void calculate(FemPoint[] femPoints, FemElement[] femElements, Force[] forces, Support[] supports) {
+    public static void calculate(
+            FemPoint[] femPoints,
+            FemElement[] femElements,
+            Force[] forces,
+            Support[] supports) {
 
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
@@ -43,6 +47,8 @@ public class Fem {
             }
             femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
         }
+        FemElement.dropNumeration();
+        FemPoint.dropNumeration();
     }
 
     private static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
