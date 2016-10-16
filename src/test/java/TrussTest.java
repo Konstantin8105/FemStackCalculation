@@ -44,14 +44,6 @@ public class TrussTest {
         //=========================//
         Fem.calculate(femPoints, lines, forces, supports);
 
-
-        for (FemElement line : lines) {
-            System.out.println(line);
-            line.getDisplacementInGlobalSystem().print(5, 6);
-            line.getDisplacementInLocalSystem().print(5, 6);
-            line.getInternalForce().print(5, 6);
-        }
-
         Assert.assertEquals(lines.length, 7);
         Assert.assertEquals(supports.length, 4);
         Assert.assertEquals(forces.length, 2);

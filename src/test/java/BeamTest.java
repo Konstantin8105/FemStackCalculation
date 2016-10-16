@@ -10,7 +10,7 @@ import org.junit.Test;
 
 public class BeamTest {
     @Test
-    public void beamTest() {
+    public void exampleBeam() {
 
         FemPoint[] femPoints = new FemPoint[]{
                 new FemPoint(0, 0, 0),
@@ -34,6 +34,7 @@ public class BeamTest {
         //=========================//
         Fem.calculate(femPoints, lines, forces, supports);
 
+        Assert.assertEquals(lines[0].getInternalForce().get(1, 0), -10000, 1e-5);
         Assert.assertEquals(lines[0].getInternalForce().get(2, 0), -50000, 1e-5);
     }
 }

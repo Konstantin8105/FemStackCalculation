@@ -13,6 +13,7 @@ import java.util.*;
 public class Fem {
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
+    static Map<Integer, Integer> convertLineGlobalAxeToNumber;
 
     public static void calculate(FemPoint[] femPoints, FemElement[] femElements, Force[] forces, Support[] supports) {
 //        for (FemElement line1 : femElements) {
@@ -23,6 +24,7 @@ public class Fem {
 //        }
 
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
+        convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
 
         Matrix A = generateMatrixCompliance(femPoints, femElements);
@@ -63,16 +65,33 @@ public class Fem {
 //        }
     }
 
-    static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] lines) {
+    private static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
         Set<Integer> listOfLineAxes = new HashSet<>();
-        for (FemElement line : lines) {
-            for (int i = 0; i < line.getPoint().length; i++) {
-                if (line instanceof FemTruss2d) {
-                    listOfLineAxes.add(line.getPoint()[i].getNumberGlobalAxe()[0]);
-                    listOfLineAxes.add(line.getPoint()[i].getNumberGlobalAxe()[1]);
-                } else if (line instanceof FemBeam2d) {
+        for (FemElement element : femElements) {
+            for (int i = 0; i < element.getPoint().length; i++) {
+                for (int j = 0; j < element.getAxes().length; j++) {
+                    listOfLineAxes.add(element.getAxes()[j]);
+                }
+            }
+        }
+        Map<Integer, Integer> map = new TreeMap<>();
+        int position = 0;
+        for (Integer number : listOfLineAxes) {
+            map.put(number, position++);
+        }
+        return map;
+    }
+
+    static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) {
+        Set<Integer> listOfLineAxes = new HashSet<>();
+        for (FemElement element : femElements) {
+            for (int i = 0; i < element.getPoint().length; i++) {
+                if (element instanceof FemTruss2d) {
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
+                } else if (element instanceof FemBeam2d) {
                     for (int j = 0; j < 3; j++) {
-                        listOfLineAxes.add(line.getPoint()[i].getNumberGlobalAxe()[j]);
+                        listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
                     }
                 }
             }
@@ -109,53 +128,53 @@ public class Fem {
 
             if (line instanceof FemTruss2d) {
                 {
-                    row = line.getAxes()[0];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[1];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[2];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[3];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
                     a[row][column] = 1;
                 }
             } else if (line instanceof FemBeam2d) {
                 {
-                    row = line.getAxes()[0];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[1];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[2];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[3];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[4];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[4]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
                     a[row][column] = 1;
                 }
                 {
-                    row = line.getAxes()[5];
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[5]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                     a[row][column] = 1;
                 }
