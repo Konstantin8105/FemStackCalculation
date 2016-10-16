@@ -40,10 +40,10 @@ public class ExampleTruss {
     }
 
     private static void calculate(MKEPoint[] mkePoints, FemElement[] lines, Force[] forces, Support[] supports) {
-        for (int i = 0; i < lines.length; i++) {
-            lines[i].getStiffenerMatrix().print(10, 2);
-            lines[i].getTr().print(10, 2);
-            lines[i].getStiffenerMatrixTr().print(10, 2);
+        for (FemElement line1 : lines) {
+            line1.getStiffenerMatrix().print(10, 2);
+            line1.getTr().print(10, 2);
+            line1.getStiffenerMatrixTr().print(10, 2);
             System.out.println("--------------");
         }
 
@@ -120,8 +120,8 @@ public class ExampleTruss {
 
     private static Matrix generateMatrixQuasiStiffener(FemElement[] lines) {
 
-        for (int i = 0; i < lines.length; i++) {
-            if (!(lines[i] instanceof FemTruss2d)) {
+        for (FemElement line : lines) {
+            if (!(line instanceof FemTruss2d)) {
                 System.out.println("WRONG - I CAN NOT CALCULATE ANOTHER TYPE");
             }
         }
@@ -149,8 +149,8 @@ public class ExampleTruss {
         //...|....0
         //...+---->---> X0
 
-        for (int i = 0; i < lines.length; i++) {
-            if (!(lines[i] instanceof FemTruss2d)) {
+        for (FemElement line1 : lines) {
+            if (!(line1 instanceof FemTruss2d)) {
                 System.out.println("WRONG - I CAN NOT CALCULATE ANOTHER TYPE");
             }
         }

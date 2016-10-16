@@ -3,22 +3,45 @@ package home.FemElements;
 import home.MKEPoint;
 import jama.Matrix;
 
-public interface FemElement {
-    Matrix getTr();
+public abstract class FemElement {
 
-    Matrix getStiffenerMatrix();
+    static private int global_number = 0;
 
-    Matrix getStiffenerMatrixTr();
+    protected static int getGlobalNumber() {
+        return global_number++;
+    }
 
-    int[] getAxes();
+    protected Matrix displacementInGlobalSystem;
+    protected Matrix displacementInLocalSystem;
+    protected Matrix internalForce;
+    protected int axes[];
+    protected MKEPoint point[];
 
-    MKEPoint[] getPoint();
+    abstract public Matrix getTr();
 
-    void addInGlobalDisplacementCoordinate(double[] localDisplacement);
+    abstract public Matrix getStiffenerMatrix();
 
-    Matrix getDisplacementInGlobalSystem();
+    abstract public Matrix getStiffenerMatrixTr();
 
-    Matrix getDisplacementInLocalSystem();
+    abstract public void addInGlobalDisplacementCoordinate(double[] localDisplacement);
 
-    Matrix getInternalForce();
+    public int[] getAxes() {
+        return axes;
+    }
+
+    public MKEPoint[] getPoint() {
+        return point;
+    }
+
+    public Matrix getDisplacementInGlobalSystem() {
+        return displacementInGlobalSystem;
+    }
+
+    public Matrix getDisplacementInLocalSystem() {
+        return displacementInLocalSystem;
+    }
+
+    public Matrix getInternalForce() {
+        return internalForce;
+    }
 }
