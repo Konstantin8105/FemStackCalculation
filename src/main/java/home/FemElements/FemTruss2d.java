@@ -9,6 +9,9 @@ public class FemTruss2d implements FemElement {
     private MKEPoint point[] = new MKEPoint[2];
     private double length;
     private int axes[] = new int[4];
+    private Matrix displacementInGlobalSystem;
+    private Matrix displacementInLocalSystem;
+    private Matrix internalForce;
 
     static private int global_number = 0;
 
@@ -46,6 +49,13 @@ public class FemTruss2d implements FemElement {
     }
 
     @Override
+    public Matrix getStiffenerMatrixTr() {
+        Matrix tr = getTr();
+        Matrix kr = getStiffenerMatrix();
+        return ((tr.transpose().times(kr)).times(tr));
+    }
+
+    @Override
     public int[] getAxes() {
         return axes;
     }
@@ -53,5 +63,31 @@ public class FemTruss2d implements FemElement {
     @Override
     public MKEPoint[] getPoint() {
         return point;
+    }
+
+    @Override
+    public void addInGlobalDisplacementCoordinate(double[] localDisplacement) {
+        double[][] temp = new double[localDisplacement.length][1];
+        for (int i = 0; i < localDisplacement.length; i++) {
+            temp[i][0] = localDisplacement[i];
+        }
+        displacementInGlobalSystem = new Matrix(temp);
+        displacementInLocalSystem = getTr().times(displacementInGlobalSystem);
+        internalForce = getStiffenerMatrix().times(displacementInLocalSystem);
+    }
+
+    @Override
+    public Matrix getDisplacementInGlobalSystem() {
+        return displacementInGlobalSystem;
+    }
+
+    @Override
+    public Matrix getDisplacementInLocalSystem() {
+        return displacementInLocalSystem;
+    }
+
+    @Override
+    public Matrix getInternalForce() {
+        return internalForce;
     }
 }

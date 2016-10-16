@@ -8,7 +8,17 @@ public interface FemElement {
 
     Matrix getStiffenerMatrix();
 
+    Matrix getStiffenerMatrixTr();
+
     int[] getAxes();
 
     MKEPoint[] getPoint();
+
+    void addInGlobalDisplacementCoordinate(double[] localDisplacement);
+
+    Matrix getDisplacementInGlobalSystem();
+
+    Matrix getDisplacementInLocalSystem();
+
+    Matrix getInternalForce();
 }
