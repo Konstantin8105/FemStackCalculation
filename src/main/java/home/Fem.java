@@ -16,37 +16,24 @@ public class Fem {
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
 
     public static void calculate(FemPoint[] femPoints, FemElement[] femElements, Force[] forces, Support[] supports) {
-//        for (FemElement line1 : femElements) {
-//            line1.getStiffenerMatrix().print(10, 2);
-//            line1.getTr().print(10, 2);
-//            line1.getStiffenerMatrixTr().print(10, 2);
-//            System.out.println("--------------");
-//        }
 
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
 
         Matrix A = generateMatrixCompliance(femPoints, femElements);
-//        A.print(3, 1);
 
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
-//        Kok.print(10, 1);
 
         Matrix Ko = (A.transpose().times(Kok)).times(A);
-//        Ko.print(10, 1);
 
         Matrix displacementVector = generateDisplacementMatrix(femPoints, forces, femElements[0].getAxes().length / 2);
-//        displacementVector.print(10, 1);
 
         Matrix K = generateMatrixStiffener(Ko, supports);
-//        K.print(10, 1);
 
         Matrix Z0 = K.solve(displacementVector);
-//        Z0.print(10, 5);
 
         Matrix Z0k = A.times(Z0);
-//        Z0k.print(10, 5);
 
         int sizeAxes = femElements[0].getAxes().length;
         for (int i = 0; i < femElements.length; i++) {
@@ -56,13 +43,6 @@ public class Fem {
             }
             femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
         }
-
-//        for (FemElement line : femElements) {
-//            System.out.println(line);
-//            line.getDisplacementInGlobalSystem().print(5, 6);
-//            line.getDisplacementInLocalSystem().print(5, 6);
-//            line.getInternalForce().print(5, 6);
-//        }
     }
 
     private static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
@@ -212,7 +192,6 @@ public class Fem {
         }
         return new Matrix(displacementVector);
     }
-
 
     private static Matrix generateMatrixStiffener(Matrix ko, Support[] supports) {
         for (Support support : supports) {
