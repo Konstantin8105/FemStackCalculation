@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class FemPoint {
 
     static private int global_number = 0;
-    private double[] globalDisplacement = new double[3];
+    private final double[] globalDisplacement = new double[3];
 
     private static int getGlobalNumber() {
         return global_number++;
@@ -52,9 +52,7 @@ public class FemPoint {
     }
 
     public void setGlobalDisplacement(double[] globalDisplacement) {
-        for (int i = 0; i < globalDisplacement.length; i++) {
-            this.globalDisplacement[i] = globalDisplacement[i];
-        }
+        System.arraycopy(globalDisplacement, 0, this.globalDisplacement, 0, globalDisplacement.length);
     }
 
     public double[] getGlobalDisplacement() {

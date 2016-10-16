@@ -12,8 +12,8 @@ import java.util.*;
 
 public class Fem {
 
-    static Map<Integer, Integer> convertPointGlobalAxeToNumber;
-    static Map<Integer, Integer> convertLineGlobalAxeToNumber;
+    private static Map<Integer, Integer> convertPointGlobalAxeToNumber;
+    private static Map<Integer, Integer> convertLineGlobalAxeToNumber;
 
     public static void calculate(
             FemPoint[] femPoints,
@@ -68,7 +68,7 @@ public class Fem {
         return map;
     }
 
-    static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) {
+    private static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) {
         Set<Integer> listOfLineAxes = new HashSet<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {

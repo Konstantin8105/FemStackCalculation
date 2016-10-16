@@ -8,6 +8,7 @@ public class FemBeam2d extends FemElement {
     private final double area;
     private final double momentInertia;
 
+    @SuppressWarnings("SameParameterValue")
     public FemBeam2d(double elacity, double area, double momentInertia, FemPoint[] point) {
         super(point);
         this.elacity = elacity;

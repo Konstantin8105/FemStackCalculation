@@ -37,9 +37,9 @@ public abstract class FemElement {
 
     abstract protected int getAmountAxes();
 
-    abstract public Matrix getTr();
+    protected abstract Matrix getTr();
 
-    abstract public Matrix getStiffenerMatrix();
+    protected abstract Matrix getStiffenerMatrix();
 
     public int[] getAxes() {
         return axes;

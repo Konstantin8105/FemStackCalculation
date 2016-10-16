@@ -5,7 +5,7 @@ import home.Direction;
 public class Force {
     private final FemPoint femPoint;
     private final double amplitude;
-    private Direction direction;
+    private final Direction direction;
 
     @SuppressWarnings("SameParameterValue")
     public Force(FemPoint femPoint, Direction direction, double amplitude) {

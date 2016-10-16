@@ -4,7 +4,7 @@ import home.Direction;
 
 public class Support {
     private final FemPoint femPoint;
-    private Direction direction;
+    private final Direction direction;
 
     @SuppressWarnings("SameParameterValue")
     public Support(FemPoint femPoint, Direction direction) {
