@@ -3,12 +3,12 @@ package home.FemElements;
 import jama.Matrix;
 
 public class FemTruss2d extends FemElement {
-    private double elacity;
-    private double area;
-    private double length;
-    private int SIZE_OF_AXES = 4;
+    private final double elacity;
+    private final double area;
+    private final double length;
+    private static final int SIZE_OF_AXES = 4;
 
-
+    @SuppressWarnings("SameParameterValue")
     public FemTruss2d(double elacity, double area, FemPoint[] point) {
         this.elacity = elacity;
         this.area = area;

@@ -8,10 +8,11 @@ public class FemPoint {
         return global_number++;
     }
 
-    private int number;
-    private int numberGlobalAxeX;
-    private int numberGlobalAxeY;
-    private double x, y;
+    private final int number;
+    private final int numberGlobalAxeX;
+    private final int numberGlobalAxeY;
+    private final double x;
+    private final double y;
 
     public FemPoint(int number, double x, double y) {
         this.number = number;

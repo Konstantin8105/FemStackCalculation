@@ -3,7 +3,8 @@ package home;
 import home.FemElements.*;
 import jama.Matrix;
 
-public class ExampleTruss {
+class ExampleTruss {
+
     public static void main(String[] args) {
         FemPoint[] femPoints = new FemPoint[]{
                 new FemPoint(0, 0, 0),

@@ -1,10 +1,11 @@
 package home.FemElements;
 
 public class Support {
-    FemPoint femPoint;
-    boolean supportByX;
-    boolean supportByY;
+    private final FemPoint femPoint;
+    private final boolean supportByX;
+    private final boolean supportByY;
 
+    @SuppressWarnings("SameParameterValue")
     public Support(FemPoint femPoint, boolean supportByX, boolean supportByY) {
         this.femPoint = femPoint;
         this.supportByX = supportByX;

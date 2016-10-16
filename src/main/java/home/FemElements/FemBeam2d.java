@@ -2,11 +2,12 @@ package home.FemElements;
 
 public class FemBeam2d {
 
-    public int number;
-    FemPoint pi, pj;
-    public double E;
-    public double A;
-    public double J;
+    public final int number;
+    final FemPoint pi;
+    final FemPoint pj;
+    public final double E;
+    public final double A;
+    public final double J;
 
     FemBeam2d(int number_, FemPoint pi_, FemPoint pj_, double E_, double A_, double J_) {
         number = number_;
@@ -53,7 +54,7 @@ public class FemBeam2d {
         return Tr_1;
     }
 
-    // FE compress-tention-bending
+    // FE compress-tension-bending
     double[][] Kr() {
         double[][] Stiff = new double[6][6];
         double l = Lij();
@@ -63,14 +64,14 @@ public class FemBeam2d {
             for (int j = 0; j < 6; j++)
                 Stiff[i][j] = 0;
         Stiff[0][0] = Stiff[3][3] = EFl;
-        Stiff[1][1] = Stiff[4][4] = 12 * EJ / (float) Math.pow((double) l, 3);
+        Stiff[1][1] = Stiff[4][4] = 12 * EJ / (float) Math.pow(l, 3);
         Stiff[2][2] = Stiff[5][5] = 4 * EJ / l;
-        Stiff[1][2] = Stiff[2][1] = 6 * EJ / (float) Math.pow((double) l, 2);
-        Stiff[4][5] = Stiff[5][4] = -6 * EJ / (float) Math.pow((double) l, 2);
+        Stiff[1][2] = Stiff[2][1] = 6 * EJ / (float) Math.pow(l, 2);
+        Stiff[4][5] = Stiff[5][4] = -6 * EJ / (float) Math.pow(l, 2);
         Stiff[0][3] = Stiff[3][0] = -EFl;
-        Stiff[1][4] = Stiff[4][1] = -12 * EJ / (float) Math.pow((double) l, 3);
-        Stiff[1][5] = Stiff[5][1] = 6 * EJ / (float) Math.pow((double) l, 2);
-        Stiff[2][4] = Stiff[4][2] = -6 * EJ / (float) Math.pow((double) l, 2);
+        Stiff[1][4] = Stiff[4][1] = -12 * EJ / (float) Math.pow(l, 3);
+        Stiff[1][5] = Stiff[5][1] = 6 * EJ / (float) Math.pow(l, 2);
+        Stiff[2][4] = Stiff[4][2] = -6 * EJ / (float) Math.pow(l, 2);
         Stiff[2][5] = Stiff[5][2] = 2 * EJ / l;
         return Stiff;
     }

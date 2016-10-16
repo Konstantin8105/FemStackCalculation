@@ -1,10 +1,11 @@
 package home.FemElements;
 
 public class Force {
-    private FemPoint femPoint;
-    private double fx;
-    private double fy;
+    private final FemPoint femPoint;
+    private final double fx;
+    private final double fy;
 
+    @SuppressWarnings("SameParameterValue")
     public Force(FemPoint femPoint, double fx, double fy) {
         this.femPoint = femPoint;
         this.fx = fx;
