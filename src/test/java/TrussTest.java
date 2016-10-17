@@ -42,7 +42,11 @@ public class TrussTest {
         };
 
         //=========================//
-        Fem.calculate(femPoints, lines, forces, supports);
+        try {
+            Fem.calculate(femPoints, lines, forces, supports);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Assert.assertEquals(lines.length, 7);
         Assert.assertEquals(supports.length, 4);

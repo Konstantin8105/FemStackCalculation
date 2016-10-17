@@ -1,6 +1,7 @@
 package home;
 
 import home.FemElements.FemBeam2d;
+import home.FemElements.FemBendBeam2d;
 import home.FemElements.FemElement;
 import home.FemElements.FemTruss2d;
 import home.Other.FemPoint;
@@ -21,12 +22,13 @@ public class Fem {
             FemPoint[] femPoints,
             FemElement[] femElements,
             Force[] forces,
-            Support[] supports) {
+            Support[] supports) throws Exception {
 
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
         if (DEBUG) System.out.println("Start calc A");
+        //TODO optimize
         Matrix A = generateMatrixCompliance(femPoints, femElements);
         List<Integer>[] A2 = generateMatrixCompliance2(femPoints, femElements);
 
@@ -43,9 +45,11 @@ public class Fem {
         Matrix K = generateMatrixStiffener(Ko, supports);
 
         if (DEBUG) System.out.println("Start calc Z0");
+        //TODO optimize
         Matrix Z0 = K.solve(displacementVector);
 
         if (DEBUG) System.out.println("Start calc Z0k");
+        //TODO optimize
         Matrix Z0k = A.times(Z0);
 
         if (DEBUG) System.out.println("Start calc localDisplacement");
@@ -62,6 +66,7 @@ public class Fem {
     }
 
     private static Matrix calculate(List<Integer>[] a, Matrix kok) {
+        //TODO create beautiful method
         // A.transpose().times(Kok)
         Matrix aK = new Matrix(a.length, kok.getColumnDimension());
         for (int i = 0; i < aK.getRowDimension(); i++) {
@@ -79,7 +84,7 @@ public class Fem {
                 aK.getArray()[i][j] = sum;
             }
         }
-        Matrix aKa = new Matrix(a.length,a.length);
+        Matrix aKa = new Matrix(a.length, a.length);
         for (int i = 0; i < a.length; i++) {
             for (int j = 0; j < a.length; j++) {
                 //a[i].get(j) is row.
@@ -110,7 +115,7 @@ public class Fem {
         return map;
     }
 
-    private static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) {
+    private static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) throws Exception {
         Set<Integer> listOfLineAxes = new HashSet<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
@@ -121,7 +126,10 @@ public class Fem {
                     for (int j = 0; j < 3; j++) {
                         listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
                     }
-                }
+                } else if(element instanceof FemBendBeam2d){
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
+                } else throw new Exception("Fem element not supported");
             }
         }
         Map<Integer, Integer> map = new TreeMap<>();
@@ -132,7 +140,7 @@ public class Fem {
         return map;
     }
 
-    private static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) {
+    private static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) throws Exception {
         //Y0
         //...^
         //...|
@@ -206,7 +214,28 @@ public class Fem {
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                     a[row][column] = 1;
                 }
-            }
+            } else if (line instanceof FemBendBeam2d) {
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
+                    a[row][column] = 1;
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
+                    a[row][column] = 1;
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
+                    a[row][column] = 1;
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
+                    a[row][column] = 1;
+                }
+            } else throw new Exception("FEM Element is not support");
         }
 
         if (DEBUG) {
@@ -226,7 +255,7 @@ public class Fem {
         return new Matrix(a);
     }
 
-    private static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) {
+    private static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) throws Exception {
         //Y0
         //...^
         //...|
@@ -298,7 +327,28 @@ public class Fem {
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                     array[column].add(row);
                 }
-            }
+            } else if (line instanceof FemBendBeam2d) {
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
+                    array[column].add(row);
+                }
+            } else throw new Exception("FEM Element is not support");
         }
 
         return array;

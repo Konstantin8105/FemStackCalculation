@@ -81,6 +81,7 @@ public abstract class FemElement {
         }
         displacementInGlobalSystem = new Matrix(temp);
         displacementInLocalSystem = getTr().times(displacementInGlobalSystem);
+        //TODO BUG FIXED = FemBendBeam haven`t Y direction
         internalForce = getStiffenerMatrix().times(displacementInLocalSystem);
     }
 

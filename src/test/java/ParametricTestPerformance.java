@@ -60,7 +60,11 @@ public class ParametricTestPerformance {
         };
 
         //=========================//
-        Fem.calculate(femPoints, lines, forces, supports);
+        try {
+            Fem.calculate(femPoints, lines, forces, supports);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         junit.framework.Assert.assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
         junit.framework.Assert.assertEquals(femPoints[femPoints.length - 1].getGlobalDisplacement()[1], 0.0249, 1e-4);
