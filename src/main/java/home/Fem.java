@@ -8,10 +8,7 @@ import home.Other.Force;
 import home.Other.Support;
 import jama.Matrix;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 public class Fem {
 
@@ -29,28 +26,29 @@ public class Fem {
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
-        if(DEBUG) System.out.println("Start calc A");
+        if (DEBUG) System.out.println("Start calc A");
         Matrix A = generateMatrixCompliance(femPoints, femElements);
+        List<Integer>[] A2 = generateMatrixCompliance2(femPoints, femElements);
 
-        if(DEBUG) System.out.println("Start calc Kok");
+        if (DEBUG) System.out.println("Start calc Kok");
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
 
-        if(DEBUG) System.out.println("Start calc Ko");
-        Matrix Ko = (A.transpose().times(Kok)).times(A);
+        if (DEBUG) System.out.println("Start calc Ko");
+        Matrix Ko = calculate(A2, Kok);
 
-        if(DEBUG) System.out.println("Start calc displacementVector");
+        if (DEBUG) System.out.println("Start calc displacementVector");
         Matrix displacementVector = generateDisplacementMatrix(femPoints, forces, femElements[0].getAxes().length / 2);
 
-        if(DEBUG) System.out.println("Start calc K");
+        if (DEBUG) System.out.println("Start calc K");
         Matrix K = generateMatrixStiffener(Ko, supports);
 
-        if(DEBUG) System.out.println("Start calc Z0");
+        if (DEBUG) System.out.println("Start calc Z0");
         Matrix Z0 = K.solve(displacementVector);
 
-        if(DEBUG) System.out.println("Start calc Z0k");
+        if (DEBUG) System.out.println("Start calc Z0k");
         Matrix Z0k = A.times(Z0);
 
-        if(DEBUG) System.out.println("Start calc localDisplacement");
+        if (DEBUG) System.out.println("Start calc localDisplacement");
         int sizeAxes = femElements[0].getAxes().length;
         for (int i = 0; i < femElements.length; i++) {
             double[] localDisplacement = new double[sizeAxes];
@@ -61,6 +59,38 @@ public class Fem {
         }
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
+    }
+
+    private static Matrix calculate(List<Integer>[] a, Matrix kok) {
+        // A.transpose().times(Kok)
+        Matrix aK = new Matrix(a.length, kok.getColumnDimension());
+        for (int i = 0; i < aK.getRowDimension(); i++) {
+            for (int j = 0; j < aK.getColumnDimension(); j++) {
+                aK.getArray()[i][j] = 0.0;
+            }
+        }
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < kok.getColumnDimension(); j++) {
+                //a[i].get(j) is row. After transpose - this is column.
+                double sum = 0;
+                for (int k = 0; k < a[i].size(); k++) {
+                    sum += kok.getArray()[j][a[i].get(k)];
+                }
+                aK.getArray()[i][j] = sum;
+            }
+        }
+        Matrix aKa = new Matrix(a.length,a.length);
+        for (int i = 0; i < a.length; i++) {
+            for (int j = 0; j < a.length; j++) {
+                //a[i].get(j) is row.
+                double sum = 0;
+                for (int k = 0; k < a[i].size(); k++) {
+                    sum += aK.getArray()[j][a[i].get(k)];
+                }
+                aKa.getArray()[i][j] = sum;
+            }
+        }
+        return aKa;
     }
 
     private static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
@@ -176,11 +206,102 @@ public class Fem {
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                     a[row][column] = 1;
                 }
-
             }
         }
 
+        if (DEBUG) {
+            long amount = 0;
+            for (int i = 0; i < a.length; i++) {
+                for (int j = 0; j < a[0].length; j++) {
+                    if (a[i][j] > 0)
+                        amount++;
+                }
+            }
+            System.out.println(
+                    "Amount not zero elements :" + amount + " of "
+                            + "(" + a.length + "," + a[0].length + ") = "
+                            + (a.length * a[0].length) + " elements");
+        }
+
         return new Matrix(a);
+    }
+
+    private static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) {
+        //Y0
+        //...^
+        //...|
+        //...|
+        //...^1
+        //...|....0
+        //...+---->---> X0
+
+        int sizeAxes = lines[0].getAxes().length / 2;
+
+        List<Integer>[] array = new ArrayList[sizeAxes * femPoints.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = new ArrayList<>();
+        }
+
+        for (FemElement line : lines) {
+            int row;
+            int column;
+
+            if (line instanceof FemTruss2d) {
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+            } else if (line instanceof FemBeam2d) {
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[4]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
+                    array[column].add(row);
+                }
+                {
+                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[5]);
+                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
+                    array[column].add(row);
+                }
+            }
+        }
+
+        return array;
     }
 
     private static Matrix generateMatrixQuasiStiffener(FemElement[] lines) {
