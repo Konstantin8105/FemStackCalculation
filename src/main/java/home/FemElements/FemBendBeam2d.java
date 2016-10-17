@@ -5,14 +5,12 @@ import jama.Matrix;
 
 public class FemBendBeam2d extends FemElement {
     private final double elacity;
-    private final double area;
     private final double momentInertia;
 
     @SuppressWarnings("SameParameterValue")
-    public FemBendBeam2d(double elacity, double area, double momentInertia, FemPoint[] point) {
+    public FemBendBeam2d(double elacity, double momentInertia, FemPoint[] point) {
         super(point);
         this.elacity = elacity;
-        this.area = area;
         this.momentInertia = momentInertia;
     }
 
@@ -24,7 +22,6 @@ public class FemBendBeam2d extends FemElement {
     @Override
     protected Matrix getTr() {
         double lambda_xx = (point[1].getX() - point[0].getX()) / getLength();
-        double lambda_xy = (point[1].getY() - point[0].getY()) / getLength();
         return new Matrix(new double[][]{
                 {lambda_xx, 0, 0, 0},
                 {0, 1, 0, 0},
@@ -37,7 +34,6 @@ public class FemBendBeam2d extends FemElement {
     protected Matrix getStiffenerMatrix() {
         double[][] stiffener = new double[4][4];
         double l = getLength();
-        double EFL = elacity * area / getLength();
         double EJ = elacity * momentInertia;
         stiffener[0][0] = stiffener[2][2] = 12.0 * EJ / Math.pow(l, 3);
         stiffener[1][1] = stiffener[3][3] = 4.00 * EJ / l;

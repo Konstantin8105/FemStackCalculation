@@ -266,7 +266,7 @@ public class Fem {
 
         int sizeAxes = lines[0].getAxes().length / 2;
 
-        List<Integer>[] array = new ArrayList[sizeAxes * femPoints.length];
+        List<Integer>[] array = new List[sizeAxes * femPoints.length];
         for (int i = 0; i < array.length; i++) {
             array[i] = new ArrayList<>();
         }

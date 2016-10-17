@@ -18,7 +18,7 @@ public class BeamBendTest {
         };
 
         FemElement[] lines = new FemElement[]{
-                new FemBendBeam2d(2e11, 53.8e-4, 8356e-8, new FemPoint[]{femPoints[0], femPoints[1]}),
+                new FemBendBeam2d(2e11, /*53.8e-4,*/ 8356e-8, new FemPoint[]{femPoints[0], femPoints[1]}),
         };
 
         Force[] forces = new Force[]{
