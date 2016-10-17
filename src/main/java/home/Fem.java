@@ -211,9 +211,9 @@ public class Fem {
 
         if (DEBUG) {
             long amount = 0;
-            for (int i = 0; i < a.length; i++) {
+            for (double[] anA : a) {
                 for (int j = 0; j < a[0].length; j++) {
-                    if (a[i][j] > 0)
+                    if (anA[j] > 0)
                         amount++;
                 }
             }
