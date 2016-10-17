@@ -8,9 +8,14 @@ import home.Other.Force;
 import home.Other.Support;
 import jama.Matrix;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 public class Fem {
+
+    private static final boolean DEBUG = false;
 
     private static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     private static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -24,21 +29,28 @@ public class Fem {
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
-
+        if(DEBUG) System.out.println("Start calc A");
         Matrix A = generateMatrixCompliance(femPoints, femElements);
 
+        if(DEBUG) System.out.println("Start calc Kok");
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
 
+        if(DEBUG) System.out.println("Start calc Ko");
         Matrix Ko = (A.transpose().times(Kok)).times(A);
 
+        if(DEBUG) System.out.println("Start calc displacementVector");
         Matrix displacementVector = generateDisplacementMatrix(femPoints, forces, femElements[0].getAxes().length / 2);
 
+        if(DEBUG) System.out.println("Start calc K");
         Matrix K = generateMatrixStiffener(Ko, supports);
 
+        if(DEBUG) System.out.println("Start calc Z0");
         Matrix Z0 = K.solve(displacementVector);
 
+        if(DEBUG) System.out.println("Start calc Z0k");
         Matrix Z0k = A.times(Z0);
 
+        if(DEBUG) System.out.println("Start calc localDisplacement");
         int sizeAxes = femElements[0].getAxes().length;
         for (int i = 0; i < femElements.length; i++) {
             double[] localDisplacement = new double[sizeAxes];

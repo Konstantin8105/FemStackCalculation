@@ -36,10 +36,11 @@ public class BeamTest {
 
         Assert.assertEquals(lines[0].getInternalForce().get(1, 0), -10000, 1e-5);
         Assert.assertEquals(lines[0].getInternalForce().get(2, 0), -50000, 1e-5);
-        Assert.assertEquals(lines[0].getDisplacementInGlobalSystem().get(4,0), 0.0249, 1e-4);
-        Assert.assertEquals(lines[0].getDisplacementInLocalSystem().get(4,0), 0.0249, 1e-4);
+        Assert.assertEquals(lines[0].getDisplacementInGlobalSystem().get(4, 0), 0.0249, 1e-4);
+        Assert.assertEquals(lines[0].getDisplacementInLocalSystem().get(4, 0), 0.0249, 1e-4);
 
         Assert.assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
         Assert.assertEquals(femPoints[1].getGlobalDisplacement()[1], 0.0249, 1e-4);
     }
+
 }
