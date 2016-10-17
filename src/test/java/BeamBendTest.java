@@ -39,9 +39,8 @@ public class BeamBendTest {
         }
 
         Assert.assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
-//        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[1], 0.0000, 1e-4);
-//        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[2], 0.0000, 1e-4);
+        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[1], 0.0000, 1e-4);
+        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[2], 0.0000, 1e-4);
         Assert.assertEquals(femPoints[1].getGlobalDisplacement()[1], 0.0249, 1e-4);
     }
-
 }
