@@ -38,4 +38,10 @@ public class FemTruss2d extends FemElement {
                 {-EFL, EFL}
         });
     }
+
+    @Override
+    protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
+        point[0].setGlobalDisplacement(new double[]{localDisplacement[0],0,0});
+        point[1].setGlobalDisplacement(new double[]{localDisplacement[1],0,0});
+    }
 }
