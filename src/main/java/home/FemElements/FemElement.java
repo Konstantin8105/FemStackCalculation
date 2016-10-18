@@ -19,10 +19,10 @@ public abstract class FemElement {
     private Matrix displacementInLocalSystem;
     private Matrix internalForce;
     private final int[] axes;
-    protected FemPoint[] point;
+    FemPoint[] point;
     private final double length;
 
-    public FemElement(FemPoint[] point) {
+    FemElement(FemPoint[] point) {
         this.point = point;
         axes = new int[getAmountAxes()];
         for (int i = 0; i < axes.length; i++) {
@@ -31,15 +31,17 @@ public abstract class FemElement {
         length = Math.sqrt(Math.pow(point[0].getX() - point[1].getX(), 2.) + Math.pow(point[0].getY() - point[1].getY(), 2.));
     }
 
-    protected double getLength(){
+    double getLength(){
         return length;
     }
 
     abstract protected int getAmountAxes();
 
-    protected abstract Matrix getTr();
+    abstract protected Matrix getTr();
 
-    protected abstract Matrix getStiffenerMatrix();
+    abstract protected Matrix getStiffenerMatrix();
+
+    abstract protected Matrix getPotentialMatrix();
 
     public int[] getAxes() {
         return axes;

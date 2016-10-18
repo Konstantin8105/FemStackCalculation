@@ -477,3 +477,207 @@ public class Standard {
         }
     }*/
 }
+
+
+
+
+
+
+
+
+
+public class FemTruss2d extends FemElement {
+    private final double elacity;
+    private final double area;
+
+    @SuppressWarnings("SameParameterValue")
+    public FemTruss2d(double elacity, double area, FemPoint[] point) {
+        super(point);
+        this.elacity = elacity;
+        this.area = area;
+        this.point = point;
+    }
+
+    @Override
+    protected int getAmountAxes() {
+        return 4;
+    }
+
+    @Override
+    public Matrix getTr() {
+        double lambda_xx = (point[1].getX() - point[0].getX()) / getLength();
+        double lambda_xy = (point[1].getY() - point[0].getY()) / getLength();
+        return new Matrix(new double[][]{
+                {lambda_xx, lambda_xy, 0, 0},
+                {0, 0, lambda_xx, lambda_xy}
+        });
+    }
+
+    @Override
+    public Matrix getStiffenerMatrix() {
+        double EFL = elacity * area / getLength();
+        return new Matrix(new double[][]{
+                {EFL, -EFL},
+                {-EFL, EFL}
+        });
+    }
+
+    @Override
+    protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
+        point[0].setGlobalDisplacement(new double[]{localDisplacement[0],0,0});
+        point[1].setGlobalDisplacement(new double[]{localDisplacement[1],0,0});
+    }
+}
+
+public class TrussTest {
+    @Test
+    public void exampleTruss() {
+        FemPoint[] femPoints = new FemPoint[]{
+                new FemPoint(0, 0, 0),
+                new FemPoint(1, 0, 1.2),
+                new FemPoint(2, 0.4, 0),
+                new FemPoint(3, 0.4, 0.6),
+                new FemPoint(4, 0.8, 0),
+        };
+
+        FemElement[] lines = new FemElement[]{
+                new FemTruss2d(2e11, 40e-4, new FemPoint[]{femPoints[0], femPoints[1]}),
+                new FemTruss2d(2e11, 64e-4, new FemPoint[]{femPoints[0], femPoints[2]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[0], femPoints[3]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[1], femPoints[3]}),
+                new FemTruss2d(2e11, 40e-4, new FemPoint[]{femPoints[2], femPoints[3]}),
+                new FemTruss2d(2e11, 64e-4, new FemPoint[]{femPoints[2], femPoints[4]}),
+                new FemTruss2d(2e11, 60e-4, new FemPoint[]{femPoints[3], femPoints[4]})
+        };
+
+        Force[] forces = new Force[]{
+                new Force(femPoints[1], Direction.DIRECTION_X, -70000),
+                new Force(femPoints[3], Direction.DIRECTION_X, 42000),
+        };
+
+        Support[] supports = new Support[]{
+                new Support(femPoints[0], Direction.DIRECTION_X),
+                new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[2], Direction.DIRECTION_Y),
+                new Support(femPoints[4], Direction.DIRECTION_Y),
+        };
+
+        //=========================//
+        try {
+            Fem.calculate(femPoints, lines, forces, supports);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals(lines.length, 7);
+        Assert.assertEquals(supports.length, 4);
+        Assert.assertEquals(forces.length, 2);
+
+        Assert.assertEquals(lines[6].getInternalForce().get(0, 0), -61594.762917, 1e-5);
+        Assert.assertEquals(lines[6].getInternalForce().get(1, 0), +61594.762917, 1e-5);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+public class FemBendBeam2d extends FemElement {
+    private final double elacity;
+    private final double momentInertia;
+
+    @SuppressWarnings("SameParameterValue")
+    public FemBendBeam2d(double elacity, double momentInertia, FemPoint[] point) {
+        super(point);
+        this.elacity = elacity;
+        this.momentInertia = momentInertia;
+    }
+
+    @Override
+    protected int getAmountAxes() {
+        return 4;
+    }
+
+    @Override
+    protected Matrix getTr() {
+        double lambda_xx = (point[1].getX() - point[0].getX()) / getLength();
+        return new Matrix(new double[][]{
+                {lambda_xx, 0, 0, 0},
+                {0, 1, 0, 0},
+                {0, 0, lambda_xx, 0},
+                {0, 0, 0, 1}
+        });
+    }
+
+    @Override
+    protected Matrix getStiffenerMatrix() {
+        double[][] stiffener = new double[4][4];
+        double l = getLength();
+        double EJ = elacity * momentInertia;
+        stiffener[0][0] = stiffener[2][2] = 12.0 * EJ / Math.pow(l, 3);
+        stiffener[1][1] = stiffener[3][3] = 4.00 * EJ / l;
+        stiffener[0][1] = stiffener[1][0] = 6.00 * EJ / Math.pow(l, 2);
+        stiffener[0][3] = stiffener[3][0] = 6.00 * EJ / Math.pow(l, 2);
+        stiffener[0][2] = stiffener[2][0] = -12. * EJ / Math.pow(l, 3);
+        stiffener[1][2] = stiffener[2][1] = -6.0 * EJ / Math.pow(l, 2);
+        stiffener[2][3] = stiffener[3][2] = -6.0 * EJ / Math.pow(l, 2);
+        stiffener[1][3] = stiffener[3][1] = 2.00 * EJ / l;
+        return new Matrix(stiffener);
+    }
+
+    @Override
+    protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
+        point[0].setGlobalDisplacement(new double[]{0,localDisplacement[0],localDisplacement[1]});
+        point[1].setGlobalDisplacement(new double[]{0,localDisplacement[2],localDisplacement[3]});
+    }
+}
+
+public class BeamBendTest {
+    @Test
+    public void exampleBeam() {
+
+        FemPoint[] femPoints = new FemPoint[]{
+                new FemPoint(0, 0, 0),
+                new FemPoint(1, 5, 0),
+        };
+
+        FemElement[] lines = new FemElement[]{
+                new FemBendBeam2d(2e11, /*53.8e-4,*/ 8356e-8, new FemPoint[]{femPoints[0], femPoints[1]}),
+        };
+
+        Force[] forces = new Force[]{
+                new Force(femPoints[1], Direction.DIRECTION_Y, 10000),
+        };
+
+        Support[] supports = new Support[]{
+//                new Support(femPoints[0], Direction.DIRECTION_X),
+                new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[0], Direction.ROTATE),
+        };
+
+        //=========================//
+        try {
+            Fem.calculate(femPoints, lines, forces, supports);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
+        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[1], 0.0000, 1e-4);
+        Assert.assertEquals(femPoints[0].getGlobalDisplacement()[2], 0.0000, 1e-4);
+        Assert.assertEquals(femPoints[1].getGlobalDisplacement()[1], 0.0249, 1e-4);
+    }
+}

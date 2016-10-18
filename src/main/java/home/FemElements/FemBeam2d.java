@@ -55,8 +55,23 @@ public class FemBeam2d extends FemElement {
     }
 
     @Override
+    protected Matrix getPotentialMatrix() {
+        double[][] stiffener = new double[6][6];
+        double l = getLength();
+        stiffener[1][1] = stiffener[4][4] = 6. / 5.0 / l;
+        stiffener[2][2] = stiffener[5][5] = 2. / 15. / l;
+        stiffener[1][2] = stiffener[2][1] = 0.1;
+        stiffener[2][4] = stiffener[4][2] = -0.1;
+        stiffener[4][5] = stiffener[5][4] = -0.1;
+        stiffener[4][1] = stiffener[1][4] = -6. / 5. / l;
+        stiffener[5][2] = stiffener[2][5] = -l / 30.;
+        stiffener[1][5] = stiffener[5][1] = 0.1;
+        return new Matrix(stiffener);
+    }
+
+    @Override
     protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
-        point[0].setGlobalDisplacement(new double[]{localDisplacement[0],localDisplacement[1],localDisplacement[2]});
-        point[1].setGlobalDisplacement(new double[]{localDisplacement[3],localDisplacement[4],localDisplacement[5]});
+        point[0].setGlobalDisplacement(new double[]{localDisplacement[0], localDisplacement[1], localDisplacement[2]});
+        point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
     }
 }
