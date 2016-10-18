@@ -1,10 +1,10 @@
-import home.Direction;
-import home.Fem;
-import home.FemElements.FemBeam2d;
-import home.FemElements.FemElement;
-import home.Other.FemPoint;
-import home.Other.Force;
-import home.Other.Support;
+import home.other.Direction;
+import home.solver.Fem;
+import home.finiteElement.FemBeam2d;
+import home.finiteElement.FemElement;
+import home.other.FemPoint;
+import home.other.Force;
+import home.other.Support;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

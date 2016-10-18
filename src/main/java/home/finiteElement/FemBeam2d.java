@@ -1,6 +1,6 @@
-package home.FemElements;
+package home.finiteElement;
 
-import home.Other.FemPoint;
+import home.other.FemPoint;
 import jama.Matrix;
 
 public class FemBeam2d extends FemElement {

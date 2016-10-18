@@ -1,6 +1,6 @@
-package home.FemElements;
+package home.finiteElement;
 
-import home.Other.FemPoint;
+import home.other.FemPoint;
 import jama.Matrix;
 
 public abstract class FemElement {
@@ -67,6 +67,12 @@ public abstract class FemElement {
         Matrix tr = getTr();
         Matrix kr = getStiffenerMatrix();
         return ((tr.transpose().times(kr)).times(tr));
+    }
+
+    public Matrix getPotentialMatrixTr() {
+        Matrix tr = getTr();
+        Matrix gr = getPotentialMatrix();
+        return ((tr.transpose().times(gr)).times(tr));
     }
 
     public void addInGlobalDisplacementCoordinate(double[] localDisplacement) {

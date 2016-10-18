@@ -1,80 +1,22 @@
-package home;
+package home.solver;
 
-import home.FemElements.FemBeam2d;
-import home.FemElements.FemElement;
-import home.Other.FemPoint;
-import home.Other.Force;
-import home.Other.Support;
+import home.finiteElement.FemBeam2d;
+import home.finiteElement.FemElement;
+import home.other.FemPoint;
+import home.other.Force;
+import home.other.Support;
 import jama.Matrix;
 
 import java.util.*;
 
-public class Fem {
+public class Solver {
 
-    private static final boolean DEBUG = false;
+    static final boolean DEBUG = true;
 
-    private static Map<Integer, Integer> convertPointGlobalAxeToNumber;
-    private static Map<Integer, Integer> convertLineGlobalAxeToNumber;
+    static Map<Integer, Integer> convertPointGlobalAxeToNumber;
+    static Map<Integer, Integer> convertLineGlobalAxeToNumber;
 
-    public static void calculate(
-            FemPoint[] femPoints,
-            FemElement[] femElements,
-            Force[] forces,
-            Support[] supports) throws Exception {
-
-        convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
-        convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
-
-        if (DEBUG) System.out.println("Start calc A");
-        //TODO optimize
-        Matrix A = generateMatrixCompliance(femPoints, femElements);
-        //List<Integer>[] A2 = generateMatrixCompliance2(femPoints, femElements);
-        if (DEBUG) A.print(5,0);
-
-        if (DEBUG) System.out.println("Start calc Kok");
-        Matrix Kok = generateMatrixQuasiStiffener(femElements);
-
-        if (DEBUG) System.out.println("Start calc Ko");
-        //Matrix Ko = calculate(A2, Kok);
-        Matrix Ko = (A.transpose().times(Kok)).times(A);
-
-        if (DEBUG) System.out.println("Start calc displacementVector");
-        Matrix displacementVector = generateDisplacementMatrix(femPoints, forces, femElements[0].getAxes().length / 2);
-
-        if (DEBUG) System.out.println("Start calc K");
-        Matrix K = generateMatrixStiffener(Ko, supports);
-        if (DEBUG) K.print(10,1);
-
-        if (DEBUG) System.out.println("Start calc Z0");
-        //TODO optimize
-        Matrix Z0 = K.solve(displacementVector);
-        if (DEBUG) Z0.print(10,6);
-
-        if (DEBUG) System.out.println("Start calc Z0k");
-        //TODO optimize
-        Matrix Z0k = A.times(Z0);
-        if (DEBUG) Z0k.print(10,6);
-
-        if (DEBUG) System.out.println("Start calc localDisplacement");
-        int sizeAxes = femElements[0].getAxes().length;
-        for (int i = 0; i < femElements.length; i++) {
-            double[] localDisplacement = new double[sizeAxes];
-            for (int j = 0; j < localDisplacement.length; j++) {
-                localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
-            }
-            femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
-        }
-        if(DEBUG){
-            for (FemElement femElement : femElements) {
-                System.out.println(femElement);
-                femElement.getInternalForce().print(10, 1);
-            }
-        }
-        FemElement.dropNumeration();
-        FemPoint.dropNumeration();
-    }
-
-    private static Matrix calculate(List<Integer>[] a, Matrix kok) {
+    static Matrix calculate(List<Integer>[] a, Matrix kok) {
         //TODO create beautiful method
         // A.transpose().times(Kok)
         Matrix aK = new Matrix(a.length, kok.getColumnDimension());
@@ -107,7 +49,7 @@ public class Fem {
         return aKa;
     }
 
-    private static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
+    static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
         Set<Integer> listOfLineAxes = new HashSet<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
@@ -124,7 +66,7 @@ public class Fem {
         return map;
     }
 
-    private static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) throws Exception {
+    static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) throws Exception {
         Set<Integer> listOfLineAxes = new HashSet<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
@@ -143,7 +85,7 @@ public class Fem {
         return map;
     }
 
-    private static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) throws Exception {
+    static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) throws Exception {
         //Y0
         //...^
         //...|
@@ -217,7 +159,7 @@ public class Fem {
     }
 
     //TODO use next method for optimization
-    private static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) throws Exception {
+    static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) throws Exception {
         //Y0
         //...^
         //...|
@@ -274,15 +216,15 @@ public class Fem {
         return array;
     }
 
-    private static Matrix generateMatrixQuasiStiffener(FemElement[] lines) {
+    static Matrix generateMatrixQuasiStiffener(FemElement[] femElements) {
 
         //TODO optimize to diagonal matrix
-        int sizeAxes = lines[0].getAxes().length;
+        int sizeAxes = femElements[0].getAxes().length;
 
-        double[][] kok = new double[lines.length * sizeAxes][lines.length * sizeAxes];
-        for (int i = 0; i < lines.length; i++) {
+        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        for (int i = 0; i < femElements.length; i++) {
             int positionBaseLine = i * sizeAxes;
-            Matrix ks = lines[i].getStiffenerMatrixTr();
+            Matrix ks = femElements[i].getStiffenerMatrixTr();
             for (int j = 0; j < sizeAxes; j++) {
                 for (int k = 0; k < sizeAxes; k++) {
                     kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
@@ -293,7 +235,27 @@ public class Fem {
         return new Matrix(kok);
     }
 
-    private static Matrix generateDisplacementMatrix(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
+    static Matrix generateMatrixQuasiPotentialStiffener(FemElement[] femElements) {
+
+        //TODO optimize to diagonal matrix
+        int sizeAxes = femElements[0].getAxes().length;
+
+        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        for (int i = 0; i < femElements.length; i++) {
+            int positionBaseLine = i * sizeAxes;
+            Matrix ks = femElements[i].getPotentialMatrixTr();
+            for (int j = 0; j < sizeAxes; j++) {
+                for (int k = 0; k < sizeAxes; k++) {
+                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+                }
+            }
+        }
+
+        return new Matrix(gok);
+    }
+
+
+    static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
         for (Force force : forces) {
             displacementVector
@@ -303,21 +265,20 @@ public class Fem {
         return new Matrix(displacementVector);
     }
 
-    private static Matrix generateMatrixStiffener(Matrix ko, Support[] supports) {
+    static Matrix generateMatrixStiffener(Matrix matrix, Support[] supports) {
         for (Support support : supports) {
-            int size = ko.getArray().length;
+            int size = matrix.getArray().length;
             int numberGlobalAxe = convertPointGlobalAxeToNumber.get(support.getFemPoint().getNumberGlobalAxe()[support.getDirection().getPosition()]);
             for (int i = 0; i < size; i++) {
-                ko.getArray()[i][numberGlobalAxe] = 0;
+                matrix.getArray()[i][numberGlobalAxe] = 0;
             }
             for (int i = 0; i < size; i++) {
-                ko.getArray()[numberGlobalAxe][i] = 0;
+                matrix.getArray()[numberGlobalAxe][i] = 0;
             }
-            ko.getArray()[numberGlobalAxe][numberGlobalAxe] = 1;
+            matrix.getArray()[numberGlobalAxe][numberGlobalAxe] = 1;
 
         }
-        return ko;
+        return matrix;
     }
-
 
 }

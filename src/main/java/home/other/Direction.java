@@ -1,4 +1,4 @@
-package home;
+package home.other;
 
 public enum Direction {
     DIRECTION_X(0),

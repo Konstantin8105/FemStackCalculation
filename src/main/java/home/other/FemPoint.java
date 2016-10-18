@@ -1,4 +1,4 @@
-package home.Other;
+package home.other;
 
 import java.util.Arrays;
 

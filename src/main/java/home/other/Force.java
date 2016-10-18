@@ -1,19 +1,23 @@
-package home.Other;
+package home.other;
 
-import home.Direction;
-
-public class Support {
+public class Force {
     private final FemPoint femPoint;
+    private final double amplitude;
     private final Direction direction;
 
     @SuppressWarnings("SameParameterValue")
-    public Support(FemPoint femPoint, Direction direction) {
+    public Force(FemPoint femPoint, Direction direction, double amplitude) {
         this.femPoint = femPoint;
         this.direction = direction;
+        this.amplitude = amplitude;
     }
 
     public FemPoint getFemPoint() {
         return femPoint;
+    }
+
+    public double getAmplitude() {
+        return amplitude;
     }
 
     public Direction getDirection() {
