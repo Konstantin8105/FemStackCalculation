@@ -59,7 +59,7 @@ public class FemBeam2d extends FemElement {
         double[][] stiffener = new double[6][6];
         double l = getLength();
         stiffener[1][1] = stiffener[4][4] = 6. / 5.0 / l;
-        stiffener[2][2] = stiffener[5][5] = 2. / 15. / l;
+        stiffener[2][2] = stiffener[5][5] = 2. * l / 15.;
         stiffener[1][2] = stiffener[2][1] = 0.1;
         stiffener[2][4] = stiffener[4][2] = -0.1;
         stiffener[4][5] = stiffener[5][4] = -0.1;

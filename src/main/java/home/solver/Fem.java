@@ -90,27 +90,18 @@ public class Fem extends Solver {
             Matrix H = K.solve(G);
             System.out.println("H");H.print(13,10);
             EigenvalueDecomposition ei = new EigenvalueDecomposition(H);
-            System.out.println("ei");ei.getD().print(12,9);
-//            ei.getV().print(10,5);
-//            ei.getD().times(Z0).print(10,5);
-//            ei.getV().times(Z0).print(10,5);
+            System.out.println("ei.getD()");ei.getD().print(12,9);
+            System.out.println("ei.getV()");ei.getV().print(10,5);
+            System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
+            System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
             for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
                 System.out.println("Real "+ei.getRealEigenvalues()[i]);
+                //if(ei.getRealEigenvalues()[i]!=0)System.out.println("1/Real ="+1./ei.getRealEigenvalues()[i]);
             }
 
-//            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//                System.out.println("Image "+ei.getImagEigenvalues()[i]);
-//            }
-//            Matrix p = ei.getV().times(Z0);
-//            p.print(10,10);
-//            for (int i = 0; i < p.getColumnDimension(); i++) {
-//                for (int j = 0; j < p.getRowDimension(); j++) {
-//                    if(p.getArray()[j][i] > 0.0000001 || -0.0000001 > p.getArray()[j][i])
-//                        System.out.println("["+j+","+i+"] = "+p.getArray()[j][i]+" ---> "+(1./p.getArray()[j][i]));
-//                    else
-//                        System.out.println("["+j+","+i+"] = "+p.getArray()[j][i]);
-//                }
-//            }
+            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
+                System.out.println("Image "+ei.getImagEigenvalues()[i]);
+            }
         }
 
         FemElement.dropNumeration();
