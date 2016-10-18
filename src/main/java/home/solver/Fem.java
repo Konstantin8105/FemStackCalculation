@@ -82,12 +82,13 @@ public class Fem extends Solver {
         if (haveBucklingAnalyze) {
             if (DEBUG) System.out.println("Start buckling analyze");
             Matrix Gok = generateMatrixQuasiPotentialStiffener(femElements);
+            System.out.println("Gok");Gok.print(13,10);
             Matrix Go = (A.transpose().times(Gok)).times(A);
-            System.out.println("Go");Go.print(15,10);
+            System.out.println("Go");Go.print(13,10);
             Matrix G = generateMatrixStiffener(Go, supports);
-            System.out.println("G");G.print(15,10);
+            System.out.println("G");G.print(13,10);
             Matrix H = K.solve(G);
-            System.out.println("H");H.print(15,10);
+            System.out.println("H");H.print(13,10);
             EigenvalueDecomposition ei = new EigenvalueDecomposition(H);
             System.out.println("ei");ei.getD().print(12,9);
 //            ei.getV().print(10,5);
