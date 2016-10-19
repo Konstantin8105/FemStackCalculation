@@ -122,11 +122,13 @@ public class Fem extends Solver {
             K2 = deleteFewColumnsRows(K2,supports);
             G = deleteFewColumnsRows(G,supports);
 
+            //todo optimize
             Matrix H = K2.solve(G);
             System.out.println("H");H.print(12,9);
             H = deleteBad(H);
             System.out.println("H");H.print(12,9);
 
+            //todo optimize
             EigenvalueDecomposition ei = H.eig();//new EigenvalueDecomposition(H);
             System.out.println("ei.getD()");ei.getD().print(12,9);
             System.out.println("ei.getV()");ei.getV().print(10,5);
