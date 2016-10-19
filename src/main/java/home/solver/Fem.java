@@ -113,6 +113,9 @@ public class Fem extends Solver {
 
 
             Matrix Gok = generateMatrixQuasiPotentialStiffener2(femElements);
+
+            //Gok = Gok.times(7000);
+
             Matrix Go = (A.transpose().times(Gok)).times(A);
             Matrix G = generateMatrixStiffener(Go, supports);
 

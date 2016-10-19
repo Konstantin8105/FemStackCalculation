@@ -143,10 +143,10 @@ public class FemBeam2dTest {
         // A = 1
         // P = 1e4
         // l = 5
-        // Pcr = -->3.14^2/(4*5^2)*2e11*1e-5 = 197192 N.
+        // Pcr = -->3.14^2/(5^2)*2e11*1e-5 = 788768 N.
         //
 
-        int amount = 3;
+        int amount = 40;
 
         FemPoint[] femPoints = new FemPoint[amount];
         for (int i = 0; i < amount; i++) {
@@ -159,14 +159,14 @@ public class FemBeam2dTest {
         }
 
         Force[] forces = new Force[]{
-                new Force(femPoints[amount-1], Direction.DIRECTION_X, -7000),
-                new Force(femPoints[amount-1], Direction.DIRECTION_Y, -10),//just for fun
+                new Force(femPoints[amount-2], Direction.DIRECTION_X, -7000),
+                //new Force(femPoints[amount-1], Direction.DIRECTION_Y, -10),//just for fun
         };
 
         Support[] supports = new Support[]{
                 new Support(femPoints[0], Direction.DIRECTION_X),
                 new Support(femPoints[0], Direction.DIRECTION_Y),
-                new Support(femPoints[0], Direction.ROTATE),
+                new Support(femPoints[amount-1], Direction.DIRECTION_Y),
         };
 
         //=========================//
@@ -177,7 +177,8 @@ public class FemBeam2dTest {
         }
 
         Assert.assertEquals(lines[0].getInternalForce().get(0, 0), 7000, 1e-5);
-        Assert.assertEquals(lines[0].getInternalForce().get(0, 0), 197192, 1e-5);//critical
+        Assert.assertEquals(lines[0].getInternalForce().get(0, 0), 788768, 1e-5);//critical
+        Assert.assertEquals(lines[0].getInternalForce().get(0, 0), 0.0088746, 1e-5);//critical
     }
 
 }

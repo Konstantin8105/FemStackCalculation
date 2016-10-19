@@ -58,14 +58,16 @@ public class FemBeam2d extends FemElement {
     protected Matrix getPotentialMatrix() {
         double[][] stiffener = new double[6][6];
         double l = getLength();
-        stiffener[1][1] = stiffener[4][4] = 6. / 5.0 / l;
-        stiffener[2][2] = stiffener[5][5] = 2. * l / 15.;
-        stiffener[1][2] = stiffener[2][1] = 0.1;
-        stiffener[2][4] = stiffener[4][2] = -0.1;
-        stiffener[4][5] = stiffener[5][4] = -0.1;
-        stiffener[4][1] = stiffener[1][4] = -6. / 5. / l;
-        stiffener[5][2] = stiffener[2][5] = -l / 30.;
-        stiffener[1][5] = stiffener[5][1] = 0.1;
+        //todo only if compress
+        double axialForce = ;
+        stiffener[1][1] = stiffener[4][4] = axialForce * (6. / 5.0 / l);
+        stiffener[2][2] = stiffener[5][5] = axialForce * (2. * l / 15.);
+        stiffener[1][2] = stiffener[2][1] = axialForce * (0.1);
+        stiffener[2][4] = stiffener[4][2] = axialForce * (-0.1);
+        stiffener[4][5] = stiffener[5][4] = axialForce * (-0.1);
+        stiffener[4][1] = stiffener[1][4] = axialForce * (-6. / 5. / l);
+        stiffener[5][2] = stiffener[2][5] = axialForce * (-l / 30.);
+        stiffener[1][5] = stiffener[5][1] = axialForce * (0.1);
         return new Matrix(stiffener);
     }
 
@@ -93,15 +95,15 @@ public class FemBeam2d extends FemElement {
         double[][] stiffener = new double[6][6];
         double l = getLength();
         double pi2 = Math.PI * Math.PI;
-        stiffener[1][1] = stiffener[4][4] = pi2/8./l;
-        stiffener[1][4] = stiffener[4][1] = pi2/8./l;
-        stiffener[2][2] = stiffener[5][5] = (pi2/4.-1.)*l/8.;
-        stiffener[2][1] = stiffener[1][2] = 1./2.-pi2/16.;
-        stiffener[2][4] = stiffener[4][2] = 1./2.-pi2/16.;
-        stiffener[4][5] = stiffener[5][4] = 1./2.-pi2/16.;
-        stiffener[1][5] = stiffener[5][1] = 1./2.-pi2/16.;
-        stiffener[2][5] = stiffener[5][2] = (pi2/4.-3.)*l/8.;
-         return new Matrix(stiffener);
+        stiffener[1][1] = stiffener[4][4] = pi2 / 8. / l;
+        stiffener[1][4] = stiffener[4][1] = pi2 / 8. / l;
+        stiffener[2][2] = stiffener[5][5] = (pi2 / 4. - 1.) * l / 8.;
+        stiffener[2][1] = stiffener[1][2] = 1. / 2. - pi2 / 16.;
+        stiffener[2][4] = stiffener[4][2] = 1. / 2. - pi2 / 16.;
+        stiffener[4][5] = stiffener[5][4] = 1. / 2. - pi2 / 16.;
+        stiffener[1][5] = stiffener[5][1] = 1. / 2. - pi2 / 16.;
+        stiffener[2][5] = stiffener[5][2] = (pi2 / 4. - 3.) * l / 8.;
+        return new Matrix(stiffener);
     }
 
     @Override
