@@ -254,6 +254,44 @@ public class Solver {
         return new Matrix(gok);
     }
 
+    static Matrix generateMatrixQuasiStiffener2(FemElement[] femElements) {
+
+        //TODO optimize to diagonal matrix
+        int sizeAxes = femElements[0].getAxes().length;
+
+        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        for (int i = 0; i < femElements.length; i++) {
+            int positionBaseLine = i * sizeAxes;
+            Matrix ks = femElements[i].getStiffenerMatrixTr2();
+            for (int j = 0; j < sizeAxes; j++) {
+                for (int k = 0; k < sizeAxes; k++) {
+                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+                }
+            }
+        }
+
+        return new Matrix(kok);
+    }
+
+    static Matrix generateMatrixQuasiPotentialStiffener2(FemElement[] femElements) {
+
+        //TODO optimize to diagonal matrix
+        int sizeAxes = femElements[0].getAxes().length;
+
+        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        for (int i = 0; i < femElements.length; i++) {
+            int positionBaseLine = i * sizeAxes;
+            Matrix ks = femElements[i].getPotentialMatrixTr2();
+            for (int j = 0; j < sizeAxes; j++) {
+                for (int k = 0; k < sizeAxes; k++) {
+                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+                }
+            }
+        }
+
+        return new Matrix(gok);
+    }
+
 
     static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
@@ -279,6 +317,70 @@ public class Solver {
 
         }
         return matrix;
+    }
+
+
+    static Matrix deleteFewColumnsRows(Matrix matrix, Support[] supports) {
+        double[][] result = new double [matrix.getRowDimension()-supports.length][matrix.getColumnDimension()-supports.length];
+        List<Integer> delete = new ArrayList<>();
+        for(Support support:supports){
+            delete.add(convertPointGlobalAxeToNumber.get(support.getFemPoint().getNumberGlobalAxe()[support.getDirection().getPosition()]));
+        }
+        int k = 0;
+        for (int i = 0; i < matrix.getRowDimension(); i++) {
+            if(isFound(i,delete)){
+                continue;
+            }
+            int f = 0;
+            for (int j = 0; j < matrix.getColumnDimension(); j++) {
+                if(isFound(j,delete)){
+                    continue;
+                }
+                result[k][f] = matrix.getArray()[i][j];
+                f++;
+            }
+            k++;
+        }
+        return new Matrix(result);
+    }
+
+    private static boolean isFound(int i, List<Integer> delete) {
+        for (int j = 0; j < delete.size(); j++) {
+            if(i == delete.get(j))
+                return true;
+        }
+        return false;
+    }
+
+    static Matrix deleteBad(Matrix h) {
+        List<Integer> delete = new ArrayList<>();
+        for (int i = 0; i < h.getColumnDimension(); i++) {
+            boolean bad = true;
+            for (int j = 0; j < h.getRowDimension(); j++) {
+                if(Math.abs(h.getArray()[i][j]) > 1e-6){
+                    bad = false;
+                }
+            }
+            if(bad)
+                delete.add(i);
+        }
+        double[][] result = new double [h.getRowDimension()-delete.size()][h.getColumnDimension()-delete.size()];
+        int k = 0;
+        for (int i = 0; i < h.getRowDimension(); i++) {
+            if(isFound(i,delete)){
+                continue;
+            }
+            int f = 0;
+            for (int j = 0; j < h.getColumnDimension(); j++) {
+                if(isFound(j,delete)){
+                    continue;
+                }
+                result[k][f] = h.getArray()[i][j];
+                f++;
+            }
+            k++;
+        }
+        return new Matrix(result);
     }
 
 }

@@ -80,33 +80,67 @@ public class Fem extends Solver {
         }
 
         if (haveBucklingAnalyze) {
-            if (DEBUG) System.out.println("Start buckling analyze");
-            Matrix Gok = generateMatrixQuasiPotentialStiffener(femElements);
-            System.out.println("Gok");Gok.print(13,10);
+//            if (DEBUG) System.out.println("Start buckling analyze");
+//            Matrix Gok = generateMatrixQuasiPotentialStiffener(femElements);
+//            System.out.println("Gok");Gok.print(13,10);
+//            Matrix Go = (A.transpose().times(Gok)).times(A);
+//            System.out.println("Go");Go.print(13,10);
+//            Matrix G = generateMatrixStiffener(Go, supports);
+//            //G = G.times(-7000);
+//            System.out.println("G");G.print(13,10);
+//            Matrix H = K.solve(G);
+//            //Matrix H = K.inverse().times(G);
+//            System.out.println("H");H.print(13,10);
+//            EigenvalueDecomposition ei = H.eig();//new EigenvalueDecomposition(H);
+//            System.out.println("ei.getD()");ei.getD().print(12,9);
+//            System.out.println("ei.getV()");ei.getV().print(10,5);
+//            //System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
+//            //System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
+//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+//                System.out.println("Real "+ei.getRealEigenvalues()[i]);
+//                //if(ei.getRealEigenvalues()[i]!=0)System.out.println("1/Real ="+1./ei.getRealEigenvalues()[i]);
+//            }
+//
+//            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
+//                System.out.println("Image "+ei.getImagEigenvalues()[i]);
+//            }
+        }
+        if(haveBucklingAnalyze){
+            System.out.println("\n\n\n\n\n\n\n\n\n\n");
+            Matrix Kok2 = generateMatrixQuasiStiffener2(femElements);
+            Matrix Ko2 = (A.transpose().times(Kok2)).times(A);
+            Matrix K2 = generateMatrixStiffener(Ko2, supports);
+
+
+            Matrix Gok = generateMatrixQuasiPotentialStiffener2(femElements);
             Matrix Go = (A.transpose().times(Gok)).times(A);
-            System.out.println("Go");Go.print(13,10);
             Matrix G = generateMatrixStiffener(Go, supports);
-            System.out.println("G");G.print(13,10);
-            Matrix H = K.solve(G);
-            System.out.println("H");H.print(13,10);
-            EigenvalueDecomposition ei = new EigenvalueDecomposition(H);
+
+            K2 = deleteFewColumnsRows(K2,supports);
+            G = deleteFewColumnsRows(G,supports);
+
+            Matrix H = K2.solve(G);
+            System.out.println("H");H.print(12,9);
+            H = deleteBad(H);
+            System.out.println("H");H.print(12,9);
+
+            EigenvalueDecomposition ei = H.eig();//new EigenvalueDecomposition(H);
             System.out.println("ei.getD()");ei.getD().print(12,9);
             System.out.println("ei.getV()");ei.getV().print(10,5);
-            System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
-            System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
+            //System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
+            //System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
             for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
                 System.out.println("Real "+ei.getRealEigenvalues()[i]);
-                //if(ei.getRealEigenvalues()[i]!=0)System.out.println("1/Real ="+1./ei.getRealEigenvalues()[i]);
+                if(ei.getRealEigenvalues()[i]!=0)System.out.println("1/Real ="+1./ei.getRealEigenvalues()[i]);
             }
 
-            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-                System.out.println("Image "+ei.getImagEigenvalues()[i]);
-            }
+//            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
+//                System.out.println("Image "+ei.getImagEigenvalues()[i]);
+//            }
         }
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
     }
-
 
 }

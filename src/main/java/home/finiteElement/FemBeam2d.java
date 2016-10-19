@@ -70,6 +70,41 @@ public class FemBeam2d extends FemElement {
     }
 
     @Override
+    public Matrix getStiffenerMatrix2() {
+        double[][] stiffener = new double[6][6];
+        double l = getLength();
+        double EFL = elacity * area / getLength();
+        double factor = Math.PI * Math.PI * elacity * momentInertia / (8. * l);
+        stiffener[0][0] = stiffener[3][3] = factor * (EFL);
+        stiffener[1][1] = stiffener[4][4] = factor * (1. / l / l);
+        stiffener[2][2] = stiffener[5][5] = factor * (1. / 4. + 1. / (Math.PI * Math.PI));
+        stiffener[1][2] = stiffener[2][1] = factor * (-1. / 2. / l);
+        stiffener[4][5] = stiffener[5][4] = factor * (-1. / 2. / l);
+        stiffener[2][4] = stiffener[4][2] = factor * (-1. / 2. / l);
+        stiffener[1][4] = stiffener[4][1] = factor * (1. / l / l);
+        stiffener[0][3] = stiffener[3][0] = factor * (-EFL);
+        stiffener[1][5] = stiffener[5][1] = factor * (-1. / 2. / l);
+        stiffener[2][5] = stiffener[5][2] = factor * (1. / 4. - 1. / (Math.PI * Math.PI));
+        return new Matrix(stiffener);
+    }
+
+    @Override
+    protected Matrix getPotentialMatrix2() {
+        double[][] stiffener = new double[6][6];
+        double l = getLength();
+        double pi2 = Math.PI * Math.PI;
+        stiffener[1][1] = stiffener[4][4] = pi2/8./l;
+        stiffener[1][4] = stiffener[4][1] = pi2/8./l;
+        stiffener[2][2] = stiffener[5][5] = (pi2/4.-1.)*l/8.;
+        stiffener[2][1] = stiffener[1][2] = 1./2.-pi2/16.;
+        stiffener[2][4] = stiffener[4][2] = 1./2.-pi2/16.;
+        stiffener[4][5] = stiffener[5][4] = 1./2.-pi2/16.;
+        stiffener[1][5] = stiffener[5][1] = 1./2.-pi2/16.;
+        stiffener[2][5] = stiffener[5][2] = (pi2/4.-3.)*l/8.;
+         return new Matrix(stiffener);
+    }
+
+    @Override
     protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
         point[0].setGlobalDisplacement(new double[]{localDisplacement[0], localDisplacement[1], localDisplacement[2]});
         point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
