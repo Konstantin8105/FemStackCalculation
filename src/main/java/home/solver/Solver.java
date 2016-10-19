@@ -218,7 +218,7 @@ public class Solver {
 
     static Matrix generateMatrixQuasiStiffener(FemElement[] femElements) {
 
-        //TODO optimize to diagonal matrix
+        //TODO optimize to diagonal matrix and symmetrical
         int sizeAxes = femElements[0].getAxes().length;
 
         double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
