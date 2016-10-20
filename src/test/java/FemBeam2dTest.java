@@ -205,8 +205,8 @@ public class FemBeam2dTest {
         femElements[7] = new FemBeam2d(2e11, 24e-4, 32e-8, new FemPoint[]{femPoints[7], femPoints[8]});
 
         Force[] forces = new Force[]{
-                new Force(femPoints[2], Direction.DIRECTION_Y, -8000),
-                new Force(femPoints[7], Direction.DIRECTION_Y, -10000),
+                new Force(femPoints[2], Direction.DIRECTION_Y, -0.8),
+                new Force(femPoints[7], Direction.DIRECTION_Y, -1.0),
         };
 
         Support[] supports = new Support[]{
@@ -227,6 +227,86 @@ public class FemBeam2dTest {
             e.printStackTrace();
         }
 
-        Assert.assertEquals(femElements[0].getBucklingAxialLoad(), 8860, 1e-5);
+        for (int i = 0; i < femElements.length; i++) {
+            System.out.println("[" + i + "] Buckling load : " + String.format("%20.1f", femElements[i].getBucklingAxialLoad()) + " N");
+        }
+
+        Assert.assertEquals(femElements[7].getBucklingAxialLoad(), 8860, 1e-5);
     }
+
+
+    @Test
+    public void testBucklingPlaneFrame2() {
+
+        FemPoint[] femPoints = new FemPoint[6];
+        femPoints[0] = new FemPoint(0, 0.0, 0.0);
+        femPoints[1] = new FemPoint(1, 0.0, 1.0);
+        femPoints[2] = new FemPoint(2, 0.0, 2.0);
+        femPoints[3] = new FemPoint(3, 0.0, 3.0);
+        femPoints[4] = new FemPoint(4, 0.0, 4.0);
+        femPoints[5] = new FemPoint(5, 3.0, 4.0);
+
+        FemElement[] femElements = new FemElement[5];
+        femElements[0] = new FemBeam2d(2e11, 1e-4, 1e-8, new FemPoint[]{femPoints[0], femPoints[1]});
+        femElements[1] = new FemBeam2d(2e11, 1e-4, 1e-8, new FemPoint[]{femPoints[1], femPoints[2]});
+        femElements[2] = new FemBeam2d(2e11, 1e-4, 1e-8, new FemPoint[]{femPoints[2], femPoints[3]});
+        femElements[3] = new FemBeam2d(2e11, 1e-4, 1e-8, new FemPoint[]{femPoints[3], femPoints[4]});
+        femElements[4] = new FemBeam2d(2e11, 1e-4, 2e-8, new FemPoint[]{femPoints[4], femPoints[5]});
+
+        Force[] forces = new Force[]{
+                new Force(femPoints[4], Direction.DIRECTION_Y, -1),
+        };
+
+        Support[] supports = new Support[]{
+                new Support(femPoints[0], Direction.DIRECTION_X),
+                new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[0], Direction.ROTATE),
+
+                new Support(femPoints[5], Direction.DIRECTION_X),
+                new Support(femPoints[5], Direction.DIRECTION_Y),
+                new Support(femPoints[5], Direction.ROTATE),
+        };
+
+        //=========================//
+        try {
+            Fem.calculate(femPoints, femElements, forces, supports, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        for (int i = 0; i < femElements.length; i++) {
+            System.out.println("[" + i + "] Buckling load : " + String.format("%20.1f", femElements[i].getBucklingAxialLoad()) + " N");
+        }
+
+        /*
+        Результаты расчетов
+Число итераций 11
+Собственное значение .230028D+07
+Собственный вектор
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+
+.0000D+00
+-.1056D+00
+.8086D+00
+.3573D+00
+-.6452D+00
+.0000D+00
+
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+.0000D+00
+         */
+        Assert.assertEquals(femElements[2].getBucklingAxialLoad(), 2*2e11*1e-8, 1e-5);
+    }
+
+
+
 }
