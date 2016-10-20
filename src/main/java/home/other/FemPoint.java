@@ -17,8 +17,8 @@ public class FemPoint {
 
     private final int number;
     private final int[] numberGlobalAxe = new int[3];
-    private final double x;
-    private final double y;
+    private double x;
+    private double y;
 
     public FemPoint(int number, double x, double y) {
         this.number = number;
@@ -57,5 +57,13 @@ public class FemPoint {
 
     public double[] getGlobalDisplacement() {
         return globalDisplacement;
+    }
+
+    public void setX(double x) {
+        this.x = x;
+    }
+
+    public void setY(double y) {
+        this.y = y;
     }
 }

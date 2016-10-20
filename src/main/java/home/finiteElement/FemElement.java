@@ -6,6 +6,7 @@ import jama.Matrix;
 public abstract class FemElement {
 
     private static int global_number = 0;
+    private double bucklingFactor;
 
     private static int getGlobalNumber() {
         return global_number++;
@@ -104,5 +105,15 @@ public abstract class FemElement {
 
     protected abstract void setGlobalDisplacementInPoint(double[] localDisplacement);
 
+    public void setBucklingFactor(double bucklingFactor) {
+        this.bucklingFactor = bucklingFactor;
+    }
 
+    public double getBucklingFactor() {
+        return bucklingFactor;
+    }
+
+    public double getBucklingAxialLoad() {
+        return bucklingFactor*internalForce.getArray()[0][0];
+    }
 }
