@@ -56,7 +56,7 @@ public class Fem extends Solver {
         if (DEBUG) forceVector.print(10, 1);
 
         if (DEBUG) System.out.println("Start calc K");
-        Matrix K = generateMatrixStiffener(Ko, supports);
+        Matrix K = putZeroInSupportRowColumns(Ko, supports);
         if (DEBUG) K.print(15, 1);
 
         if (DEBUG) {
@@ -93,9 +93,19 @@ public class Fem extends Solver {
 
         if (DEBUG) {
             Matrix Z01 = K.solve(forceVector);
+            System.out.println("Z01");
+            Z01.print(15, 10);
             Matrix G0 = K.solve(Z01);
             System.out.println("G0");
             G0.print(15, 10);
+        }
+
+        for (int i = 0; i < femPoints.length; i++) {
+            System.out.println("[" + i + "]");
+            for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
+                System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
+            }
+
         }
 
         if (haveBucklingAnalyze) {
@@ -104,7 +114,7 @@ public class Fem extends Solver {
 //            System.out.println("Gok");Gok.print(13,10);
 //            Matrix Go = (A.transpose().times(Gok)).times(A);
 //            System.out.println("Go");Go.print(13,10);
-//            Matrix G = generateMatrixStiffener(Go, supports);
+//            Matrix G = putZeroInSupportRowColumns(Go, supports);
 //            //G = G.times(-7000);
 //            System.out.println("G");G.print(13,10);
 //            Matrix H = K.solve(G);
@@ -124,75 +134,129 @@ public class Fem extends Solver {
 //                System.out.println("Image "+ei.getImagEigenvalues()[i]);
 //            }
         }
-        if (haveBucklingAnalyze) {
+//        if (haveBucklingAnalyze) {
+//
+//            A = generateMatrixCompliance(femPoints, femElements);
+//
+//            if (DEBUG) System.out.println("\n\n\n\n\n\n\n\n\n\n");
+//            Matrix Kok2 = generateMatrixQuasiStiffener2(femElements);
+//            Matrix Ko2 = (A.transpose().times(Kok2)).times(A);
+//            if (DEBUG) System.out.println("Ko2");
+//            if (DEBUG) Ko2.print(12, 1);
+//
+//            Matrix K2 = putZeroInSupportRowColumns(Ko2, supports);
+//            if (DEBUG) System.out.println("K2");
+//            if (DEBUG) K2.print(12, 1);
+//
+//            K2 = deleteFewColumnsRows(K2, supports);
+//            //K2 = putZeroInSupportRowColumns(K2, supports);
+//            if (DEBUG) System.out.println("K2");
+//            if (DEBUG) K2.print(12, 1);
+//
+//            Matrix Gok = generateMatrixQuasiPotentialStiffener2(femElements);
+//            if (DEBUG) System.out.println("Gok");
+//            if (DEBUG) Gok.print(12, 1);
+//
+//            Matrix Go = (A.transpose().times(Gok)).times(A);
+//            if (DEBUG) System.out.println("Go");
+//            if (DEBUG) Go.print(12, 1);
+//            Matrix G = putZeroInSupportRowColumns(Go, supports);
+//            if (DEBUG) System.out.println("G");
+//            if (DEBUG) G.print(12, 1);
+//
+//            G = deleteFewColumnsRows(G, supports);
+//            //G = putZeroInSupportRowColumns(G, supports);
+//            if (DEBUG) System.out.println("G");
+//            if (DEBUG) G.print(12, 1);
+//
+//            //todo optimize
+//            Matrix H = K2.solve(G);
+//            if (DEBUG) System.out.println("H");
+//            if (DEBUG) H.print(12, 1);
+//            H = deleteBad(H);
+//            if (DEBUG) System.out.println("H");
+//            if (DEBUG) H.print(12, 1);
+//
+//            //todo optimize
+//            EigenvalueDecomposition ei = H.eig();//new EigenvalueDecomposition(H);
+//            if (DEBUG) System.out.println("ei.getD()");
+//            if (DEBUG) ei.getD().print(12, 9);
+//            if (DEBUG) System.out.println("ei.getV()");
+//            if (DEBUG) ei.getV().print(10, 5);
+//            //System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
+//            //System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
+//            if (DEBUG) for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+//                System.out.println("Real " + ei.getRealEigenvalues()[i]);
+//                if (ei.getRealEigenvalues()[i] != 0) System.out.println("1/Real =" + 1. / ei.getRealEigenvalues()[i]);
+//            }
+//
+//            double maxRe = 0;
+//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+//                if (ei.getRealEigenvalues()[i] > 0)
+//                    maxRe = Math.max(maxRe, ei.getRealEigenvalues()[i]);
+//            }
+//
+//            for (int i = 0; i < femElements.length; i++) {
+//                femElements[i].setBucklingFactor(1. / maxRe);
+//            }
+//
+////            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
+////                System.out.println("Image "+ei.getImagEigenvalues()[i]);
+////            }
+//        }
 
+        if (true) {
+            // modal analyze
             A = generateMatrixCompliance(femPoints, femElements);
 
-            if (DEBUG) System.out.println("\n\n\n\n\n\n\n\n\n\n");
-            Matrix Kok2 = generateMatrixQuasiStiffener2(femElements);
-            Matrix Ko2 = (A.transpose().times(Kok2)).times(A);
-            if (DEBUG) System.out.println("Ko2");
-            if (DEBUG) Ko2.print(12, 1);
+            Matrix Mok = generateQuasiMatrixMass(femElements);
+            if (DEBUG) System.out.println("Mok");
+            if (DEBUG) Mok.print(12, 1);
 
-            Matrix K2 = generateMatrixStiffener(Ko2, supports);
-            if (DEBUG) System.out.println("K2");
-            if (DEBUG) K2.print(12, 1);
+            Matrix Mo = (A.transpose().times(Mok)).times(A);
+            if (DEBUG) System.out.println("Mo");
+            if (DEBUG) Mo.print(12, 1);
+            Matrix M = putZeroInSupportRowColumns(Mo, supports);
+            if (DEBUG) System.out.println("M");
+            if (DEBUG) M.print(12, 1);
 
-            K2 = deleteFewColumnsRows(K2, supports);
-            //K2 = generateMatrixStiffener(K2, supports);
-            if (DEBUG) System.out.println("K2");
-            if (DEBUG) K2.print(12, 1);
+            K = deleteFewColumnsRows(K, supports);
+            M = deleteFewColumnsRows(M, supports);
 
-            Matrix Gok = generateMatrixQuasiPotentialStiffener2(femElements);
-            if (DEBUG) System.out.println("Gok");
-            if (DEBUG) Gok.print(12, 1);
-
-            Matrix Go = (A.transpose().times(Gok)).times(A);
-            if (DEBUG) System.out.println("Go");
-            if (DEBUG) Go.print(12, 1);
-            Matrix G = generateMatrixStiffener(Go, supports);
-            if (DEBUG) System.out.println("G");
-            if (DEBUG) G.print(12, 1);
-
-            G = deleteFewColumnsRows(G, supports);
-            //G = generateMatrixStiffener(G, supports);
-            if (DEBUG) System.out.println("G");
-            if (DEBUG) G.print(12, 1);
-
-            //todo optimize
-            Matrix H = K2.solve(G);
-            if (DEBUG) System.out.println("H");
-            if (DEBUG) H.print(12, 1);
-            H = deleteBad(H);
-            if (DEBUG) System.out.println("H");
-            if (DEBUG) H.print(12, 1);
-
-            //todo optimize
-            EigenvalueDecomposition ei = H.eig();//new EigenvalueDecomposition(H);
-            if (DEBUG) System.out.println("ei.getD()");
-            if (DEBUG) ei.getD().print(12, 9);
-            if (DEBUG) System.out.println("ei.getV()");
-            if (DEBUG) ei.getV().print(10, 5);
-            //System.out.println("ei.getD().times(Z0)");ei.getD().times(Z0).print(10,5);
-            //System.out.println("ei.getV().times(Z0)");ei.getV().times(Z0).print(10,5);
-            if (DEBUG) for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-                System.out.println("Real " + ei.getRealEigenvalues()[i]);
-                if (ei.getRealEigenvalues()[i] != 0) System.out.println("1/Real =" + 1. / ei.getRealEigenvalues()[i]);
-            }
-
-            double maxRe = 0;
-            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-                if (ei.getRealEigenvalues()[i] > 0)
-                    maxRe = Math.max(maxRe, ei.getRealEigenvalues()[i]);
-            }
-
-            for (int i = 0; i < femElements.length; i++) {
-                femElements[i].setBucklingFactor(1. / maxRe);
-            }
-
-//            for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//                System.out.println("Image "+ei.getImagEigenvalues()[i]);
+            EigenvalueDecomposition ei = (K.solve(M)).eig();
+            if (DEBUG) System.out.println("V");
+            if (DEBUG) ei.getV().print(6, 3);
+            if (DEBUG) System.out.println("D");
+            if (DEBUG) ei.getD().print(12, 1);
+//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+//                System.out.println("real == " + ei.getRealEigenvalues()[i]);
 //            }
+//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+//                System.out.println(Math.sqrt(1./ei.getRealEigenvalues()[i]) + "Hz");
+//            }
+//            for (int i = 0; i < ei.getD().getArray().length; i++) {
+//                System.out.println("real D == " + ei.getD().getArray()[i][i]);
+//            }
+//            System.out.println();
+//            for (int i = 0; i < ei.getD().getArray().length; i++) {
+//                System.out.println("Hz D == " + Math.sqrt(ei.getD().getArray()[i][i]));
+//            }
+            System.out.println();
+            for (int i = 0; i < ei.getD().getArray().length; i++) {
+                System.out.println("Hz2 D == " + Math.sqrt(1./ei.getD().getArray()[i][i]));
+            }
+
+            Matrix Kom = ei.getV();
+            if (DEBUG) System.out.println("Kom");
+            if (DEBUG) Kom.print(12, 1);
+
+//            Matrix Zo = Kom.solve(forceVector);
+//            if (DEBUG) System.out.println("Zo");
+//            if (DEBUG) Zo.print(12, 1);
+//
+//            Matrix Sok = Kok.times(A).times(Zo);
+//            if (DEBUG) System.out.println("Sok");
+//            if (DEBUG) Sok.print(12, 1);
         }
 
         FemElement.dropNumeration();

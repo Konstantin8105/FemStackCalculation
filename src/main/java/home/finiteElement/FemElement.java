@@ -88,6 +88,12 @@ public abstract class FemElement {
         return ((tr.transpose().times(gr)).times(tr));
     }
 
+    public Matrix getMatrixMassTr() {
+        Matrix tr = getTr();
+        Matrix gr = getMatrixMass();
+        return ((tr.transpose().times(gr)).times(tr));
+    }
+
     public void addInGlobalDisplacementCoordinate(double[] localDisplacement) {
         double[][] temp = new double[localDisplacement.length][1];
         for (int i = 0; i < localDisplacement.length; i++) {
@@ -102,6 +108,8 @@ public abstract class FemElement {
     public abstract Matrix getStiffenerMatrix2();
 
     protected abstract Matrix getPotentialMatrix2();
+
+    protected abstract Matrix getMatrixMass();
 
     protected abstract void setGlobalDisplacementInPoint(double[] localDisplacement);
 

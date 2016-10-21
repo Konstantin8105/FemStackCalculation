@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Solver {
 
-    static final boolean DEBUG = true;
+    static boolean DEBUG = true;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -279,6 +279,25 @@ public class Solver {
         return new Matrix(gok);
     }
 
+    static Matrix generateQuasiMatrixMass(FemElement[] femElements) {
+        //TODO optimize to diagonal matrix
+        int sizeAxes = femElements[0].getAxes().length;
+
+        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        for (int i = 0; i < femElements.length; i++) {
+            int positionBaseLine = i * sizeAxes;
+            Matrix ks = femElements[i].getMatrixMassTr();
+            for (int j = 0; j < sizeAxes; j++) {
+                for (int k = 0; k < sizeAxes; k++) {
+                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+                }
+            }
+        }
+
+        return new Matrix(gok);
+    }
+
+
 
     static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
@@ -290,7 +309,7 @@ public class Solver {
         return new Matrix(displacementVector);
     }
 
-    static Matrix generateMatrixStiffener(Matrix matrix, Support[] supports) {
+    static Matrix putZeroInSupportRowColumns(Matrix matrix, Support[] supports) {
         for (Support support : supports) {
             int size = matrix.getArray().length;
             int numberGlobalAxe = convertPointGlobalAxeToNumber.get(support.getFemPoint().getNumberGlobalAxe()[support.getDirection().getPosition()]);
@@ -305,7 +324,6 @@ public class Solver {
         }
         return matrix;
     }
-
 
     static Matrix deleteFewColumnsRows(Matrix matrix, Support[] supports) {
         double[][] result = new double[matrix.getRowDimension() - supports.length][matrix.getColumnDimension() - supports.length];
