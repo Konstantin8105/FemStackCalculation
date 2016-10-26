@@ -333,8 +333,8 @@ public class FemBeam2dTest {
         femElements[5] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[5], femPoints[2]});
 
         Force[] forces = new Force[]{
-                new Force(femPoints[1], Direction.DIRECTION_Y, -1000),
-                new Force(femPoints[3], Direction.DIRECTION_Y, -1000),
+                new Force(femPoints[1], Direction.DIRECTION_Y, 1000),
+                new Force(femPoints[3], Direction.DIRECTION_Y, 1000),
         };
 
         Support[] supports = new Support[]{
@@ -371,12 +371,13 @@ public class FemBeam2dTest {
         femPoints[1] = new FemPoint(1, l/2., 0);
         femPoints[2] = new FemPoint(2, l, 0);
 
-        double elacity = 2e11;
-        double inertia = 63.82e-8;
+        double elacity = 2.05e11;
+        double area = 7.85e-5;
+        double inertia = 4.908e-10;
 
         FemElement[] femElements = new FemElement[2];
-        femElements[0] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
-        femElements[1] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
+        femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
+        femElements[1] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
 
         Force[] forces = new Force[]{
                 new Force(femPoints[1], Direction.DIRECTION_Y, 1000),
@@ -396,7 +397,9 @@ public class FemBeam2dTest {
             e.printStackTrace();
         }
 
-        Assert.assertEquals(femElements[1].getBucklingAxialLoad(), Math.sqrt(9.81/1.632194714300637E-4), 1e-5);
+        Assert.assertEquals(femElements[0].getBucklingAxialLoad(), 1.094, 1e-5);
+        Assert.assertEquals(femElements[1].getBucklingAxialLoad(), 89.23, 1e-5);
+        Assert.assertEquals(femElements[2].getBucklingAxialLoad(), 2304., 1e-5);
     }
 
     @Test
@@ -411,14 +414,15 @@ public class FemBeam2dTest {
         femPoints[3] = new FemPoint(3, l*3./4, 0);
         femPoints[4] = new FemPoint(4, l, 0);
 
-        double elacity = 2e11;
-        double inertia = 63.82e-8;
+        double elacity = 2.05e11;
+        double inertia = 4.9087e-10;
+        double area = 7.8539e-5;
 
         FemElement[] femElements = new FemElement[4];
-        femElements[0] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
-        femElements[1] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
-        femElements[2] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[2], femPoints[3]});
-        femElements[3] = new FemBeam2d(elacity, 24e-4, inertia, new FemPoint[]{femPoints[3], femPoints[4]});
+        femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
+        femElements[1] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
+        femElements[2] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[2], femPoints[3]});
+        femElements[3] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[3], femPoints[4]});
 
         Force[] forces = new Force[]{
                 new Force(femPoints[2], Direction.DIRECTION_Y, 1000),
@@ -427,7 +431,57 @@ public class FemBeam2dTest {
         Support[] supports = new Support[]{
                 new Support(femPoints[0], Direction.DIRECTION_X),
                 new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[0], Direction.ROTATE),
 
+                new Support(femPoints[4], Direction.DIRECTION_X),
+                new Support(femPoints[4], Direction.DIRECTION_Y),
+                new Support(femPoints[4], Direction.ROTATE),
+        };
+
+        //=========================//
+        try {
+            Fem.calculate(femPoints, femElements, forces, supports, true);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Assert.assertEquals(femElements[0].getBucklingAxialLoad(), 2.187, 1e-5);
+        Assert.assertEquals(femElements[1].getBucklingAxialLoad(), 120.468, 1e-5);
+        Assert.assertEquals(femElements[2].getBucklingAxialLoad(), 159.328, 1e-5);
+    }
+
+    @Test
+    public void testBucklingPlaneFrameHz5() {
+
+        double l = 1.;
+
+        FemPoint[] femPoints = new FemPoint[5];
+        femPoints[0] = new FemPoint(0, 0, 0);
+        femPoints[1] = new FemPoint(1, l/4., 0);
+        femPoints[2] = new FemPoint(2, l/2., 0);
+        femPoints[3] = new FemPoint(3, l*3./4, 0);
+        femPoints[4] = new FemPoint(4, l, 0);
+
+        double elacity = 2.05e11;
+        double inertia = 4.9087e-10;
+        double area = 7.8539e-5;
+
+        FemElement[] femElements = new FemElement[4];
+        femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
+        femElements[1] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
+        femElements[2] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[2], femPoints[3]});
+        femElements[3] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[3], femPoints[4]});
+
+        Force[] forces = new Force[]{
+                new Force(femPoints[2], Direction.DIRECTION_Y, 1000),
+        };
+
+        Support[] supports = new Support[]{
+                new Support(femPoints[0], Direction.DIRECTION_X),
+                new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[0], Direction.ROTATE),
+
+                new Support(femPoints[4], Direction.DIRECTION_X),
                 new Support(femPoints[4], Direction.DIRECTION_Y),
         };
 
@@ -438,6 +492,8 @@ public class FemBeam2dTest {
             e.printStackTrace();
         }
 
-        Assert.assertEquals(femElements[1].getBucklingAxialLoad(), Math.sqrt(9.81/1.632194714300637E-4), 1e-5);
+        Assert.assertEquals(femElements[0].getBucklingAxialLoad(), 1.653, 1e-5);
+        Assert.assertEquals(femElements[1].getBucklingAxialLoad(), 92.371, 1e-5);
+        Assert.assertEquals(femElements[2].getBucklingAxialLoad(), 147.813, 1e-5);
     }
 }

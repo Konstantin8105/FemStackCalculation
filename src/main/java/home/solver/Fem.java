@@ -1,11 +1,11 @@
 package home.solver;
 
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
 import home.finiteElement.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
-import jama.EigenvalueDecomposition;
-import jama.Matrix;
 
 public class Fem extends Solver {
 
@@ -51,10 +51,6 @@ public class Fem extends Solver {
         Matrix Ko = (A.transpose().times(Kok)).times(A);
         if (DEBUG) Ko.print(15, 1);
 
-        if (DEBUG) System.out.println("Start calc forceVector");
-        Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getAxes().length / 2);
-        if (DEBUG) forceVector.print(10, 1);
-
         if (DEBUG) System.out.println("Start calc K");
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
         if (DEBUG) K.print(15, 1);
@@ -64,50 +60,57 @@ public class Fem extends Solver {
                 System.out.println("[" + i + "," + i + "]=" + K.getArray()[i][i]);
             }
         }
-        if (DEBUG) System.out.println("Start calc Z0");
-        //TODO optimize
-        Matrix Z0 = K.solve(forceVector);
-        if (DEBUG) Z0.print(10, 6);
+
+        if (forces.length > 0) {
+            if (DEBUG) System.out.println("Start calc forceVector");
+            Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getAxes().length / 2);
+            if (DEBUG) forceVector.print(10, 1);
+
+            if (DEBUG) System.out.println("Start calc Z0");
+            //TODO optimize
+            Matrix Z0 = K.solve(forceVector);
+            if (DEBUG) Z0.print(10, 6);
 
 
-        if (DEBUG) System.out.println("Start calc Z0k");
-        //TODO optimize
-        Matrix Z0k = A.times(Z0);
-        if (DEBUG) Z0k.print(10, 6);
+            if (DEBUG) System.out.println("Start calc Z0k");
+            //TODO optimize
+            Matrix Z0k = A.times(Z0);
+            if (DEBUG) Z0k.print(10, 6);
 
-        if (DEBUG) System.out.println("Start calc localDisplacement");
-        int sizeAxes = femElements[0].getAxes().length;
-        for (int i = 0; i < femElements.length; i++) {
-            double[] localDisplacement = new double[sizeAxes];
-            for (int j = 0; j < localDisplacement.length; j++) {
-                localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
+            if (DEBUG) System.out.println("Start calc localDisplacement");
+            int sizeAxes = femElements[0].getAxes().length;
+            for (int i = 0; i < femElements.length; i++) {
+                double[] localDisplacement = new double[sizeAxes];
+                for (int j = 0; j < localDisplacement.length; j++) {
+                    localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
+                }
+                femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
             }
-            femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
-        }
-        if (DEBUG) {
-            for (FemElement femElement : femElements) {
-                System.out.println(femElement);
-                femElement.getInternalForce().print(10, 1);
-            }
-        }
-
-        if (DEBUG) {
-            Matrix Z01 = K.solve(forceVector);
-            System.out.println("Z01");
-            Z01.print(15, 10);
-            Matrix G0 = K.solve(Z01);
-            System.out.println("G0");
-            G0.print(15, 10);
-        }
-
-        for (int i = 0; i < femPoints.length; i++) {
-            System.out.println("[" + i + "]");
-            for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
-                System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
+            if (DEBUG) {
+                for (FemElement femElement : femElements) {
+                    System.out.println(femElement);
+                    femElement.getInternalForce().print(10, 1);
+                }
             }
 
-        }
+            if (DEBUG) {
+                Matrix Z01 = K.solve(forceVector);
+                System.out.println("Z01");
+                Z01.print(15, 10);
+                Matrix G0 = K.solve(Z01);
+                System.out.println("G0");
+                G0.print(15, 10);
+            }
 
+            if (DEBUG) {
+                for (int i = 0; i < femPoints.length; i++) {
+                    System.out.println("[" + i + "]");
+                    for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
+                        System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
+                    }
+                }
+            }
+        }
         if (haveBucklingAnalyze) {
 //            if (DEBUG) System.out.println("Start buckling analyze");
 //            Matrix Gok = generateMatrixQuasiPotentialStiffener(femElements);
@@ -209,13 +212,23 @@ public class Fem extends Solver {
             // modal analyze
             A = generateMatrixCompliance(femPoints, femElements);
 
-            Matrix Mok = generateQuasiMatrixMass(femElements);
+            Matrix Mok = generateQuasiMatrixMass(femElements);//, forces
             if (DEBUG) System.out.println("Mok");
             if (DEBUG) Mok.print(12, 1);
+
+            for (int i = 0; i < forces.length; i++) {
+                double forceAmplitude = forces[i].getAmplitude();
+                FemPoint point = forces[i].getFemPoint();
+                int axes[] = point.getNumberGlobalAxe();
+                Mok.getArray()[axes[0]][axes[0]] += forceAmplitude;
+                Mok.getArray()[axes[1]][axes[1]] += forceAmplitude;
+            }
+
 
             Matrix Mo = (A.transpose().times(Mok)).times(A);
             if (DEBUG) System.out.println("Mo");
             if (DEBUG) Mo.print(12, 1);
+
             Matrix M = putZeroInSupportRowColumns(Mo, supports);
             if (DEBUG) System.out.println("M");
             if (DEBUG) M.print(12, 1);
@@ -223,32 +236,28 @@ public class Fem extends Solver {
             K = deleteFewColumnsRows(K, supports);
             M = deleteFewColumnsRows(M, supports);
 
-            EigenvalueDecomposition ei = (K.solve(M)).eig();
+            EigenvalueDecomposition ei = (M.solve(K)).eig();
             if (DEBUG) System.out.println("V");
             if (DEBUG) ei.getV().print(6, 3);
             if (DEBUG) System.out.println("D");
             if (DEBUG) ei.getD().print(12, 1);
-//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//                System.out.println("real == " + ei.getRealEigenvalues()[i]);
-//            }
-//            for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//                System.out.println(Math.sqrt(1./ei.getRealEigenvalues()[i]) + "Hz");
-//            }
-//            for (int i = 0; i < ei.getD().getArray().length; i++) {
-//                System.out.println("real D == " + ei.getD().getArray()[i][i]);
-//            }
-//            System.out.println();
-//            for (int i = 0; i < ei.getD().getArray().length; i++) {
-//                System.out.println("Hz D == " + Math.sqrt(ei.getD().getArray()[i][i]));
-//            }
+
             System.out.println();
             for (int i = 0; i < ei.getD().getArray().length; i++) {
                 System.out.println("Hz2 D == " + Math.sqrt(1./ei.getD().getArray()[i][i]));
             }
 
-            Matrix Kom = ei.getV();
-            if (DEBUG) System.out.println("Kom");
-            if (DEBUG) Kom.print(12, 1);
+
+//            SingularValueDecomposition ei = new SingularValueDecomposition(K.solve(M));
+//            System.out.println();
+//            for (int i = 0; i < ei.getS().getArray().length; i++) {
+//                System.out.println("Hz2 D == " + Math.sqrt(1. / ei.getS().getArray()[i][i]));
+//            }
+
+
+//            Matrix Kom = ei.getV();
+//            if (DEBUG) System.out.println("Kom");
+//            if (DEBUG) Kom.print(12, 1);
 
 //            Matrix Zo = Kom.solve(forceVector);
 //            if (DEBUG) System.out.println("Zo");

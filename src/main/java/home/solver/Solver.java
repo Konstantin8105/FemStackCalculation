@@ -1,17 +1,18 @@
 package home.solver;
 
+import Jama.EigenvalueDecomposition;
+import Jama.Matrix;
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
-import jama.Matrix;
 
 import java.util.*;
 
 public class Solver {
 
-    static boolean DEBUG = true;
+    static boolean DEBUG = false;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -388,4 +389,27 @@ public class Solver {
         return new Matrix(result);
     }
 
+    public static Matrix calculateEigen(Matrix K, Matrix M){
+        Matrix input = M.solve(K);
+        EigenvalueDecomposition ei = input.eig();
+        double[] values = ei.getRealEigenvalues();
+        Arrays.sort(values);
+        //ei.getD().print(10, 5);
+        //ei.getV().print(10, 5);
+        //for (int i = 0; i < ei.getRealEigenvalues().length; i++)
+        //    System.out.println("Real  " + ei.getRealEigenvalues()[i]);
+        //for (int i = 0; i < ei.getImagEigenvalues().length; i++)
+        //    System.out.println("Image " + ei.getImagEigenvalues()[i]);
+        //System.out.println("||V*V^T-I|| = ");
+        //System.out.println(ei.getV().times(ei.getV().transpose()).minus(Matrix.identity(input.getColumnDimension(), input.getColumnDimension())).normInf());
+
+        //System.out.println("||AV-DV||=");
+        //System.out.println(input.times(ei.getV()).minus(ei.getV().times(ei.getD())).normInf());
+
+        Matrix eigenValues = new Matrix(values.length,1);
+        for (int i = 0; i < values.length; i++) {
+            eigenValues.set(i,0,values[i]);
+        }
+        return eigenValues;
+    }
 }

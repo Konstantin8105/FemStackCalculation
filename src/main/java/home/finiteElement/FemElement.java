@@ -1,7 +1,7 @@
 package home.finiteElement;
 
+import Jama.Matrix;
 import home.other.FemPoint;
-import jama.Matrix;
 
 public abstract class FemElement {
 
@@ -32,7 +32,7 @@ public abstract class FemElement {
         length = Math.sqrt(Math.pow(point[0].getX() - point[1].getX(), 2.) + Math.pow(point[0].getY() - point[1].getY(), 2.));
     }
 
-    double getLength(){
+    double getLength() {
         return length;
     }
 
@@ -88,9 +88,17 @@ public abstract class FemElement {
         return ((tr.transpose().times(gr)).times(tr));
     }
 
-    public Matrix getMatrixMassTr() {
+    public Matrix getMatrixMassTr() {//Force force
         Matrix tr = getTr();
         Matrix gr = getMatrixMass();
+//        double forceAmplitude = Math.abs(force.getAmplitude());
+//        if (forceAmplitude > 0) {
+//            double halfForce = forceAmplitude / 2.;
+//            gr.getArray()[0][0] += halfForce;
+//            gr.getArray()[1][1] += halfForce;
+//            gr.getArray()[3][3] += halfForce;
+//            gr.getArray()[4][4] += halfForce;
+//        }
         return ((tr.transpose().times(gr)).times(tr));
     }
 
@@ -122,6 +130,6 @@ public abstract class FemElement {
     }
 
     public double getBucklingAxialLoad() {
-        return bucklingFactor*internalForce.getArray()[0][0];
+        return bucklingFactor * internalForce.getArray()[0][0];
     }
 }

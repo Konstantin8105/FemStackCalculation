@@ -11,13 +11,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Maven: de.mukis:de.mukis.jama:2.0.0.M1" level="project" />
-    <orderEntry type="library" name="Maven: com.nativelibs4java:javacl:1.0.0-RC2" level="project" />
-    <orderEntry type="library" name="Maven: com.nativelibs4java:javacl-core:1.0.0-RC2" level="project" />
-    <orderEntry type="library" name="Maven: com.nativelibs4java:opencl4java:1.0.0-RC2" level="project" />
-    <orderEntry type="library" name="Maven: com.nativelibs4java:bridj:0.6.1" level="project" />
-    <orderEntry type="library" name="Maven: com.google.android.tools:dx:1.7" level="project" />
-    <orderEntry type="library" name="Maven: com.nativelibs4java:nativelibs4java-utils:1.4" level="project" />
+    <orderEntry type="library" name="Maven: gov.nist.math:jama:1.0.3" level="project" />
     <orderEntry type="library" name="Maven: org.jetbrains:annotations-java5:15.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.12" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.hamcrest:hamcrest-core:1.3" level="project" />

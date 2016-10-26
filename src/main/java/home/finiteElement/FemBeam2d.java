@@ -1,7 +1,7 @@
 package home.finiteElement;
 
+import Jama.Matrix;
 import home.other.FemPoint;
-import jama.Matrix;
 
 public class FemBeam2d extends FemElement {
     private final double elacity;
@@ -110,21 +110,41 @@ public class FemBeam2d extends FemElement {
 
     @Override
     protected Matrix getMatrixMass() {
-        double mu = 78500*area;//N/m^3
+//        double mu = 78500*area;//N/m^3
+//        double[][] stiffener = new double[6][6];
+//        double l = getLength();
+//        stiffener[0][0] = stiffener[3][3] = l/3.*mu;
+//        stiffener[1][1] = stiffener[4][4] = 13.*l/35.*mu;
+//        stiffener[2][2] = stiffener[5][5] = l*l*l/105.*mu;
+//        stiffener[1][2] = stiffener[2][1] = 11.*l*l/210.*mu;
+//        stiffener[4][5] = stiffener[5][4] = -11.*l*l/210.*mu;
+//        stiffener[0][3] = stiffener[3][0] = l/6.*mu;
+//        stiffener[1][4] = stiffener[4][1] = 9.*l/70.*mu;
+//        stiffener[2][4] = stiffener[4][2] = 13.*l*l/420.*mu;
+//        stiffener[1][5] = stiffener[5][1] = -13.*l*l/420.*mu;
+//        stiffener[2][5] = stiffener[5][2] = -l*l*l/140.*mu;
+//        return new Matrix(stiffener);
+
+        double density = 7833.41;//76819.5;//78500;
+        double mu = density*area;//N/m^3
         double[][] stiffener = new double[6][6];
         double l = getLength();
+        double rz =  density*momentInertia;
+
         stiffener[0][0] = stiffener[3][3] = l/3.*mu;
-        stiffener[1][1] = stiffener[4][4] = 13.*l/35.*mu;
-        stiffener[2][2] = stiffener[5][5] = l*l*l/105.*mu;
-        stiffener[1][2] = stiffener[2][1] = 11.*l*l/210.*mu;
-        stiffener[4][5] = stiffener[5][4] = -11.*l*l/210.*mu;
+        stiffener[1][1] = stiffener[4][4] = 13.*l/35.*mu+6.*rz/(5.*l);
+        stiffener[2][2] = stiffener[5][5] = l*l*l/105.*mu + 2.*l*rz/15.;
+        stiffener[1][2] = stiffener[2][1] = 11.*l*l/210.*mu + rz/10.;
+        stiffener[4][5] = stiffener[5][4] = -11.*l*l/210.*mu - rz/10.;
         stiffener[0][3] = stiffener[3][0] = l/6.*mu;
-        stiffener[1][4] = stiffener[4][1] = 9.*l/70.*mu;
-        stiffener[2][4] = stiffener[4][2] = 13.*l*l/420.*mu;
-        stiffener[1][5] = stiffener[5][1] = -13.*l*l/420.*mu;
-        stiffener[2][5] = stiffener[5][2] = -l*l*l/140.*mu;
+        stiffener[1][4] = stiffener[4][1] = 9.*l/70.*mu - 6.*rz/(5.*l);
+        stiffener[2][4] = stiffener[4][2] = 13.*l*l/420.*mu - rz/10.;
+        stiffener[1][5] = stiffener[5][1] = -13.*l*l/420.*mu + rz/10.;
+        stiffener[2][5] = stiffener[5][2] = -l*l*l/140.*mu - rz*l/30.;
+
         return new Matrix(stiffener);
     }
+
 
     @Override
     protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
