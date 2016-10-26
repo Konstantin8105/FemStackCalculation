@@ -1,6 +1,5 @@
 package home.solver;
 
-import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import home.finiteElement.FemElement;
 import home.other.FemPoint;
@@ -236,16 +235,25 @@ public class Fem extends Solver {
             K = deleteFewColumnsRows(K, supports);
             M = deleteFewColumnsRows(M, supports);
 
-            EigenvalueDecomposition ei = (M.solve(K)).eig();
-            if (DEBUG) System.out.println("V");
-            if (DEBUG) ei.getV().print(6, 3);
-            if (DEBUG) System.out.println("D");
-            if (DEBUG) ei.getD().print(12, 1);
 
-            System.out.println();
-            for (int i = 0; i < ei.getD().getArray().length; i++) {
-                System.out.println("Hz2 D == " + Math.sqrt(1./ei.getD().getArray()[i][i]));
+            Matrix value = Solver.calculateEigen(K,M);
+            for (int i = 0; i < value.getArray().length; i++) {
+                System.out.println(
+                        i+ " = "
+                        + value.getArray()[i][0]
+                );
             }
+//
+//            EigenvalueDecomposition ei = (M.solve(K)).eig();
+//            if (DEBUG) System.out.println("V");
+//            if (DEBUG) ei.getV().print(6, 3);
+//            if (DEBUG) System.out.println("D");
+//            if (DEBUG) ei.getD().print(12, 1);
+//
+//            System.out.println();
+//            for (int i = 0; i < ei.getD().getArray().length; i++) {
+//                System.out.println("Hz2 D == " + Math.sqrt(1./ei.getD().getArray()[i][i]));
+//            }
 
 
 //            SingularValueDecomposition ei = new SingularValueDecomposition(K.solve(M));
