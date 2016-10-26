@@ -13,6 +13,8 @@ import org.junit.runners.Parameterized;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static org.junit.Assert.assertEquals;
+
 @RunWith(Parameterized.class)
 public class ParametricTestPerformance {
 
@@ -40,7 +42,7 @@ public class ParametricTestPerformance {
         for (int i = 0; i < femPoints.length; i++) {
             femPoints[i] = new FemPoint(i, (double) i / (double) (amountIntermediatePoints - 1) * 5.0, 0);
         }
-        Assert.assertEquals(femPoints.length, amountIntermediatePoints);
+        assertEquals(femPoints.length, amountIntermediatePoints);
 
         FemElement[] lines = new FemElement[amountIntermediatePoints - 1];
         for (int i = 0; i < lines.length; i++) {
@@ -64,7 +66,7 @@ public class ParametricTestPerformance {
             e.printStackTrace();
         }
 
-        junit.framework.Assert.assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
-        junit.framework.Assert.assertEquals(femPoints[femPoints.length - 1].getGlobalDisplacement()[1], 0.0249, 1e-4);
+        assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
+        assertEquals(femPoints[femPoints.length - 1].getGlobalDisplacement()[1], 0.0249, 1e-4);
     }
 }

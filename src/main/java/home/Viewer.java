@@ -8,8 +8,6 @@ import java.awt.*;
 
 public class Viewer extends JFrame {
 
-    final private int WINDOWS_SIZE = 800;
-
     public Viewer(final FemPoint[] femPoints, final FemElement[] femElements) {
 
         final BorderBox box = new BorderBox();
@@ -18,14 +16,15 @@ public class Viewer extends JFrame {
             box.addPoint(femPoints[i]);
         }
 
+        int WINDOWS_SIZE = 800;
         final double scale = Math.min(
                 WINDOWS_SIZE / (box.getX_max() - box.getX_min()),
                 WINDOWS_SIZE / (box.getY_max() - box.getY_min())
         );
 
-        for (int i = 0; i < femPoints.length; i++) {
-            femPoints[i].setX(femPoints[i].getX() * scale + 20);
-            femPoints[i].setY(femPoints[i].getY() * scale + 20);
+        for (FemPoint femPoint : femPoints) {
+            femPoint.setX(femPoint.getX() * scale + 20);
+            femPoint.setY(femPoint.getY() * scale + 20);
         }
 
         JPanel panel = new JPanel() {

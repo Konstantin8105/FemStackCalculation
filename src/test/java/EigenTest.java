@@ -154,10 +154,6 @@ public class EigenTest {
         //https://www.isr.umd.edu/~austin/aladdin.d/matrix-appl-buckling.html
         /* [a] : Define section/material properties Buckling Problem */
 
-        double E = 200e9;
-        double I = 1000e-8;
-        double L = 5;
-
         /* [b] : Define a (5x5) matrices for finite difference approximation */
 
         double[][] A = new double[][]{
@@ -187,10 +183,6 @@ public class EigenTest {
     public void alladinTestBuckling2() {
         //https://www.isr.umd.edu/~austin/aladdin.d/matrix-appl-buckling.html
         /* [a] : Define section/material properties Buckling Problem */
-
-        double E = 200e9;
-        double I = 1000e-8;
-        double L = 5;
 
         /* [b] : Define a (5x5) matrices for finite difference approximation */
 

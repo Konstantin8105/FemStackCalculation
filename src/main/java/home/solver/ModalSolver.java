@@ -53,9 +53,9 @@ public class ModalSolver extends Solver {
         if (DEBUG) System.out.println("Mok");
         if (DEBUG) Mok.print(12, 1);
 
-        for (int i = 0; i < forces.length; i++) {
-            double forceAmplitude = forces[i].getAmplitude();
-            FemPoint point = forces[i].getFemPoint();
+        for (Force force : forces) {
+            double forceAmplitude = force.getAmplitude();
+            FemPoint point = force.getFemPoint();
             int axes[] = point.getNumberGlobalAxe();
             Mok.getArray()[axes[0]][axes[0]] += forceAmplitude;
             Mok.getArray()[axes[1]][axes[1]] += forceAmplitude;

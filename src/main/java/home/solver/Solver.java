@@ -12,7 +12,7 @@ import java.util.*;
 
 public class Solver {
 
-    static boolean DEBUG = false;
+    static final boolean DEBUG = false;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -105,9 +105,9 @@ public class Solver {
             System.out.println("Amount rows(points elements*3) = " + femPoints.length * 3);
             System.out.println("Matrix A size = [" + a.length + "," + a[0].length + "]");
             boolean bug = false;
-            for (int i = 0; i < a.length; i++) {
+            for (double[] anA : a) {
                 for (int j = 0; j < a[0].length; j++) {
-                    if (a[i][j] != 0 && a[i][j] != 1) {
+                    if (anA[j] != 0 && anA[j] != 1) {
                         bug = true;
                     }
                 }
@@ -300,10 +300,10 @@ public class Solver {
 
 
     static Matrix addPointMass(Matrix mo, Force[] forces) {
-        for (int i = 0; i < forces.length; i++) {
-            FemPoint point = forces[i].getFemPoint();
-            mo.getArray()[point.getNumberGlobalAxe()[0]][point.getNumberGlobalAxe()[0]] += forces[i].getAmplitude();
-            mo.getArray()[point.getNumberGlobalAxe()[1]][point.getNumberGlobalAxe()[1]] += forces[i].getAmplitude();
+        for (Force force : forces) {
+            FemPoint point = force.getFemPoint();
+            mo.getArray()[point.getNumberGlobalAxe()[0]][point.getNumberGlobalAxe()[0]] += force.getAmplitude();
+            mo.getArray()[point.getNumberGlobalAxe()[1]][point.getNumberGlobalAxe()[1]] += force.getAmplitude();
         }
         return mo;
     }
@@ -359,8 +359,8 @@ public class Solver {
     }
 
     private static boolean isFound(int i, List<Integer> delete) {
-        for (int j = 0; j < delete.size(); j++) {
-            if (i == delete.get(j))
+        for (Integer aDelete : delete) {
+            if (i == aDelete)
                 return true;
         }
         return false;

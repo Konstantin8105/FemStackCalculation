@@ -20,7 +20,7 @@ public abstract class FemElement {
     private Matrix displacementInLocalSystem;
     private Matrix internalForce;
     private final int[] axes;
-    FemPoint[] point;
+    final FemPoint[] point;
     private final double length;
 
     FemElement(FemPoint[] point) {
