@@ -121,7 +121,7 @@ public class EigenTest {
                 {0, 0, 0, 3}
         };
         Matrix massM = new Matrix(mass);
-        massM = massM.times(1500 * 10);
+        massM = massM.times(1500);// * 10
 
         System.out.println("Matrix mass");
         massM.print(8, 0);
@@ -139,14 +139,14 @@ public class EigenTest {
         System.out.println("Matrix stiff");
         stiffM.print(8, 0);
 
-        // TODO: 26.10.2016 eigenvector --- divide each element to maximal
-        // TODO: 26.10.2016 eigenvalue at 10 times less
+        Matrix[] values = Solver.calculateEigen(stiffM, massM);
+        for (int i = 0; i < values[0].getArray().length; i++) {
+            System.out.println(i + " = "+ values[0].getArray()[i][0]);
+        }
 
-        Matrix values = Solver.calculateEigen(stiffM, massM);
-
-        Assert.assertEquals(values.getArray()[0][0], 117.8, 1e-1);
-        Assert.assertEquals(values.getArray()[1][0], 586.5, 1e-1);
-        Assert.assertEquals(values.getArray()[2][0], 1125, 1e-1);
+        Assert.assertEquals(values[0].getArray()[0][0], 117.8, 1e-1);
+        Assert.assertEquals(values[0].getArray()[1][0], 586.5, 1e-1);
+        Assert.assertEquals(values[0].getArray()[2][0], 1125, 1e-1);
     }
 
     @Test
@@ -176,9 +176,43 @@ public class EigenTest {
                 {0, 0, 0, 1, 10},
         };
 
-        Matrix values = Solver.calculateEigen(new Matrix(A), new Matrix(B));
+        Matrix[] values = Solver.calculateEigen(new Matrix(A), new Matrix(B));
 
-        Assert.assertEquals(values.getArray()[0][0], 0.02284, 1e-1);
-        Assert.assertEquals(values.getArray()[1][0], 0.09091, 1e-1);
+        Assert.assertEquals(values[0].getArray()[0][0], 0.02284, 1e-1);
+        Assert.assertEquals(values[0].getArray()[1][0], 0.09091, 1e-1);
     }
+
+
+    @Test
+    public void alladinTestBuckling2() {
+        //https://www.isr.umd.edu/~austin/aladdin.d/matrix-appl-buckling.html
+        /* [a] : Define section/material properties Buckling Problem */
+
+        double E = 200e9;
+        double I = 1000e-8;
+        double L = 5;
+
+        /* [b] : Define a (5x5) matrices for finite difference approximation */
+
+        double[][] A = new double[][]{
+                {2, -1, 0, 0, 0},
+                {-1, 2, -1, 0, 0},
+                {0, -1, 2, -1, 0},
+                {0, 0, -1, 2, -1},
+                {0, 0, 0, -1, 2},
+        };
+
+        double[][] B = new double[][]{
+                {10, 1, 0, 0, 0},
+                {1, 10, 1, 0, 0},
+                {0, 1, 10, 1, 0},
+                {0, 0, 1, 10, 1},
+                {0, 0, 0, 1, 10},
+        };
+        Matrix[] values = Solver.calculateEigen(new Matrix(A), new Matrix(B));
+
+        Assert.assertEquals(values[0].getArray()[0][0], 0.02284, 1e-1);
+        Assert.assertEquals(values[0].getArray()[1][0], 0.09091, 1e-1);
+    }
+
 }

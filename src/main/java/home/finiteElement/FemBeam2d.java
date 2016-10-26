@@ -125,7 +125,7 @@ public class FemBeam2d extends FemElement {
 //        stiffener[2][5] = stiffener[5][2] = -l*l*l/140.*mu;
 //        return new Matrix(stiffener);
 
-        double density = 7833.41;//76819.5;//78500;
+        double density = 7833.41*9.81;//76819.5;//78500;
         double mu = density*area;//N/m^3
         double[][] stiffener = new double[6][6];
         double l = getLength();

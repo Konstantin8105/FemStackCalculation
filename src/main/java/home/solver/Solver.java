@@ -75,7 +75,7 @@ public class Solver {
                     for (int j = 0; j < 3; j++) {
                         listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
                     }
-                } else throw new Exception("Fem element not supported");
+                } else throw new Exception("ModalSolver element not supported");
             }
         }
         Map<Integer, Integer> map = new TreeMap<>();
@@ -299,6 +299,14 @@ public class Solver {
     }
 
 
+    static Matrix addPointMass(Matrix mo, Force[] forces) {
+        for (int i = 0; i < forces.length; i++) {
+            FemPoint point = forces[i].getFemPoint();
+            mo.getArray()[point.getNumberGlobalAxe()[0]][point.getNumberGlobalAxe()[0]] += forces[i].getAmplitude();
+            mo.getArray()[point.getNumberGlobalAxe()[1]][point.getNumberGlobalAxe()[1]] += forces[i].getAmplitude();
+        }
+        return mo;
+    }
 
     static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
@@ -389,27 +397,45 @@ public class Solver {
         return new Matrix(result);
     }
 
-    public static Matrix calculateEigen(Matrix K, Matrix M){
+    public static Matrix[] calculateEigen(Matrix K, Matrix M) {
+
+        // TODO: 26.10.2016 eigenvector --- divide each element to maximal
+        // TODO: 26.10.2016 eigenvalue at 10 times less
+
         Matrix input = M.solve(K);
         EigenvalueDecomposition ei = input.eig();
-        double[] values = ei.getRealEigenvalues();
-        Arrays.sort(values);
-        //ei.getD().print(10, 5);
-        //ei.getV().print(10, 5);
-        //for (int i = 0; i < ei.getRealEigenvalues().length; i++)
-        //    System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-        //for (int i = 0; i < ei.getImagEigenvalues().length; i++)
-        //    System.out.println("Image " + ei.getImagEigenvalues()[i]);
-        //System.out.println("||V*V^T-I|| = ");
-        //System.out.println(ei.getV().times(ei.getV().transpose()).minus(Matrix.identity(input.getColumnDimension(), input.getColumnDimension())).normInf());
+        class Eigen {
+            double value;
+            int index;
 
-        //System.out.println("||AV-DV||=");
-        //System.out.println(input.times(ei.getV()).minus(ei.getV().times(ei.getD())).normInf());
-
-        Matrix eigenValues = new Matrix(values.length,1);
-        for (int i = 0; i < values.length; i++) {
-            eigenValues.set(i,0,values[i]);
+            public Eigen(double value, int index) {
+                this.value = value;
+                this.index = index;
+            }
         }
-        return eigenValues;
+        List<Eigen> eigens = new ArrayList<>();
+        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
+            eigens.add(new Eigen(ei.getRealEigenvalues()[i], i));
+        }
+        Collections.sort(eigens, new Comparator<Eigen>() {
+            @Override
+            public int compare(Eigen o1, Eigen o2) {
+                if (o1.value > o2.value)
+                    return 1;
+                if (o1.value < o2.value)
+                    return -1;
+                return 0;
+            }
+        });
+        Matrix d = ei.getV();
+        Matrix values = new Matrix(eigens.size(), 1);
+        Matrix vectors = new Matrix(d.getRowDimension(), d.getColumnDimension());
+        for (int i = 0; i < eigens.size(); i++) {
+            values.set(i, 0, eigens.get(i).value);
+            for (int j = 0; j < d.getRowDimension(); j++) {
+                vectors.set(j, eigens.get(i).index, eigens.get(i).value);
+            }
+        }
+        return new Matrix[]{values, vectors};
     }
 }

@@ -1,10 +1,10 @@
 import home.other.Direction;
-import home.solver.Fem;
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
+import home.solver.StrengthSolver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,7 +59,7 @@ public class ParametricTestPerformance {
 
         //=========================//
         try {
-            Fem.calculate(femPoints, lines, forces, supports);
+            StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
         }
