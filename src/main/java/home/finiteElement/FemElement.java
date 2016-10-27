@@ -6,7 +6,6 @@ import home.other.FemPoint;
 public abstract class FemElement {
 
     private static int global_number = 0;
-    private double bucklingFactor;
 
     private static int getGlobalNumber() {
         return global_number++;
@@ -16,9 +15,6 @@ public abstract class FemElement {
         global_number = 0;
     }
 
-    private Matrix displacementInGlobalSystem;
-    private Matrix displacementInLocalSystem;
-    private Matrix internalForce;
     private final int[] axes;
     final FemPoint[] point;
     private final double length;
@@ -41,9 +37,6 @@ public abstract class FemElement {
     abstract protected Matrix getTr();
 
     abstract protected Matrix getStiffenerMatrix();
-
-    abstract protected Matrix getPotentialMatrix();
-
     public int[] getAxes() {
         return axes;
     }
@@ -52,14 +45,17 @@ public abstract class FemElement {
         return point;
     }
 
+    private Matrix displacementInGlobalSystem;
     public Matrix getDisplacementInGlobalSystem() {
         return displacementInGlobalSystem;
     }
 
+    private Matrix displacementInLocalSystem;
     public Matrix getDisplacementInLocalSystem() {
         return displacementInLocalSystem;
     }
 
+    private Matrix internalForce;
     public Matrix getInternalForce() {
         return internalForce;
     }
@@ -69,38 +65,18 @@ public abstract class FemElement {
         Matrix kr = getStiffenerMatrix();
         return ((tr.transpose().times(kr)).times(tr));
     }
+//
+//    public Matrix getStiffenerMatrixTr2() {
+//        Matrix tr = getTr();
+//        Matrix kr = getStiffenerMatrix2();
+//        return ((tr.transpose().times(kr)).times(tr));
+//    }
 
-    public Matrix getPotentialMatrixTr() {
-        Matrix tr = getTr();
-        Matrix gr = getPotentialMatrix();
-        return ((tr.transpose().times(gr)).times(tr));
-    }
-
-    public Matrix getStiffenerMatrixTr2() {
-        Matrix tr = getTr();
-        Matrix kr = getStiffenerMatrix2();
-        return ((tr.transpose().times(kr)).times(tr));
-    }
-
-    public Matrix getPotentialMatrixTr2() {
-        Matrix tr = getTr();
-        Matrix gr = getPotentialMatrix2();
-        return ((tr.transpose().times(gr)).times(tr));
-    }
-
-    public Matrix getMatrixMassTr() {//Force force
-        Matrix tr = getTr();
-        Matrix gr = getMatrixMass();
-//        double forceAmplitude = Math.abs(force.getAmplitude());
-//        if (forceAmplitude > 0) {
-//            double halfForce = forceAmplitude / 2.;
-//            gr.getArray()[0][0] += halfForce;
-//            gr.getArray()[1][1] += halfForce;
-//            gr.getArray()[3][3] += halfForce;
-//            gr.getArray()[4][4] += halfForce;
-//        }
-        return ((tr.transpose().times(gr)).times(tr));
-    }
+//    public Matrix getPotentialMatrixTr2() {
+//        Matrix tr = getTr();
+//        Matrix gr = getPotentialMatrix2();
+//        return ((tr.transpose().times(gr)).times(tr));
+//    }
 
     public void addInGlobalDisplacementCoordinate(double[] localDisplacement) {
         double[][] temp = new double[localDisplacement.length][1];
@@ -113,23 +89,24 @@ public abstract class FemElement {
         internalForce = getStiffenerMatrix().times(displacementInLocalSystem);
     }
 
-    public abstract Matrix getStiffenerMatrix2();
+//    private double bucklingFactor;
+//
+//    public void setBucklingFactor(double bucklingFactor) {
+//        this.bucklingFactor = bucklingFactor;
+//    }
+//
+//    public double getBucklingFactor() {
+//        return bucklingFactor;
+//    }
+//
+//    public double getBucklingAxialLoad() {
+//        return bucklingFactor * internalForce.getArray()[0][0];
+//    }
 
-    protected abstract Matrix getPotentialMatrix2();
-
-    protected abstract Matrix getMatrixMass();
+//    public abstract Matrix getStiffenerMatrix2();
+//
+//    protected abstract Matrix getPotentialMatrix2();
 
     protected abstract void setGlobalDisplacementInPoint(double[] localDisplacement);
 
-    public void setBucklingFactor(double bucklingFactor) {
-        this.bucklingFactor = bucklingFactor;
-    }
-
-    public double getBucklingFactor() {
-        return bucklingFactor;
-    }
-
-    public double getBucklingAxialLoad() {
-        return bucklingFactor * internalForce.getArray()[0][0];
-    }
 }

@@ -3,7 +3,9 @@ package home.solver;
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import home.finiteElement.FemBeam2d;
+import home.finiteElement.FemBending2d;
 import home.finiteElement.FemElement;
+import home.finiteElement.ModalFemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
@@ -12,7 +14,7 @@ import java.util.*;
 
 public class Solver {
 
-    static final boolean DEBUG = false;
+    static boolean DEBUG = false;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -52,7 +54,8 @@ public class Solver {
 
     static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
         Set<Integer> listOfLineAxes = new HashSet<>();
-        for (FemElement element : femElements) {
+        for (int h = femElements.length - 1; h >= 0; h--) {
+            FemElement element = femElements[h];
             for (int i = 0; i < element.getPoint().length; i++) {
                 for (int j = 0; j < element.getAxes().length; j++) {
                     listOfLineAxes.add(element.getAxes()[j]);
@@ -75,6 +78,9 @@ public class Solver {
                     for (int j = 0; j < 3; j++) {
                         listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
                     }
+                } else if (element instanceof FemBending2d) {
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
                 } else throw new Exception("ModalSolver element not supported");
             }
         }
@@ -95,8 +101,18 @@ public class Solver {
         //...|....0
         //...+---->---> X0
 
+        int elementAxes = -1;
+        int pointAxes = -1;
 
-        double[][] a = new double[lines.length * 6][femPoints.length * 3];
+        if (lines[0] instanceof FemBeam2d) {
+            elementAxes = 6;
+            pointAxes = 3;
+        } else if (lines[0] instanceof FemBending2d) {
+            elementAxes = 4;
+            pointAxes = 2;
+        } else throw new Exception("FEM Element is not support");
+
+        double[][] a = new double[lines.length * elementAxes][femPoints.length * pointAxes];
 
         if (DEBUG) {
             System.out.println("Amount fem elements = " + lines.length);
@@ -126,6 +142,22 @@ public class Solver {
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[point].getNumberGlobalAxe()[axe]);
                     a[row][column] = 1;
                 }
+            } else if (line instanceof FemBending2d) {
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
+                a[row][column] = 1;
+
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
+                a[row][column] = 1;
+
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
+                a[row][column] = 1;
+
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
+                a[row][column] = 1;
             } else throw new Exception("FEM Element is not support");
         }
 
@@ -223,64 +255,65 @@ public class Solver {
         return new Matrix(kok);
     }
 
-    static Matrix generateMatrixQuasiPotentialStiffener(FemElement[] femElements) {
-
-        //TODO optimize to diagonal matrix
-        int sizeAxes = femElements[0].getAxes().length;
-
-        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
-        for (int i = 0; i < femElements.length; i++) {
-            int positionBaseLine = i * sizeAxes;
-            Matrix ks = femElements[i].getPotentialMatrixTr();
-            for (int j = 0; j < sizeAxes; j++) {
-                for (int k = 0; k < sizeAxes; k++) {
-                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-                }
-            }
-        }
-
-        return new Matrix(gok);
-    }
-
-    static Matrix generateMatrixQuasiStiffener2(FemElement[] femElements) {
-
-        //TODO optimize to diagonal matrix
-        int sizeAxes = femElements[0].getAxes().length;
-
-        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
-        for (int i = 0; i < femElements.length; i++) {
-            int positionBaseLine = i * sizeAxes;
-            Matrix ks = femElements[i].getStiffenerMatrixTr2();
-            for (int j = 0; j < sizeAxes; j++) {
-                for (int k = 0; k < sizeAxes; k++) {
-                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-                }
-            }
-        }
-
-        return new Matrix(kok);
-    }
-
-    static Matrix generateMatrixQuasiPotentialStiffener2(FemElement[] femElements) {
-
-        //TODO optimize to diagonal matrix
-        int sizeAxes = femElements[0].getAxes().length;
-
-        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
-        for (int i = 0; i < femElements.length; i++) {
-            int positionBaseLine = i * sizeAxes;
-            Matrix ks = femElements[i].getPotentialMatrixTr2();
-            for (int j = 0; j < sizeAxes; j++) {
-                for (int k = 0; k < sizeAxes; k++) {
-                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-                }
-            }
-        }
-
-        return new Matrix(gok);
-    }
-
-    static Matrix generateQuasiMatrixMass(FemElement[] femElements) {
+    //
+//    static Matrix generateMatrixQuasiPotentialStiffener(FemElement[] femElements) {
+//
+//        //TODO optimize to diagonal matrix
+//        int sizeAxes = femElements[0].getAxes().length;
+//
+//        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+//        for (int i = 0; i < femElements.length; i++) {
+//            int positionBaseLine = i * sizeAxes;
+//            Matrix ks = femElements[i].getPotentialMatrixTr();
+//            for (int j = 0; j < sizeAxes; j++) {
+//                for (int k = 0; k < sizeAxes; k++) {
+//                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+//                }
+//            }
+//        }
+//
+//        return new Matrix(gok);
+//    }
+//
+//    static Matrix generateMatrixQuasiStiffener2(FemElement[] femElements) {
+//
+//        //TODO optimize to diagonal matrix
+//        int sizeAxes = femElements[0].getAxes().length;
+//
+//        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+//        for (int i = 0; i < femElements.length; i++) {
+//            int positionBaseLine = i * sizeAxes;
+//            Matrix ks = femElements[i].getStiffenerMatrixTr2();
+//            for (int j = 0; j < sizeAxes; j++) {
+//                for (int k = 0; k < sizeAxes; k++) {
+//                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+//                }
+//            }
+//        }
+//
+//        return new Matrix(kok);
+//    }
+//
+//    static Matrix generateMatrixQuasiPotentialStiffener2(FemElement[] femElements) {
+//
+//        //TODO optimize to diagonal matrix
+//        int sizeAxes = femElements[0].getAxes().length;
+//
+//        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+//        for (int i = 0; i < femElements.length; i++) {
+//            int positionBaseLine = i * sizeAxes;
+//            Matrix ks = femElements[i].getPotentialMatrixTr2();
+//            for (int j = 0; j < sizeAxes; j++) {
+//                for (int k = 0; k < sizeAxes; k++) {
+//                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+//                }
+//            }
+//        }
+//
+//        return new Matrix(gok);
+//    }
+//
+    static Matrix generateQuasiMatrixMass(ModalFemElement[] femElements) {
         //TODO optimize to diagonal matrix
         int sizeAxes = femElements[0].getAxes().length;
 
@@ -339,6 +372,30 @@ public class Solver {
         List<Integer> delete = new ArrayList<>();
         for (Support support : supports) {
             delete.add(convertPointGlobalAxeToNumber.get(support.getFemPoint().getNumberGlobalAxe()[support.getDirection().getPosition()]));
+        }
+        int k = 0;
+        for (int i = 0; i < matrix.getRowDimension(); i++) {
+            if (isFound(i, delete)) {
+                continue;
+            }
+            int f = 0;
+            for (int j = 0; j < matrix.getColumnDimension(); j++) {
+                if (isFound(j, delete)) {
+                    continue;
+                }
+                result[k][f] = matrix.getArray()[i][j];
+                f++;
+            }
+            k++;
+        }
+        return new Matrix(result);
+    }
+
+    static Matrix deleteFewColumnsRows(Matrix matrix, int[] list) {
+        double[][] result = new double[matrix.getRowDimension() - list.length][matrix.getColumnDimension() - list.length];
+        List<Integer> delete = new ArrayList<>();
+        for (int i = 0; i < list.length; i++) {
+            delete.add(list[i]);
         }
         int k = 0;
         for (int i = 0; i < matrix.getRowDimension(); i++) {
@@ -433,9 +490,28 @@ public class Solver {
         for (int i = 0; i < eigens.size(); i++) {
             values.set(i, 0, eigens.get(i).value);
             for (int j = 0; j < d.getRowDimension(); j++) {
-                vectors.set(j, eigens.get(i).index, eigens.get(i).value);
+                vectors.set(j, eigens.get(i).index, d.getArray()[j][i]);
             }
         }
         return new Matrix[]{values, vectors};
+    }
+
+
+    protected static int[] getZeroColumnsRows(Matrix matrix) {
+        List<Integer> integers = new ArrayList<>();
+        for (int i = 0; i < matrix.getArray().length; i++) {
+            boolean onlyZeros = true;
+            for (int j = 0; j < matrix.getArray()[i].length; j++) {
+                if (matrix.getArray()[i][j] != 0)
+                    onlyZeros = false;
+            }
+            if (onlyZeros)
+                integers.add(i);
+        }
+        int[] array = new int[integers.size()];
+        for (int i = 0; i < integers.size(); i++) {
+            array[i] = integers.get(i);
+        }
+        return array;
     }
 }

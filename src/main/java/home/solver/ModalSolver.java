@@ -2,15 +2,16 @@ package home.solver;
 
 import Jama.Matrix;
 import home.finiteElement.FemElement;
+import home.finiteElement.ModalFemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
 
 public class ModalSolver extends Solver {
 
-    public static void calculate(
+    public static Matrix[] calculate(
             FemPoint[] femPoints,
-            FemElement[] femElements,
+            ModalFemElement[] femElements,
             Force[] forces,
             Support[] supports) throws Exception {
 
@@ -53,12 +54,24 @@ public class ModalSolver extends Solver {
         if (DEBUG) System.out.println("Mok");
         if (DEBUG) Mok.print(12, 1);
 
-        for (Force force : forces) {
-            double forceAmplitude = force.getAmplitude();
-            FemPoint point = force.getFemPoint();
-            int axes[] = point.getNumberGlobalAxe();
-            Mok.getArray()[axes[0]][axes[0]] += forceAmplitude;
-            Mok.getArray()[axes[1]][axes[1]] += forceAmplitude;
+        if(forces != null) {
+            for (Force force : forces) {
+                double forceAmplitude = force.getAmplitude();
+                FemPoint point = force.getFemPoint();
+                int axes[] = point.getNumberGlobalAxe();
+                //todo wrong because force in local system but not in global system
+//                switch (force.getDirection()){
+//                    case DIRECTION_X:
+//                        Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[0])][convertPointGlobalAxeToNumber.get(axes[0])] += forceAmplitude;
+//                        break;
+//                    case DIRECTION_Y:
+                        Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[1])][convertPointGlobalAxeToNumber.get(axes[1])] += forceAmplitude;
+//                        break;
+//                    case ROTATE:
+//                Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[2])][convertPointGlobalAxeToNumber.get(axes[2])] += forceAmplitude;
+//                        break;
+//                }
+            }
         }
 
 
@@ -74,26 +87,38 @@ public class ModalSolver extends Solver {
         K = deleteFewColumnsRows(K, supports);
         M = deleteFewColumnsRows(M, supports);
 
-        Matrix[] value = Solver.calculateEigen(K, M);
-        System.out.println("N\tvalue\t\t1/sqrt(value)\t\tsqrt(value)");
-        for (int i = 0; i < value[0].getArray().length; i++) {
-            System.out.println(String.format("%3d", i)
-                    + " = "
-                    + String.format("%.3e", value[0].getArray()[i][0])
-                    + " ---> "
-                    + String.format("%.3f", (1. / Math.sqrt(value[0].getArray()[i][0])))
-                    + " ---> "
-                    + String.format("%.3e", (Math.sqrt(value[0].getArray()[i][0])))
-            );
-        }
+//        int[] deleteColumnsRows = getZeroColumnsRows(M);
+//        K = deleteFewColumnsRows(K, deleteColumnsRows);
+//        M = deleteFewColumnsRows(M, deleteColumnsRows);
 
-        System.out.println("First wave");
-        for (int i = 0; i < value[1].getArray().length; i++) {
-            System.out.println(value[1].getArray()[i][0]);
-        }
+        if (DEBUG) System.out.println("M");
+        if (DEBUG) M.print(12, 1);
+
+        if (DEBUG) System.out.println("K");
+        if (DEBUG) K.print(12, 1);
+
+        Matrix[] value = Solver.calculateEigen(K, M);
+
+//        System.out.println("N\tvalue\t\t1/sqrt(value)\t\tsqrt(value)");
+//        for (int i = 0; i < value[0].getArray().length; i++) {
+//            System.out.println(String.format("%3d", i)
+//                    + " = "
+//                    + String.format("%.3e", value[0].getArray()[i][0])
+//                    + " ---> "
+//                    + String.format("%.3f", (1. / Math.sqrt(value[0].getArray()[i][0])))
+//                    + " ---> "
+//                    + String.format("%.3e", (Math.sqrt(value[0].getArray()[i][0])))
+//            );
+//        }
+//
+//        System.out.println("First wave");
+//        for (int i = 0; i < value[1].getArray().length; i++) {
+//            System.out.println(value[1].getArray()[i][0]);
+//        }
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
-    }
 
+        return value;
+    }
 }

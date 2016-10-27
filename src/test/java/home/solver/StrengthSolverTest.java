@@ -2,6 +2,7 @@ package home.solver;
 
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.FemElement;
+import home.finiteElement.ModalFemElement;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;
@@ -60,7 +61,7 @@ public class StrengthSolverTest {
         // l = 5
         // Vmax = P*l^3/(3*E*J) = 0.2083333
 
-        int amount = 3;
+        int amount = 4;
 
         FemPoint[] femPoints = new FemPoint[amount];
         for (int i = 0; i < amount; i++) {
@@ -97,4 +98,44 @@ public class StrengthSolverTest {
         assertEquals(femPoints[amount - 1].getGlobalDisplacement()[1], 0.2083333, 1e-4);
     }
 
+    @Test
+    public void testBookPage535() {
+        double L = 1;
+        FemPoint[] femPoints = new FemPoint[2];
+        femPoints[0] = new FemPoint(0, 0.0, 0);
+        femPoints[1] = new FemPoint(1, L, 0);
+
+        double E = 200000e6;
+        double I = 78e-8;
+
+        double elacity = E;
+        double inertia = I;
+        double area = 1e-13;
+        double Q = 1230;
+
+        ModalFemElement[] femElements = new ModalFemElement[1];
+        femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
+
+        Support[] supports = new Support[]{
+                new Support(femPoints[0], Direction.DIRECTION_X),
+                new Support(femPoints[0], Direction.DIRECTION_Y),
+                new Support(femPoints[0], Direction.ROTATE),
+        };
+
+        Force[] forces = new Force[]{
+                new Force(femPoints[1], Direction.DIRECTION_Y, Q)
+        };
+        //=========================//
+        try {
+            StrengthSolver.calculate(femPoints, femElements, forces, supports);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        double deflection = Q * Math.pow(L, 3.) / (3 * E * I);
+        System.out.println("Deflection = " + deflection);
+
+        assertEquals(femPoints[1].getGlobalDisplacement()[0], 0.0000, 1e-4);
+        assertEquals(femPoints[1].getGlobalDisplacement()[1], deflection, 1e-4);
+    }
 }

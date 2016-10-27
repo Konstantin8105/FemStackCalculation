@@ -141,7 +141,7 @@ public class EigenTest {
 
         Matrix[] values = Solver.calculateEigen(stiffM, massM);
         for (int i = 0; i < values[0].getArray().length; i++) {
-            System.out.println(i + " = "+ values[0].getArray()[i][0]);
+            System.out.println(i + " = " + values[0].getArray()[i][0]);
         }
 
         Assert.assertEquals(values[0].getArray()[0][0], 117.8, 1e-1);
@@ -207,4 +207,34 @@ public class EigenTest {
         Assert.assertEquals(values[0].getArray()[1][0], 0.09091, 1e-1);
     }
 
+    @Test
+    public void alladinTestEigen() {
+        double[][] k = new double[][]{
+                {2, -2},
+                {-2, 4}
+        };
+        Matrix K = new Matrix(k);
+
+        double[][] m = new double[][]{
+                {1, 0},
+                {0, 1}
+        };
+        Matrix M = new Matrix(m);
+
+        Matrix[] values = Solver.calculateEigen(K, M);
+
+        System.out.println("Eigenvalue:");
+        for (int i = 0; i < values[0].getArray().length; i++) {
+            System.out.println(
+                    i
+                    + " == "
+                    + values[0].getArray()[i][0]
+            );
+        }
+        System.out.println("Eigenvector:");
+        values[1].print(10,6);
+
+        Assert.assertEquals(values[0].getArray()[0][0], 7.63932e-01, 1e-1);
+        Assert.assertEquals(values[0].getArray()[1][0], 5.23607e0, 1e-1);
+    }
 }
