@@ -2,10 +2,7 @@ package home.solver;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import home.finiteElement.FemBeam2d;
-import home.finiteElement.FemBending2d;
-import home.finiteElement.FemElement;
-import home.finiteElement.ModalFemElement;
+import home.finiteElement.*;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
@@ -14,7 +11,7 @@ import java.util.*;
 
 public class Solver {
 
-    static boolean DEBUG = false;
+    static boolean DEBUG = true;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -81,7 +78,9 @@ public class Solver {
                 } else if (element instanceof FemBending2d) {
                     listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
                     listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
-                } else throw new Exception("ModalSolver element not supported");
+                } else if(element instanceof FemTruss2d){
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
+                }else throw new Exception("ModalSolver element not supported");
             }
         }
         Map<Integer, Integer> map = new TreeMap<>();
@@ -110,6 +109,9 @@ public class Solver {
         } else if (lines[0] instanceof FemBending2d) {
             elementAxes = 4;
             pointAxes = 2;
+        } else if(lines[0] instanceof FemTruss2d) {
+            elementAxes = 4;
+            pointAxes = 1;
         } else throw new Exception("FEM Element is not support");
 
         double[][] a = new double[lines.length * elementAxes][femPoints.length * pointAxes];
@@ -157,6 +159,15 @@ public class Solver {
 
                 row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
+                a[row][column] = 1;
+            } else if(line instanceof FemTruss2d){
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
+                System.out.println(row+"  "+column);
+                a[row][column] = 1;
+
+                row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
                 a[row][column] = 1;
             } else throw new Exception("FEM Element is not support");
         }
