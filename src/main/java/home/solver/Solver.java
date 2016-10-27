@@ -460,6 +460,10 @@ public class Solver {
         // TODO: 26.10.2016 eigenvalue at 10 times less
 
         Matrix input = M.solve(K);
+
+        if (DEBUG) System.out.println("input = M.solve(K)");
+        if (DEBUG) input.print(12, 1);
+
         EigenvalueDecomposition ei = input.eig();
         class Eigen {
             double value;

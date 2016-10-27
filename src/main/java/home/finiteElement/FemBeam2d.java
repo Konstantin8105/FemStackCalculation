@@ -138,7 +138,7 @@ public class FemBeam2d extends ModalFemElement {
         double density = 78500;//N/m^3//7844.68*9.81;//76819.5;//78500;
         double[][] stiffener = new double[6][6];
         double l = getLength();
-        double mu = density*area*l;
+        double mu = density*area;//*l;
         double rz = 0;// density*momentInertia;
 
         stiffener[0][0] = stiffener[3][3] = l/3.*mu;
