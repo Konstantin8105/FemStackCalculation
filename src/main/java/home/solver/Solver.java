@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Solver {
 
-    static boolean DEBUG = true;
+    static boolean DEBUG = false;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
@@ -163,7 +163,6 @@ public class Solver {
             } else if(line instanceof FemTruss2d){
                 row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
-                System.out.println(row+"  "+column);
                 a[row][column] = 1;
 
                 row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
