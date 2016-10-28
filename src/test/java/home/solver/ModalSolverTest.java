@@ -659,12 +659,9 @@ public class ModalSolverTest {
 
     @Test
     public void testSelfWeight() {
-        double L = 1;
-        double E = 2e11;
-        double I = 78e-8;
-
-        double elacity = E;
-        double inertia = I;
+        double L = 1.;
+        double elacity = 2.05e11;
+        double inertia = 7.8e-7;
         double area = 0.00313078;
 
         List<Double> Tall = new ArrayList<>();
@@ -677,10 +674,10 @@ public class ModalSolverTest {
 
             ModalFemElement[] femElements = new ModalFemElement[i - 1];
             for (int j = 0; j < femElements.length; j++) {
-                femElements[j] = new FemBending2d(elacity, area, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
+                femElements[j] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
             }
             Support[] supports = new Support[]{
-//                    new Support(femPoints[0], Direction.DIRECTION_X),
+                    new Support(femPoints[0], Direction.DIRECTION_X),
                     new Support(femPoints[0], Direction.DIRECTION_Y),
                     new Support(femPoints[0], Direction.ROTATE),
 
@@ -703,12 +700,9 @@ public class ModalSolverTest {
             Tall.add(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]));
         }
 
-        for (int i = 0; i < Tall.size(); i++) {
-            System.out.println("Tall[" + i + "] = " + Tall.get(i));
-        }
-
         // in according to STAAD:
-        // TODO: 10/27/16  check by STAAD
-        assertEquals(Tall.get(0), 0.023, 1e-2);
+        // T = 0.022 sec
+        // f = 44.572 Hz
+        assertEquals(Tall.get(Tall.size()-1), 0.022, 1e-3);
     }
 }
