@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class ModalSolverTest {
     /*
@@ -466,11 +467,15 @@ public class ModalSolverTest {
 
         //=========================//
         Matrix[] values = null;
+        boolean exception = false;
         try {
             values = ModalSolver.calculate(femPoints, femElements, null, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         System.out.println("Eigenvalue:");
         for (int i = 0; i < values[0].getArray().length; i++) {
@@ -536,12 +541,16 @@ public class ModalSolverTest {
         };
 
         //=========================//
+        boolean exception = false;
         Matrix[] values = null;
         try {
             values = ModalSolver.calculate(femPoints, femElements, null, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         System.out.println("Eigenvalue:");
         for (int i = 0; i < values[0].getArray().length; i++) {
@@ -606,6 +615,7 @@ public class ModalSolverTest {
             };
             //=========================//
             Matrix[] values = null;
+            boolean exception = false;
             try {
                 //StrengthSolver.calculate(femPoints, femElements, forces, supports);
                 values = ModalSolver.calculate(femPoints, femElements, forces, supports);
@@ -630,7 +640,10 @@ public class ModalSolverTest {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                exception = true;
             }
+
+            assertFalse(exception);
 
         }
 
@@ -675,12 +688,16 @@ public class ModalSolverTest {
             };
 
             //=========================//
+            boolean exception = false;
             Matrix[] values = null;
             try {
                 values = ModalSolver.calculate(femPoints, femElements, null, supports);
             } catch (Exception e) {
                 e.printStackTrace();
+                exception = true;
             }
+
+            assertFalse(exception);
 
             System.out.println(i + " : " + (2 * Math.PI / Math.sqrt(values[0].getArray()[0][0])));
             Tall.add(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]));

@@ -8,6 +8,7 @@ import home.solver.StrengthSolver;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class FemTruss2dTest {
 
@@ -44,11 +45,15 @@ public class FemTruss2dTest {
         };
 
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         assertEquals(lines.length, 7);
         assertEquals(supports.length, 4);

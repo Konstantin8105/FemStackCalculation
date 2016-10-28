@@ -8,6 +8,7 @@ import home.solver.StrengthSolver;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class FemBending2dTest {
 
@@ -34,11 +35,15 @@ public class FemBending2dTest {
         };
 
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
         assertEquals(femPoints[0].getGlobalDisplacement()[1], 0.0000, 1e-4);

@@ -10,6 +10,7 @@ import home.other.Support;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class StrengthSolverTest {
 
@@ -36,11 +37,15 @@ public class StrengthSolverTest {
         };
 
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         assertEquals(lines[0].getInternalForce().get(1, 0), -10000, 1e-5);
         assertEquals(lines[0].getInternalForce().get(2, 0), -50000, 1e-5);
@@ -84,11 +89,15 @@ public class StrengthSolverTest {
         };
 
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         assertEquals(lines[0].getInternalForce().get(0, 0), 0, 1e-5);
         assertEquals(lines[0].getInternalForce().get(1, 0), -1e4, 1e-5);
@@ -126,11 +135,15 @@ public class StrengthSolverTest {
                 new Force(femPoints[1], Direction.DIRECTION_Y, Q)
         };
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, femElements, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         double deflection = Q * Math.pow(L, 3.) / (3 * E * I);
         System.out.println("Deflection = " + deflection);

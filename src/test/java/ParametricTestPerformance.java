@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(Parameterized.class)
 public class ParametricTestPerformance {
@@ -60,11 +61,15 @@ public class ParametricTestPerformance {
         };
 
         //=========================//
+        boolean exception = false;
         try {
             StrengthSolver.calculate(femPoints, lines, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
+            exception = true;
         }
+
+        assertFalse(exception);
 
         assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
         assertEquals(femPoints[femPoints.length - 1].getGlobalDisplacement()[1], 0.0249, 1e-4);
