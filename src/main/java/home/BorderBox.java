@@ -9,7 +9,7 @@ import home.other.FemPoint;
  * @author Izyumov Konstantin
  * @since 24/08/2016
  */
-public class BorderBox {
+class BorderBox {
     private double x_min;
     private double x_max;
     private double y_min;

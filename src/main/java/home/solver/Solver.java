@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Solver {
 
-    static boolean DEBUG = false;
+    static final boolean DEBUG = false;
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
