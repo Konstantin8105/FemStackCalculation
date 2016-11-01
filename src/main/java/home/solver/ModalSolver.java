@@ -50,31 +50,9 @@ public class ModalSolver extends Solver {
         // modal analyze
         A = generateMatrixCompliance(femPoints, femElements);
 
-        Matrix Mok = generateQuasiMatrixMass(femElements);//, forces
+        Matrix Mok = generateQuasiMatrixMass(femElements);
         if (DEBUG) System.out.println("Mok");
         if (DEBUG) Mok.print(12, 1);
-
-/*
-        if(forces != null) {
-            for (Force force : forces) {
-                double forceAmplitude = force.getAmplitude();
-                FemPoint point = force.getFemPoint();
-                int axes[] = point.getNumberGlobalAxe();
-                //todo wrong because force in local system but not in global system
-//                switch (force.getDirection()){
-//                    case DIRECTION_X:
-//                Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[0])][convertPointGlobalAxeToNumber.get(axes[0])] += forceAmplitude;
-//                        break;
-//                    case DIRECTION_Y:
-                Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[1])][convertPointGlobalAxeToNumber.get(axes[1])] += forceAmplitude;
-//                        break;
-//                    case ROTATE:
-//                Mok.getArray()[convertPointGlobalAxeToNumber.get(axes[2])][convertPointGlobalAxeToNumber.get(axes[2])] += forceAmplitude;
-//                        break;
-//                }
-            }
-        }
-        */
 
         Matrix Mo = (A.transpose().times(Mok)).times(A);
         if (DEBUG) System.out.println("Mo");
@@ -98,7 +76,6 @@ public class ModalSolver extends Solver {
                 }
                 axe = convertPointGlobalAxeToNumber.get(axe);
 
-                //todo wrong because force in local system but not in global system
                 Mo.getArray()[axe][axe] += forceAmplitude;
             }
         }

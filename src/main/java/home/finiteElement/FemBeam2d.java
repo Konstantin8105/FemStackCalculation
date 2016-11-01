@@ -43,13 +43,13 @@ public class FemBeam2d extends ModalFemElement {
         double EJ = elacity * momentInertia;
         stiffener[0][0] = stiffener[3][3] = +EFL;
         stiffener[0][3] = stiffener[3][0] = -EFL;
-        stiffener[1][1] = stiffener[4][4] = 12.0 * EJ / Math.pow(l, 3);
+        stiffener[1][1] = stiffener[4][4] = 12.0 * EJ / Math.pow(l, 3.);
         stiffener[2][2] = stiffener[5][5] = 4.00 * EJ / l;
-        stiffener[1][2] = stiffener[2][1] = 6.00 * EJ / Math.pow(l, 2);
-        stiffener[1][5] = stiffener[5][1] = 6.00 * EJ / Math.pow(l, 2);
-        stiffener[4][5] = stiffener[5][4] = -6.0 * EJ / Math.pow(l, 2);
-        stiffener[2][4] = stiffener[4][2] = -6.0 * EJ / Math.pow(l, 2);
-        stiffener[1][4] = stiffener[4][1] = -12. * EJ / Math.pow(l, 3);
+        stiffener[1][2] = stiffener[2][1] = 6.00 * EJ / Math.pow(l, 2.);
+        stiffener[1][5] = stiffener[5][1] = 6.00 * EJ / Math.pow(l, 2.);
+        stiffener[4][5] = stiffener[5][4] = -6.0 * EJ / Math.pow(l, 2.);
+        stiffener[2][4] = stiffener[4][2] = -6.0 * EJ / Math.pow(l, 2.);
+        stiffener[1][4] = stiffener[4][1] = -12. * EJ / Math.pow(l, 3.);
         stiffener[2][5] = stiffener[5][2] = 2.00 * EJ / l;
         return new Matrix(stiffener);
     }
@@ -138,7 +138,7 @@ public class FemBeam2d extends ModalFemElement {
         double density = 78500;//N/m^3//7844.68*9.81;//76819.5;//78500;
         double[][] stiffener = new double[6][6];
         double l = getLength();
-        double mu = density*area;//*l;
+        double mu = density*area;
         double rz =  density*momentInertia;
 
         stiffener[0][0] = stiffener[3][3] = l/3.*mu;
