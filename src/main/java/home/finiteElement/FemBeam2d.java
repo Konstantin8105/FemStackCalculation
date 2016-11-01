@@ -17,7 +17,7 @@ public class FemBeam2d extends ModalFemElement {
     }
 
     @Override
-    protected int getAmountAxes() {
+    protected int getAmountLocalAxes() {
         return 6;
     }
 

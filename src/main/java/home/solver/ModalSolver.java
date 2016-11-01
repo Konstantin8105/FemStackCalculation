@@ -75,6 +75,12 @@ public class ModalSolver extends Solver {
             }
         }
         */
+
+        Matrix Mo = (A.transpose().times(Mok)).times(A);
+        if (DEBUG) System.out.println("Mo");
+        if (DEBUG) Mo.print(12, 1);
+
+
         if (forces != null) {
             for (Force force : forces) {
                 double forceAmplitude = force.getAmplitude();
@@ -91,17 +97,12 @@ public class ModalSolver extends Solver {
                         break;
                 }
                 axe = convertPointGlobalAxeToNumber.get(axe);
+
                 //todo wrong because force in local system but not in global system
-                Mok.getArray()[axe][axe] += forceAmplitude;
+                Mo.getArray()[axe][axe] += forceAmplitude;
             }
         }
 
-        /*if (DEBUG)*/ System.out.println("Mok with force");
-        /*if (DEBUG) */Mok.print(12, 1);
-
-        Matrix Mo = (A.transpose().times(Mok)).times(A);
-        if (DEBUG) System.out.println("Mo");
-        if (DEBUG) Mo.print(12, 1);
         //Matrix M = putZeroInSupportRowColumns(addPointMass(Mo, forces), supports);
         Matrix M = putZeroInSupportRowColumns(Mo, supports);
         if (DEBUG) System.out.println("M");

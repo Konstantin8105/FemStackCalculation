@@ -593,7 +593,7 @@ public class ModalSolverTest {
         double Q = 1230;
 
         List<Double> w2 = new ArrayList<>();
-//        List<Double> deformation = new ArrayList<>();
+        List<Double> deformation = new ArrayList<>();
 
         for (int i = 2; i <= 4; i += 1) {
             FemPoint[] femPoints = new FemPoint[i];
@@ -612,7 +612,7 @@ public class ModalSolverTest {
             };
 
             Force[] forces = new Force[]{
-                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q)
+                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q/9.81)// TODO: 01.11.2016 strange 9.8
             };
             //=========================//
             Matrix[] values;
@@ -641,11 +641,12 @@ public class ModalSolverTest {
 //                System.out.println("Eigenvector:");
 //                values[1].print(10, 6);
 
-//                StrengthSolver.calculate(femPoints, femElements, forces, supports);
-//                double displacement = femPoints[i - 1].getGlobalDisplacement()[1];
-//                deformation.add(displacement);
+                StrengthSolver.calculate(femPoints, femElements, forces, supports);
+                double displacement = femPoints[i - 1].getGlobalDisplacement()[1];
+                deformation.add(displacement);
 //                System.out.println("Deformation = " + displacement + " meter");
 //                double w = Math.sqrt(9.81 / displacement);
+//                System.out.println("W^2 = " + (w*w) + " 1/sec");
 //                System.out.println("W = " + w + " 1/sec");
 //                double periodT = 2 * Math.PI / w;
 //                System.out.println("Period = " + periodT + " sec.");
@@ -666,8 +667,10 @@ public class ModalSolverTest {
         // T = 0.102 sec.
         // f = 9.832 Hz.
         double T = 0.1028431;
+        //double w = Math.sqrt(w2.get(w2.size() - 1));
+        //assertEquals(2*Math.PI/w, T, 1e-4);
         assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 1e-2);
-//        assertEquals(Math.sqrt(9.81 / deformation.get(deformation.size() - 1)), 2. * Math.PI / T, 1e-5);
+        assertEquals(Math.sqrt(9.81 / deformation.get(deformation.size() - 1)), 2. * Math.PI / T, 1e-4);
     }
 
 

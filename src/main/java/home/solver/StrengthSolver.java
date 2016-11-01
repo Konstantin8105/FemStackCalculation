@@ -48,7 +48,7 @@ public class StrengthSolver extends Solver {
 
         if (forces.length > 0) {
             if (DEBUG) System.out.println("Start calc forceVector");
-            Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getAxes().length / 2);
+            Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getLocalAxes().length / 2);
             if (DEBUG) forceVector.print(10, 1);
 
             if (DEBUG) System.out.println("Start calc Z0");
@@ -63,7 +63,7 @@ public class StrengthSolver extends Solver {
             if (DEBUG) Z0k.print(10, 6);
 
             if (DEBUG) System.out.println("Start calc localDisplacement");
-            int sizeAxes = femElements[0].getAxes().length;
+            int sizeAxes = femElements[0].getLocalAxes().length;
             for (int i = 0; i < femElements.length; i++) {
                 double[] localDisplacement = new double[sizeAxes];
                 for (int j = 0; j < localDisplacement.length; j++) {

@@ -16,7 +16,7 @@ public class FemBending2d extends ModalFemElement {
     }
 
     @Override
-    protected int getAmountAxes() {
+    protected int getAmountLocalAxes() {
         return 4;
     }
 

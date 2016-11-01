@@ -15,31 +15,31 @@ public abstract class FemElement {
         global_number = 0;
     }
 
-    private final int[] axes;
+    private final int[] localAxes;
     final FemPoint[] point;
     private final double length;
 
     FemElement(FemPoint[] point) {
         this.point = point;
-        axes = new int[getAmountAxes()];
-        for (int i = 0; i < axes.length; i++) {
-            axes[i] = getGlobalNumber();
+        localAxes = new int[getAmountLocalAxes()];
+        for (int i = 0; i < localAxes.length; i++) {
+            localAxes[i] = getGlobalNumber();
         }
         length = Math.sqrt(Math.pow(point[0].getX() - point[1].getX(), 2.) + Math.pow(point[0].getY() - point[1].getY(), 2.));
-        нам нужен конвертор от осей точек на оси линии
+        // TODO: 01.11.2016  нам нужен конвертор от осей точек на оси линии
     }
 
     double getLength() {
         return length;
     }
 
-    abstract protected int getAmountAxes();
+    abstract protected int getAmountLocalAxes();
 
     abstract protected Matrix getTr();
 
     abstract protected Matrix getStiffenerMatrix();
-    public int[] getAxes() {
-        return axes;
+    public int[] getLocalAxes() {
+        return localAxes;
     }
 
     public FemPoint[] getPoint() {

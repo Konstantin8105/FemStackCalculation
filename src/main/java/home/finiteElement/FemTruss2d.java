@@ -14,7 +14,7 @@ public class FemTruss2d extends FemElement {
     }
 
     @Override
-    protected int getAmountAxes() {
+    protected int getAmountLocalAxes() {
         return 4;
     }
 

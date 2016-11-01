@@ -15,6 +15,13 @@ public class Solver {
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
+    static Map<Integer, Integer> convertPointGlobalAxeToLineGlobalAxe;
+
+    static void convertPointGlobalAxeToLineGlobalAxe(){
+        for (int i = 0; i < 1; i++) {
+
+        }
+    }
 
     static Matrix calculate(List<Integer>[] a, Matrix kok) {
         //TODO create beautiful method
@@ -54,8 +61,8 @@ public class Solver {
         for (int h = femElements.length - 1; h >= 0; h--) {
             FemElement element = femElements[h];
             for (int i = 0; i < element.getPoint().length; i++) {
-                for (int j = 0; j < element.getAxes().length; j++) {
-                    listOfLineAxes.add(element.getAxes()[j]);
+                for (int j = 0; j < element.getLocalAxes().length; j++) {
+                    listOfLineAxes.add(element.getLocalAxes()[j]);
                 }
             }
         }
@@ -172,34 +179,34 @@ public class Solver {
             int column;
             if (line instanceof FemBeam2d) {
                 for (int i = 0; i < 6; i++) {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[i]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[i]);
                     int axe = i % 3;
                     int point = i / 3;
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[point].getNumberGlobalAxe()[axe]);
                     a[row][column] = 1;
                 }
             } else if (line instanceof FemBending2d) {
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
                 a[row][column] = 1;
 
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
                 a[row][column] = 1;
 
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[2]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
                 a[row][column] = 1;
 
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[3]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                 a[row][column] = 1;
             } else if (line instanceof FemTruss2d) {
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
                 a[row][column] = 1;
 
-                row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
                 a[row][column] = 1;
             } else throw new Exception("FEM Element is not support");
@@ -232,7 +239,7 @@ public class Solver {
         //...|....0
         //...+---->---> X0
 
-        int sizeAxes = lines[0].getAxes().length / 2;
+        int sizeAxes = lines[0].getLocalAxes().length / 2;
 
         List<Integer>[] array = new List[sizeAxes * femPoints.length];
         for (int i = 0; i < array.length; i++) {
@@ -245,32 +252,32 @@ public class Solver {
 
             if (line instanceof FemBeam2d) {
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
                     array[column].add(row);
                 }
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[1]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
                     array[column].add(row);
                 }
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[2]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[2]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
                     array[column].add(row);
                 }
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[3]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
                     array[column].add(row);
                 }
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[4]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[4]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
                     array[column].add(row);
                 }
                 {
-                    row = convertLineGlobalAxeToNumber.get(line.getAxes()[5]);
+                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[5]);
                     column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                     array[column].add(row);
                 }
@@ -283,7 +290,7 @@ public class Solver {
     static Matrix generateMatrixQuasiStiffener(FemElement[] femElements) {
 
         //TODO optimize to diagonal matrix and symmetrical
-        int sizeAxes = femElements[0].getAxes().length;
+        int sizeAxes = femElements[0].getLocalAxes().length;
 
         double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
         for (int i = 0; i < femElements.length; i++) {
@@ -303,7 +310,7 @@ public class Solver {
 //    static Matrix generateMatrixQuasiPotentialStiffener(FemElement[] femElements) {
 //
 //        //TODO optimize to diagonal matrix
-//        int sizeAxes = femElements[0].getAxes().length;
+//        int sizeAxes = femElements[0].getLocalAxes().length;
 //
 //        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
 //        for (int i = 0; i < femElements.length; i++) {
@@ -322,7 +329,7 @@ public class Solver {
 //    static Matrix generateMatrixQuasiStiffener2(FemElement[] femElements) {
 //
 //        //TODO optimize to diagonal matrix
-//        int sizeAxes = femElements[0].getAxes().length;
+//        int sizeAxes = femElements[0].getLocalAxes().length;
 //
 //        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
 //        for (int i = 0; i < femElements.length; i++) {
@@ -341,7 +348,7 @@ public class Solver {
 //    static Matrix generateMatrixQuasiPotentialStiffener2(FemElement[] femElements) {
 //
 //        //TODO optimize to diagonal matrix
-//        int sizeAxes = femElements[0].getAxes().length;
+//        int sizeAxes = femElements[0].getLocalAxes().length;
 //
 //        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
 //        for (int i = 0; i < femElements.length; i++) {
@@ -359,7 +366,7 @@ public class Solver {
 //
     static Matrix generateQuasiMatrixMass(ModalFemElement[] femElements) {
         //TODO optimize to diagonal matrix
-        int sizeAxes = femElements[0].getAxes().length;
+        int sizeAxes = femElements[0].getLocalAxes().length;
 
         double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
         for (int i = 0; i < femElements.length; i++) {
