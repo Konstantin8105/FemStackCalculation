@@ -68,7 +68,28 @@ public class Solver {
     }
 
     static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) throws Exception {
-        Set<Integer> listOfLineAxes = new HashSet<>();
+//        Set<Integer> listOfLineAxes = new HashSet<>();
+//        for (FemElement element : femElements) {
+//            for (int i = 0; i < element.getPoint().length; i++) {
+//                if (element instanceof FemBeam2d) {
+//                    for (int j = 0; j < 3; j++) {
+//                        listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
+//                    }
+//                } else if (element instanceof FemBending2d) {
+//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
+//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
+//                } else if(element instanceof FemTruss2d){
+//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
+//                }else throw new Exception("ModalSolver element not supported");
+//            }
+//        }
+//        Map<Integer, Integer> map = new TreeMap<>();
+//        int position = 0;
+//        for (Integer number : listOfLineAxes) {
+//            map.put(number, position++);
+//        }
+//        return map;
+        List<Integer> listOfLineAxes = new ArrayList<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
                 if (element instanceof FemBeam2d) {
@@ -78,9 +99,22 @@ public class Solver {
                 } else if (element instanceof FemBending2d) {
                     listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
                     listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
-                } else if(element instanceof FemTruss2d){
+                } else if (element instanceof FemTruss2d) {
                     listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
-                }else throw new Exception("ModalSolver element not supported");
+                } else throw new Exception("ModalSolver element not supported");
+            }
+        }
+        Collections.sort(listOfLineAxes);
+        Iterator<Integer> iterator = listOfLineAxes.iterator();
+        int last = -1;
+        while (iterator.hasNext()) {
+            int value = iterator.next();
+            if (last == -1) {
+                last = value;
+            } else if (value == last) {
+                iterator.remove();
+            } else {
+                last = value;
             }
         }
         Map<Integer, Integer> map = new TreeMap<>();
@@ -109,7 +143,7 @@ public class Solver {
         } else if (lines[0] instanceof FemBending2d) {
             elementAxes = 4;
             pointAxes = 2;
-        } else if(lines[0] instanceof FemTruss2d) {
+        } else if (lines[0] instanceof FemTruss2d) {
             elementAxes = 4;
             pointAxes = 1;
         } else throw new Exception("FEM Element is not support");
@@ -160,7 +194,7 @@ public class Solver {
                 row = convertLineGlobalAxeToNumber.get(line.getAxes()[3]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
                 a[row][column] = 1;
-            } else if(line instanceof FemTruss2d){
+            } else if (line instanceof FemTruss2d) {
                 row = convertLineGlobalAxeToNumber.get(line.getAxes()[0]);
                 column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
                 a[row][column] = 1;
@@ -507,6 +541,10 @@ public class Solver {
                 vectors.set(j, eigens.get(i).index, d.getArray()[j][i]);
             }
         }
+
+        if (DEBUG) System.out.println("Eigen values");
+        if (DEBUG) values.print(12, 1);
+
         return new Matrix[]{values, vectors};
     }
 

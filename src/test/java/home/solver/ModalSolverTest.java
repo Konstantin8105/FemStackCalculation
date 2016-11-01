@@ -447,7 +447,7 @@ public class ModalSolverTest {
 
         double elacity = E;
         double inertia = I;
-        double area = mbar/ 78500;
+        double area = mbar / 78500;
 
 
         ModalFemElement[] femElements = new ModalFemElement[5];
@@ -592,7 +592,8 @@ public class ModalSolverTest {
         double area = 1e-5;
         double Q = 1230;
 
-        List<Double> Tall = new ArrayList<>();
+        List<Double> w2 = new ArrayList<>();
+//        List<Double> deformation = new ArrayList<>();
 
         for (int i = 2; i <= 4; i += 1) {
             FemPoint[] femPoints = new FemPoint[i];
@@ -614,29 +615,40 @@ public class ModalSolverTest {
                     new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q)
             };
             //=========================//
-            Matrix[] values = null;
+            Matrix[] values;
             boolean exception = false;
             try {
+                System.out.println();
                 //StrengthSolver.calculate(femPoints, femElements, forces, supports);
                 values = ModalSolver.calculate(femPoints, femElements, forces, supports);
-                System.out.println(i + " : " + (2 * Math.PI / Math.sqrt(values[0].getArray()[0][0])));
-                Tall.add(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]));
+                System.out.println("Points = " + i + " : W^2 = " + values[0].getArray()[0][0] + " 1/sec^2");
+//                System.out.println("Points = " + i + " : T = " + (2 * Math.PI / Math.sqrt(values[0].getArray()[0][0])) + " sec.");
+//                w2.add(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]));
+                w2.add(values[0].getArray()[0][0]);
 
 
-                System.out.println("Eigenvalue:");
-                for (int h = 0; h < values[0].getArray().length; h++) {
-                    System.out.println(i
-                            + " == "
-                            + String.format("%.3e", values[0].getArray()[h][0])
-                            + " rad.sec^-2.0"
-                            + " : T = "
-                            + String.format("%.3e", 2 * Math.PI / Math.sqrt(values[0].getArray()[h][0]))
-                            + " sec."
-                    );
-                }
-                System.out.println("Eigenvector:");
-                values[1].print(10, 6);
+//                System.out.println("Eigenvalue:");
+//                for (int h = 0; h < values[0].getArray().length; h++) {
+//                    System.out.println(i
+//                            + " == "
+//                            + String.format("%.3e", values[0].getArray()[h][0])
+//                            + " rad.sec^-2.0"
+//                            + " : T = "
+//                            + String.format("%.3e", 2 * Math.PI / Math.sqrt(values[0].getArray()[h][0]))
+//                            + " sec."
+//                    );
+//                }
+//                System.out.println("Eigenvector:");
+//                values[1].print(10, 6);
 
+//                StrengthSolver.calculate(femPoints, femElements, forces, supports);
+//                double displacement = femPoints[i - 1].getGlobalDisplacement()[1];
+//                deformation.add(displacement);
+//                System.out.println("Deformation = " + displacement + " meter");
+//                double w = Math.sqrt(9.81 / displacement);
+//                System.out.println("W = " + w + " 1/sec");
+//                double periodT = 2 * Math.PI / w;
+//                System.out.println("Period = " + periodT + " sec.");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -653,7 +665,9 @@ public class ModalSolverTest {
         // in according to STAAD:
         // T = 0.102 sec.
         // f = 9.832 Hz.
-        assertEquals(Tall.get(Tall.size() - 1), 0.1028431, 1e-2);
+        double T = 0.1028431;
+        assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 1e-2);
+//        assertEquals(Math.sqrt(9.81 / deformation.get(deformation.size() - 1)), 2. * Math.PI / T, 1e-5);
     }
 
 
@@ -703,6 +717,6 @@ public class ModalSolverTest {
         // in according to STAAD:
         // T = 0.022 sec
         // f = 44.572 Hz
-        assertEquals(Tall.get(Tall.size()-1), 0.022, 1e-3);
+        assertEquals(Tall.get(Tall.size() - 1), 0.022, 1e-3);
     }
 }

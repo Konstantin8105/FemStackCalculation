@@ -26,6 +26,7 @@ public abstract class FemElement {
             axes[i] = getGlobalNumber();
         }
         length = Math.sqrt(Math.pow(point[0].getX() - point[1].getX(), 2.) + Math.pow(point[0].getY() - point[1].getY(), 2.));
+        нам нужен конвертор от осей точек на оси линии
     }
 
     double getLength() {
