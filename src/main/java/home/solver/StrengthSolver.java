@@ -2,103 +2,132 @@ package home.solver;
 
 import Jama.Matrix;
 import home.finiteElement.interfaces.FemElement;
+import home.finiteElement.interfaces.iStrength;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class StrengthSolver extends Solver {
 
-    public static void calculate(
+
+    class DeformationPoint {
+        int idPoint;
+        double[] deformation;
+    }
+
+    List<DeformationPoint> localDeformationPoint = new ArrayList<>();
+    List<DeformationPoint> globalDeformationPoint = new ArrayList<>();
+
+    class LocalForce {
+        int idElement;
+        double[] forces;
+    }
+
+    List<LocalForce> localForces = new ArrayList<>();
+
+    public StrengthSolver(
             FemPoint[] femPoints,
-            FemElement[] femElements,
+            iStrength[] femElements,
             Force[] forces,
             Support[] supports) throws Exception {
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
 
+        if (forces == null)
+            return;
+        if (forces.length > 0)
+            return;
+
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
-        if (DEBUG) System.out.println("Start calc A");
         //TODO optimize
         Matrix A = generateMatrixCompliance(femPoints, femElements);
-        //List<Integer>[] A2 = generateMatrixCompliance2(femPoints, femElements);
-        if (DEBUG) A.print(3, 0);
-
-        if (DEBUG) System.out.println("Start calc Kok");
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
-        if (DEBUG) Kok.print(15, 1);
-
-        if (DEBUG) System.out.println("Start calc Ko");
-        //Matrix Ko = calculate(A2, Kok);
-        //TODO optimize
         Matrix Ko = (A.transpose().times(Kok)).times(A);
-        if (DEBUG) Ko.print(15, 1);
-
-        if (DEBUG) System.out.println("Start calc K");
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
-        if (DEBUG) K.print(15, 1);
+        Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getAmountLocalAxes() / 2);
+        //TODO optimize
+        Matrix Z0 = K.solve(forceVector);
 
-        if (DEBUG) {
-            for (int i = 0; i < K.getArray().length; i++) {
-                System.out.println("[" + i + "," + i + "]=" + K.getArray()[i][i]);
+        if (DEBUG) System.out.println("Start calc Z0k");
+        //TODO optimize
+        Matrix Z0k = A.times(Z0);
+        if (DEBUG) Z0k.print(10, 6);
+
+        if (DEBUG) System.out.println("Start calc localDisplacement");
+        for (int i = 0; i < femElements.length; i++) {
+            int sizeAxes = femElements[i].getAmountLocalAxes();
+
+
+            double[] localDisplacement = new double[sizeAxes];
+            for (int j = 0; j < localDisplacement.length; j++) {
+                localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
             }
+            addInGlobalDisplacementCoordinate(femElements[i], localDisplacement);
         }
-
-        if (forces.length > 0) {
-            if (DEBUG) System.out.println("Start calc forceVector");
-            Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getLocalAxes().length / 2);
-            if (DEBUG) forceVector.print(10, 1);
-
-            if (DEBUG) System.out.println("Start calc Z0");
-            //TODO optimize
-            Matrix Z0 = K.solve(forceVector);
-            if (DEBUG) Z0.print(10, 6);
-
-
-            if (DEBUG) System.out.println("Start calc Z0k");
-            //TODO optimize
-            Matrix Z0k = A.times(Z0);
-            if (DEBUG) Z0k.print(10, 6);
-
-            if (DEBUG) System.out.println("Start calc localDisplacement");
-            int sizeAxes = femElements[0].getLocalAxes().length;
-            for (int i = 0; i < femElements.length; i++) {
-                double[] localDisplacement = new double[sizeAxes];
-                for (int j = 0; j < localDisplacement.length; j++) {
-                    localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
-                }
-                femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
-            }
-            if (DEBUG) {
-                for (FemElement femElement : femElements) {
-                    System.out.println(femElement);
-                    femElement.getInternalForce().print(10, 1);
-                }
-            }
-
-            if (DEBUG) {
-                Matrix Z01 = K.solve(forceVector);
-                System.out.println("Z01");
-                Z01.print(15, 10);
-                Matrix G0 = K.solve(Z01);
-                System.out.println("G0");
-                G0.print(15, 10);
-            }
-
-            if (DEBUG) {
-                for (int i = 0; i < femPoints.length; i++) {
-                    System.out.println("[" + i + "]");
-                    for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
-                        System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
-                    }
-                }
-            }
-        }
+//        if (DEBUG) {
+//            for (FemElement femElement : femElements) {
+//                System.out.println(femElement);
+//                femElement.getInternalForce().print(10, 1);
+//            }
+//        }
+//
+//        if (DEBUG) {
+//            Matrix Z01 = K.solve(forceVector);
+//            System.out.println("Z01");
+//            Z01.print(15, 10);
+//            Matrix G0 = K.solve(Z01);
+//            System.out.println("G0");
+//            G0.print(15, 10);
+//        }
+//
+//        if (DEBUG) {
+//            for (int i = 0; i < femPoints.length; i++) {
+//                System.out.println("[" + i + "]");
+//                for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
+//                    System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
+//                }
+//            }
+//        }
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
+    }
+
+
+    private Matrix displacementInGlobalSystem;
+
+    public Matrix getDisplacementInGlobalSystem() {
+        return displacementInGlobalSystem;
+    }
+
+    private Matrix displacementInLocalSystem;
+
+    public Matrix getDisplacementInLocalSystem() {
+        return displacementInLocalSystem;
+    }
+
+    private Matrix internalForce;
+
+    public Matrix getInternalForce() {
+        return internalForce;
+    }
+
+
+    public void addInGlobalDisplacementCoordinate(iStrength femElement, double[] localDisplacement) {
+        double[][] temp = new double[localDisplacement.length][1];
+        for (int i = 0; i < localDisplacement.length; i++) {
+            temp[i][0] = localDisplacement[i];
+        }
+        femElement.setGlobalDisplacementInPoint(localDisplacement);
+        displacementInGlobalSystem = new Matrix(temp);
+        displacementInLocalSystem = femElement.getTr().times(displacementInGlobalSystem);
+        internalForce = femElement.getStiffenerMatrix().times(displacementInLocalSystem);
     }
 
 }

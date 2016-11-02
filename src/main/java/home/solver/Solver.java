@@ -4,7 +4,7 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import home.finiteElement.*;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.ModalFemElement;
+import home.finiteElement.interfaces.iModal;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
@@ -366,7 +366,7 @@ public class Solver {
 //        return new Matrix(gok);
 //    }
 //
-    static Matrix generateQuasiMatrixMass(ModalFemElement[] femElements) {
+    static Matrix generateQuasiMatrixMass(iModal[] femElements) {
         //TODO optimize to diagonal matrix
         int sizeAxes = femElements[0].getLocalAxes().length;
 

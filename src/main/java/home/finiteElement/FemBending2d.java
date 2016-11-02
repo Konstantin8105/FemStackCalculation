@@ -1,10 +1,11 @@
 package home.finiteElement;
 
 import Jama.Matrix;
-import home.finiteElement.interfaces.ModalFemElement;
+import home.finiteElement.interfaces.FemElement;
+import home.finiteElement.interfaces.iModal;
 import home.other.FemPoint;
 
-public class FemBending2d extends ModalFemElement {
+public class FemBending2d extends FemElement implements iModal {
     private final double elacity;
     private final double area;
     private final double momentInertia;
@@ -22,7 +23,7 @@ public class FemBending2d extends ModalFemElement {
     }
 
     @Override
-    protected Matrix getTr() {
+    public Matrix getTr() {
         double lambda_xx = (point[1].getX() - point[0].getX()) / getLength();
         return new Matrix(new double[][]{
                 {lambda_xx, 0, 0, 0},
@@ -33,7 +34,7 @@ public class FemBending2d extends ModalFemElement {
     }
 
     @Override
-    protected Matrix getStiffenerMatrix() {
+    public Matrix getStiffenerMatrix() {
         double[][] stiffener = new double[4][4];
         double l = getLength();
         double EJ = elacity * momentInertia;
@@ -49,7 +50,7 @@ public class FemBending2d extends ModalFemElement {
     }
 
     @Override
-    protected Matrix getMatrixMass() {
+    public Matrix getMatrixMass() {
         double density = 78500;//N/m^3//7833.41*9.81;//76819.5;//78500;
         double[][] stiffener = new double[4][4];
         double l = getLength();
@@ -70,7 +71,7 @@ public class FemBending2d extends ModalFemElement {
     }
 
     @Override
-    protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
+    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
         point[0].setGlobalDisplacement(new double[]{0, localDisplacement[0], localDisplacement[1]});
         point[1].setGlobalDisplacement(new double[]{0, localDisplacement[2], localDisplacement[3]});
     }

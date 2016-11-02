@@ -3,7 +3,7 @@ package home.solver;
 import Jama.Matrix;
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.FemBending2d;
-import home.finiteElement.interfaces.ModalFemElement;
+import home.finiteElement.interfaces.iModal;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;
@@ -168,7 +168,7 @@ public class ModalSolverTest {
         double inertia = 15.5E+6 * 1e-12;
         double area = 31.6 * 9.81 / 78500;
 
-        ModalFemElement[] femElements = new ModalFemElement[5];
+        iModal[] femElements = new iModal[5];
         femElements[0] = new FemBending2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
         femElements[1] = new FemBending2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
         femElements[2] = new FemBending2d(elacity, area, inertia, new FemPoint[]{femPoints[2], femPoints[3]});
@@ -235,7 +235,7 @@ public class ModalSolverTest {
         double inertia = 15.5E+6 * 1e-12;
         double area = 31.6 * 9.81 / 78500;
 
-        ModalFemElement[] femElements = new ModalFemElement[5];
+        iModal[] femElements = new iModal[5];
         femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
         femElements[1] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]});
         femElements[2] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[2], femPoints[3]});
@@ -308,7 +308,7 @@ public class ModalSolverTest {
                 femPoints[j] = new FemPoint(j, L * (j) / (double) (i - 1), 0);
             }
 
-            ModalFemElement[] femElements = new ModalFemElement[i - 1];
+            iModal[] femElements = new iModal[i - 1];
             for (int j = 0; j < femElements.length; j++) {
                 femElements[j] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
             }
@@ -365,7 +365,7 @@ public class ModalSolverTest {
                 femPoints[j] = new FemPoint(j, L * (double) (j) / (double) (amountPoints - 1), 0);
             }
 
-            ModalFemElement[] femElements = new ModalFemElement[amountPoints - 1];
+            iModal[] femElements = new iModal[amountPoints - 1];
             for (int j = 0; j < femElements.length; j++) {
                 femElements[j] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
             }
@@ -396,7 +396,7 @@ public class ModalSolverTest {
                 femPoints[j] = new FemPoint(j, L * (double) (j) / (double) (amountPoints - 1), 0);
             }
 
-            ModalFemElement[] femElements = new ModalFemElement[amountPoints - 1];
+            iModal[] femElements = new iModal[amountPoints - 1];
             for (int j = 0; j < femElements.length; j++) {
                 femElements[j] = new FemBeam2d(elacity, area * 1e-6, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
             }
@@ -456,7 +456,7 @@ public class ModalSolverTest {
                 new FemPoint(3,2,1),
         };
 
-        ModalFemElement[] femElements = new ModalFemElement[]{
+        iModal[] femElements = new iModal[]{
                 new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]}),
                 new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[1], femPoints[2]}),
                 new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[2], femPoints[3]}),

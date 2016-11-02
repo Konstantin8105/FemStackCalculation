@@ -2,7 +2,7 @@ package home.solver;
 
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.ModalFemElement;
+import home.finiteElement.interfaces.iModal;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;
@@ -122,7 +122,7 @@ public class StrengthSolverTest {
         double area = 1e-13;
         double Q = 1230;
 
-        ModalFemElement[] femElements = new ModalFemElement[1];
+        iModal[] femElements = new iModal[1];
         femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
 
         Support[] supports = new Support[]{

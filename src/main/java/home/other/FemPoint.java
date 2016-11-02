@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class FemPoint {
 
+    static private int global_number_id = -1;
+
     static private int global_number = 0;
     private final double[] globalDisplacement = new double[3];
 
@@ -19,6 +21,7 @@ public class FemPoint {
     private final int[] numberGlobalAxe = new int[3];
     private double x;
     private double y;
+    private int id;
 
     public FemPoint(int number, double x, double y) {
         this.number = number;
@@ -27,6 +30,11 @@ public class FemPoint {
         for (int i = 0; i < numberGlobalAxe.length; i++) {
             numberGlobalAxe[i] = getGlobalNumber();
         }
+        id = global_number_id++;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public double getX() {

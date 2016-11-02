@@ -2,9 +2,10 @@ package home.finiteElement;
 
 import Jama.Matrix;
 import home.finiteElement.interfaces.FemElement;
+import home.finiteElement.interfaces.iStrength;
 import home.other.FemPoint;
 
-public class FemTruss2d extends FemElement {
+public class FemTruss2d extends FemElement implements iStrength {
     private final double elacity;
     private final double area;
 
@@ -39,8 +40,8 @@ public class FemTruss2d extends FemElement {
     }
 
     @Override
-    protected void setGlobalDisplacementInPoint(double[] localDisplacement) {
-        point[0].setGlobalDisplacement(new double[]{localDisplacement[0],0,0});
-        point[1].setGlobalDisplacement(new double[]{localDisplacement[1],0,0});
+    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
+        point[0].setGlobalDisplacement(new double[]{localDisplacement[0], 0, 0});
+        point[1].setGlobalDisplacement(new double[]{localDisplacement[1], 0, 0});
     }
 }

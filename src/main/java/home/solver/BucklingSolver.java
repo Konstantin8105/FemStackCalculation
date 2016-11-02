@@ -8,6 +8,20 @@ import home.other.Support;
 
 public class BucklingSolver extends Solver {
 
+    //    private double bucklingFactor;
+//
+//    public void setBucklingFactor(double bucklingFactor) {
+//        this.bucklingFactor = bucklingFactor;
+//    }
+//
+//    public double getBucklingFactor() {
+//        return bucklingFactor;
+//    }
+//
+//    public double getBucklingAxialLoad() {
+//        return bucklingFactor * internalForce.getArray()[0][0];
+//    }
+
     public static void calculate(
             FemPoint[] femPoints,
             FemElement[] femElements,

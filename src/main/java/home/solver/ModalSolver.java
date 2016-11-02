@@ -2,7 +2,7 @@ package home.solver;
 
 import Jama.Matrix;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.ModalFemElement;
+import home.finiteElement.interfaces.iModal;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
@@ -11,7 +11,7 @@ public class ModalSolver extends Solver {
 
     public static Matrix[] calculate(
             FemPoint[] femPoints,
-            ModalFemElement[] femElements,
+            iModal[] femElements,
             Force[] forces,
             Support[] supports) throws Exception {
 
