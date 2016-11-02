@@ -1,4 +1,4 @@
-package home.finiteElement;
+package home.finiteElements;
 
 public class CombineFemTest {
 //

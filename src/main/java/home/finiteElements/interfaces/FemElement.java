@@ -1,4 +1,4 @@
-package home.finiteElement.interfaces;
+package home.finiteElements.interfaces;
 
 import Jama.Matrix;
 import home.other.FemPoint;

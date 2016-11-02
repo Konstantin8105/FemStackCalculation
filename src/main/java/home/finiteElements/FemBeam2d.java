@@ -1,7 +1,7 @@
-package home.finiteElement;
+package home.finiteElements;
 
 import Jama.Matrix;
-import home.finiteElement.interfaces.FemElement;
+import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 
 public class FemBeam2d extends FemElement {

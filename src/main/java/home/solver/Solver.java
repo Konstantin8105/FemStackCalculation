@@ -2,10 +2,10 @@ package home.solver;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import home.finiteElement.FemBeam2d;
-import home.finiteElement.FemBending2d;
-import home.finiteElement.FemTruss2d;
-import home.finiteElement.interfaces.FemElement;
+import home.finiteElements.FemBeam2d;
+import home.finiteElements.FemBending2d;
+import home.finiteElements.FemTruss2d;
+import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;

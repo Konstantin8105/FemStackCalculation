@@ -1,5 +1,5 @@
-import home.finiteElement.FemBeam2d;
-import home.finiteElement.interfaces.FemElement;
+import home.finiteElements.FemBeam2d;
+import home.finiteElements.interfaces.FemElement;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;
