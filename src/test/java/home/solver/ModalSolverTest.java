@@ -442,7 +442,7 @@ public class ModalSolverTest {
 
         double E = 200000e6;
         double I = 15.5E+6 * 1e-12;
-        double L = 4;
+//        double L = 4;
         double mbar = 31.6 * 9.81;
 
 
@@ -517,7 +517,7 @@ public class ModalSolverTest {
 
         double E = 200000e6;
         double I = 15.5E+6 * 1e-12;
-        double L = 4;
+//        double L = 4;
         double mbar = 31.6 * 9.81;
 
 

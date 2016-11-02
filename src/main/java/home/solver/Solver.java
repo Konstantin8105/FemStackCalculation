@@ -15,13 +15,13 @@ public class Solver {
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
-    static Map<Integer, Integer> convertPointGlobalAxeToLineGlobalAxe;
-
-    static void convertPointGlobalAxeToLineGlobalAxe(){
-        for (int i = 0; i < 1; i++) {
-
-        }
-    }
+//    static Map<Integer, Integer> convertPointGlobalAxeToLineGlobalAxe;
+//
+//    static void convertPointGlobalAxeToLineGlobalAxe(){
+//        for (int i = 0; i < 1; i++) {
+//
+//        }
+//    }
 
     static Matrix calculate(List<Integer>[] a, Matrix kok) {
         //TODO create beautiful method
@@ -141,8 +141,8 @@ public class Solver {
         //...|....0
         //...+---->---> X0
 
-        int elementAxes = -1;
-        int pointAxes = -1;
+        int elementAxes;//= -1;
+        int pointAxes;// = -1;
 
         if (lines[0] instanceof FemBeam2d) {
             elementAxes = 6;
@@ -445,8 +445,8 @@ public class Solver {
     static Matrix deleteFewColumnsRows(Matrix matrix, int[] list) {
         double[][] result = new double[matrix.getRowDimension() - list.length][matrix.getColumnDimension() - list.length];
         List<Integer> delete = new ArrayList<>();
-        for (int i = 0; i < list.length; i++) {
-            delete.add(list[i]);
+        for (int aList : list) {
+            delete.add(aList);
         }
         int k = 0;
         for (int i = 0; i < matrix.getRowDimension(); i++) {
