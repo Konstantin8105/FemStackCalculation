@@ -85,6 +85,8 @@ public class ModalSolver extends Solver {
         if (DEBUG) System.out.println("M");
         if (DEBUG) M.print(12, 1);
 
+        M = M.times(1./9.81);
+
         K = deleteFewColumnsRows(K, supports);
         M = deleteFewColumnsRows(M, supports);
 
@@ -100,21 +102,19 @@ public class ModalSolver extends Solver {
 
         Matrix[] value = Solver.calculateEigen(K, M);
 
-//        System.out.println("N\tvalue\t\t1/sqrt(value)\t\tsqrt(value)");
+//        System.out.println("N\tvalue\t\t2*PI/sqrt(value)");
 //        for (int i = 0; i < value[0].getArray().length; i++) {
 //            System.out.println(String.format("%3d", i)
 //                    + " = "
-//                    + String.format("%.3e", value[0].getArray()[i][0])
+//                    + String.format("%20.2f", value[0].getArray()[i][0])
 //                    + " ---> "
-//                    + String.format("%.3f", (1. / Math.sqrt(value[0].getArray()[i][0])))
-//                    + " ---> "
-//                    + String.format("%.3e", (Math.sqrt(value[0].getArray()[i][0])))
+//                    + String.format("%.5f", 2. * Math.PI /Math.sqrt(value[0].getArray()[i][0])) + " sec."
 //            );
 //        }
 //
 //        System.out.println("First wave");
 //        for (int i = 0; i < value[1].getArray().length; i++) {
-//            System.out.println(value[1].getArray()[i][0]);
+//            System.out.println(String.format("%10.3f",value[1].getArray()[i][0]));
 //        }
 
         FemElement.dropNumeration();

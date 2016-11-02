@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ModalSolverTest {
     /*
@@ -442,7 +443,7 @@ public class ModalSolverTest {
         double E = 200000e6;
         double I = 15.5E+6 * 1e-12;
         double L = 4;
-        double mbar = 31.6;// * 10;
+        double mbar = 31.6 * 9.81;
 
 
         double elacity = E;
@@ -517,7 +518,7 @@ public class ModalSolverTest {
         double E = 200000e6;
         double I = 15.5E+6 * 1e-12;
         double L = 4;
-        double mbar = 31.6;
+        double mbar = 31.6 * 9.81;
 
 
         double elacity = E;
@@ -611,7 +612,7 @@ public class ModalSolverTest {
             };
 
             Force[] forces = new Force[]{
-                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q/9.81)// TODO: 01.11.2016 strange 9.8
+                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q)// TODO: 01.11.2016 strange 9.8
             };
             //=========================//
             Matrix[] values;
@@ -637,7 +638,7 @@ public class ModalSolverTest {
         // f = 9.832 Hz.
         double T = 0.1028431;
         assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 20);
-        double T2 = 2. * Math.PI /Math.sqrt(w2.get(w2.size() - 1));
+        double T2 = 2. * Math.PI / Math.sqrt(w2.get(w2.size() - 1));
         assertEquals(T2, T, 1e-3);
     }
 
@@ -646,18 +647,18 @@ public class ModalSolverTest {
     public void testSelfWeight() {
         double L = 1.;
         double elacity = 2.05e11;
-        double inertia = 7.8e-7;
-        double area = 0.00313078;
+        double inertia = 1.08e-6;
+        double area = 0.0036;
 
-        List<Double> w2 = new ArrayList<>();
+        double w_lineForce = -1;
 
-        for (int i = 2; i < 5; i++) {
-            FemPoint[] femPoints = new FemPoint[i];
-            for (int j = 0; j < i; j++) {
-                femPoints[j] = new FemPoint(j, L * (double)(j) / (double) (i - 1), 0);
+        for (int amountPoints = 2; amountPoints < 5; amountPoints++) {
+            FemPoint[] femPoints = new FemPoint[amountPoints];
+            for (int j = 0; j < amountPoints; j++) {
+                femPoints[j] = new FemPoint(j, L * (double) (j) / (double) (amountPoints - 1), 0);
             }
 
-            ModalFemElement[] femElements = new ModalFemElement[i - 1];
+            ModalFemElement[] femElements = new ModalFemElement[amountPoints - 1];
             for (int j = 0; j < femElements.length; j++) {
                 femElements[j] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
             }
@@ -665,32 +666,71 @@ public class ModalSolverTest {
                     new Support(femPoints[0], Direction.DIRECTION_X),
                     new Support(femPoints[0], Direction.DIRECTION_Y),
                     new Support(femPoints[0], Direction.ROTATE),
-
-                    new Support(femPoints[i - 1], Direction.DIRECTION_Y)
             };
 
             //=========================//
             boolean exception = false;
-            Matrix[] values = null;
+            Matrix[] values;
             try {
                 values = ModalSolver.calculate(femPoints, femElements, null, supports);
-                System.out.println(i + " : " + (2 * Math.PI / Math.sqrt(values[0].getArray()[0][0])) + " sec.");
-                w2.add(values[0].getArray()[0][0]);
+                w_lineForce = values[0].getArray()[0][0];
+                System.out.println(amountPoints + " : W^2 with point force = " + w_lineForce);
             } catch (Exception e) {
                 e.printStackTrace();
                 exception = true;
             }
-
             assertFalse(exception);
-
         }
 
+        double w_pointsForces = -1;
+        for (int amountPoints = 10; amountPoints < 150; amountPoints += 20) {
+            FemPoint[] femPoints = new FemPoint[amountPoints];
+            for (int j = 0; j < amountPoints; j++) {
+                femPoints[j] = new FemPoint(j, L * (double) (j) / (double) (amountPoints - 1), 0);
+            }
+
+            ModalFemElement[] femElements = new ModalFemElement[amountPoints - 1];
+            for (int j = 0; j < femElements.length; j++) {
+                femElements[j] = new FemBeam2d(elacity, area * 1e-6, inertia, new FemPoint[]{femPoints[j], femPoints[j + 1]});
+            }
+
+            Support[] supports = new Support[]{
+                    new Support(femPoints[0], Direction.DIRECTION_X),
+                    new Support(femPoints[0], Direction.DIRECTION_Y),
+                    new Support(femPoints[0], Direction.ROTATE),
+            };
+
+            Force[] forces = new Force[amountPoints - 1];
+            for (int i = 0; i < forces.length; i++) {
+                forces[i] = new Force(femPoints[i + 1], Direction.DIRECTION_Y, area * L * 78500 / (amountPoints - 1));
+            }
+            forces[forces.length - 1] =
+                    new Force(femPoints[amountPoints - 1], Direction.DIRECTION_Y, area * L * 78500 / (amountPoints - 1) / 2.);
+
+            //=========================//
+            boolean exception = false;
+            Matrix[] values;
+            try {
+                values = ModalSolver.calculate(femPoints, femElements, forces, supports);
+                w_pointsForces = values[0].getArray()[0][0];
+                System.out.println(amountPoints + " : W^2 with point force = " + w_pointsForces);
+            } catch (Exception e) {
+                e.printStackTrace();
+                exception = true;
+            }
+            assertFalse(exception);
+        }
+
+        assertEquals(w_lineForce, w_pointsForces, 100);
+
         // in according to STAAD:
-        // T = 0.022 sec
-        // f = 44.572 Hz
-        double T = 0.022;
-        assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 20);
-        double T2 = 2. * Math.PI /Math.sqrt(w2.get(w2.size() - 1));
+        // T = 0.0204545 sec
+        // f = 48.889 Hz
+        double T = 0.0204545;
+        double W = Math.pow(2. * Math.PI / T, 2.);
+        System.out.println("Ideal W = " + W);
+        assertTrue(1. - w_lineForce / W < 1e-3);
+        double T2 = 2. * Math.PI / Math.sqrt(w_lineForce);
         assertEquals(T2, T, 1e-3);
     }
 }
