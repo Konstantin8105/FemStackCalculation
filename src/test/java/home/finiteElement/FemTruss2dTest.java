@@ -1,5 +1,6 @@
 package home.finiteElement;
 
+import home.finiteElement.interfaces.FemElement;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;

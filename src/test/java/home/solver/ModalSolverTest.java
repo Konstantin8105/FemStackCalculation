@@ -3,7 +3,7 @@ package home.solver;
 import Jama.Matrix;
 import home.finiteElement.FemBeam2d;
 import home.finiteElement.FemBending2d;
-import home.finiteElement.ModalFemElement;
+import home.finiteElement.interfaces.ModalFemElement;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;

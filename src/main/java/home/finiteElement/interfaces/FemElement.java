@@ -1,4 +1,4 @@
-package home.finiteElement;
+package home.finiteElement.interfaces;
 
 import Jama.Matrix;
 import home.other.FemPoint;
@@ -16,10 +16,10 @@ public abstract class FemElement {
     }
 
     private final int[] localAxes;
-    final FemPoint[] point;
+    final protected FemPoint[] point;
     private final double length;
 
-    FemElement(FemPoint[] point) {
+    protected FemElement(FemPoint[] point) {
         this.point = point;
         localAxes = new int[getAmountLocalAxes()];
         for (int i = 0; i < localAxes.length; i++) {
@@ -29,7 +29,7 @@ public abstract class FemElement {
         // TODO: 01.11.2016  нам нужен конвертор от осей точек на оси линии
     }
 
-    double getLength() {
+    protected double getLength() {
         return length;
     }
 

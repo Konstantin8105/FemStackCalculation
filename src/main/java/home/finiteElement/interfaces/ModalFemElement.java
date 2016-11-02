@@ -1,11 +1,11 @@
-package home.finiteElement;
+package home.finiteElement.interfaces;
 
 import Jama.Matrix;
 import home.other.FemPoint;
 
-public abstract class ModalFemElement extends FemElement{
+public abstract class ModalFemElement extends FemElement {
 
-    ModalFemElement(FemPoint[] point) {
+    protected ModalFemElement(FemPoint[] point) {
         super(point);
     }
 

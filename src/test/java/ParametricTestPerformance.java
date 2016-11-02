@@ -1,6 +1,6 @@
 import home.other.Direction;
 import home.finiteElement.FemBeam2d;
-import home.finiteElement.FemElement;
+import home.finiteElement.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;

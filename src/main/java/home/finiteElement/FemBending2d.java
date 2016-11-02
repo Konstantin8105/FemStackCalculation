@@ -1,6 +1,7 @@
 package home.finiteElement;
 
 import Jama.Matrix;
+import home.finiteElement.interfaces.ModalFemElement;
 import home.other.FemPoint;
 
 public class FemBending2d extends ModalFemElement {

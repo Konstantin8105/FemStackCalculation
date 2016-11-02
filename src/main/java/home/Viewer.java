@@ -1,6 +1,6 @@
 package home;
 
-import home.finiteElement.FemElement;
+import home.finiteElement.interfaces.FemElement;
 import home.other.FemPoint;
 
 import javax.swing.*;

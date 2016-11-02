@@ -1,8 +1,8 @@
 package home.solver;
 
 import home.finiteElement.FemBeam2d;
-import home.finiteElement.FemElement;
-import home.finiteElement.ModalFemElement;
+import home.finiteElement.interfaces.FemElement;
+import home.finiteElement.interfaces.ModalFemElement;
 import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;

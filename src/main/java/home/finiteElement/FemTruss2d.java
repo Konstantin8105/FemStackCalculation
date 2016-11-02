@@ -1,6 +1,7 @@
 package home.finiteElement;
 
 import Jama.Matrix;
+import home.finiteElement.interfaces.FemElement;
 import home.other.FemPoint;
 
 public class FemTruss2d extends FemElement {

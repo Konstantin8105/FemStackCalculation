@@ -1,4 +1,4 @@
-package home.finiteElement;
+package home.finiteElement.interfaces;
 
 public abstract class BucklingFemElement {
 

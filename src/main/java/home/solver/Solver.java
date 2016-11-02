@@ -3,6 +3,8 @@ package home.solver;
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import home.finiteElement.*;
+import home.finiteElement.interfaces.FemElement;
+import home.finiteElement.interfaces.ModalFemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
