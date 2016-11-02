@@ -27,3 +27,5 @@
 ###src/main/resources/
 ###src/test/
 target/
+.idea/libraries/*.xml
+src/main/resources/

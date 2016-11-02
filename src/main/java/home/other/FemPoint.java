@@ -7,7 +7,7 @@ public class FemPoint {
     static private int global_number_id = -1;
 
     static private int global_number = 0;
-    private final double[] globalDisplacement = new double[3];
+//    private final double[] globalDisplacement = new double[3];
 
     private static int getGlobalNumber() {
         return global_number++;
@@ -59,13 +59,13 @@ public class FemPoint {
         return numberGlobalAxe;
     }
 
-    public void setGlobalDisplacement(double[] globalDisplacement) {
-        System.arraycopy(globalDisplacement, 0, this.globalDisplacement, 0, globalDisplacement.length);
-    }
-
-    public double[] getGlobalDisplacement() {
-        return globalDisplacement;
-    }
+//    public void setGlobalDisplacement(double[] globalDisplacement) {
+//        System.arraycopy(globalDisplacement, 0, this.globalDisplacement, 0, globalDisplacement.length);
+//    }
+//
+//    public double[] getGlobalDisplacement() {
+//        return globalDisplacement;
+//    }
 
     public void setX(double x) {
         this.x = x;

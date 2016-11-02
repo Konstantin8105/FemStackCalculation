@@ -1,12 +1,10 @@
 package home.finiteElement;
 
 import Jama.Matrix;
-import home.finiteElement.interfaces.iBuckling;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.iModal;
 import home.other.FemPoint;
 
-public class FemBeam2d extends FemElement implements iModal,iBuckling {
+public class FemBeam2d extends FemElement {
     private final double elacity;
     private final double area;
     private final double momentInertia;
@@ -19,10 +17,10 @@ public class FemBeam2d extends FemElement implements iModal,iBuckling {
         this.momentInertia = momentInertia;
     }
 
-    @Override
-    protected int getAmountLocalAxes() {
-        return 6;
-    }
+//    @Override
+//    protected int getAmountLocalAxes() {
+//        return 6;
+//    }
 
     @Override
     public Matrix getTr() {
@@ -80,25 +78,29 @@ public class FemBeam2d extends FemElement implements iModal,iBuckling {
         double density = 78500;// N/m^3
         double[][] stiffener = new double[6][6];
         double l = getLength();
-        double mu = density*area;
-        double rz = density*momentInertia;
-        stiffener[0][0] = stiffener[3][3] = l/3.*mu;
-        stiffener[1][1] = stiffener[4][4] = 13.*l/35.*mu+6.*rz/(5.*l);
-        stiffener[2][2] = stiffener[5][5] = l*l*l/105.*mu + 2.*l*rz/15.;
-        stiffener[1][2] = stiffener[2][1] = 11.*l*l/210.*mu + rz/10.;
-        stiffener[4][5] = stiffener[5][4] = -11.*l*l/210.*mu - rz/10.;
-        stiffener[0][3] = stiffener[3][0] = l/6.*mu;
-        stiffener[1][4] = stiffener[4][1] = 9.*l/70.*mu - 6.*rz/(5.*l);
-        stiffener[2][4] = stiffener[4][2] = 13.*l*l/420.*mu - rz/10.;
-        stiffener[1][5] = stiffener[5][1] = -13.*l*l/420.*mu + rz/10.;
-        stiffener[2][5] = stiffener[5][2] = -l*l*l/140.*mu - rz*l/30.;
+        double mu = density * area;
+        double rz = density * momentInertia;
+        stiffener[0][0] = stiffener[3][3] = l / 3. * mu;
+        stiffener[1][1] = stiffener[4][4] = 13. * l / 35. * mu + 6. * rz / (5. * l);
+        stiffener[2][2] = stiffener[5][5] = l * l * l / 105. * mu + 2. * l * rz / 15.;
+        stiffener[1][2] = stiffener[2][1] = 11. * l * l / 210. * mu + rz / 10.;
+        stiffener[4][5] = stiffener[5][4] = -11. * l * l / 210. * mu - rz / 10.;
+        stiffener[0][3] = stiffener[3][0] = l / 6. * mu;
+        stiffener[1][4] = stiffener[4][1] = 9. * l / 70. * mu - 6. * rz / (5. * l);
+        stiffener[2][4] = stiffener[4][2] = 13. * l * l / 420. * mu - rz / 10.;
+        stiffener[1][5] = stiffener[5][1] = -13. * l * l / 420. * mu + rz / 10.;
+        stiffener[2][5] = stiffener[5][2] = -l * l * l / 140. * mu - rz * l / 30.;
         return new Matrix(stiffener);
     }
 
-    @Override
-    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
-        point[0].setGlobalDisplacement(new double[]{localDisplacement[0], localDisplacement[1], localDisplacement[2]});
-        point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
-    }
+//    @Override
+//    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
+//        point[0].setGlobalDisplacement(new double[]{localDisplacement[0], localDisplacement[1], localDisplacement[2]});
+//        point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
+//    }
 
+    @Override
+    public boolean[] getAxeAllowable() {
+        return new boolean[]{true, true, true, true, true, true};
+    }
 }

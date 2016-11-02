@@ -2,7 +2,6 @@ package home.solver;
 
 import Jama.Matrix;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.iStrength;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
@@ -16,6 +15,11 @@ public class StrengthSolver extends Solver {
     class DeformationPoint {
         int idPoint;
         double[] deformation;
+
+        public DeformationPoint(int idPoint, double[] deformation) {
+            this.idPoint = idPoint;
+            this.deformation = deformation;
+        }
     }
 
     List<DeformationPoint> localDeformationPoint = new ArrayList<>();
@@ -23,14 +27,19 @@ public class StrengthSolver extends Solver {
 
     class LocalForce {
         int idElement;
-        double[] forces;
+        Matrix forces;
+
+        public LocalForce(int idElement, Matrix forces) {
+            this.idElement = idElement;
+            this.forces = forces;
+        }
     }
 
     List<LocalForce> localForces = new ArrayList<>();
 
     public StrengthSolver(
             FemPoint[] femPoints,
-            iStrength[] femElements,
+            FemElement[] femElements,
             Force[] forces,
             Support[] supports) throws Exception {
 
@@ -39,7 +48,7 @@ public class StrengthSolver extends Solver {
 
         if (forces == null)
             return;
-        if (forces.length > 0)
+        if (forces.length == 0)
             return;
 
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
@@ -50,7 +59,7 @@ public class StrengthSolver extends Solver {
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
         Matrix Ko = (A.transpose().times(Kok)).times(A);
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
-        Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getAmountLocalAxes() / 2);
+        Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getLocalAxes().length / 2);
         //TODO optimize
         Matrix Z0 = K.solve(forceVector);
 
@@ -61,9 +70,7 @@ public class StrengthSolver extends Solver {
 
         if (DEBUG) System.out.println("Start calc localDisplacement");
         for (int i = 0; i < femElements.length; i++) {
-            int sizeAxes = femElements[i].getAmountLocalAxes();
-
-
+            int sizeAxes = femElements[i].getLocalAxes().length;
             double[] localDisplacement = new double[sizeAxes];
             for (int j = 0; j < localDisplacement.length; j++) {
                 localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
@@ -100,34 +107,80 @@ public class StrengthSolver extends Solver {
     }
 
 
-    private Matrix displacementInGlobalSystem;
+//    private Matrix displacementInGlobalSystem;
+//
+//    public Matrix getDisplacementInGlobalSystem() {
+//        return displacementInGlobalSystem;
+//    }
+//
+//    private Matrix displacementInLocalSystem;
+//
+//    public Matrix getDisplacementInLocalSystem() {
+//        return displacementInLocalSystem;
+//    }
+//
+//    private Matrix internalForce;
+//
+//    public Matrix getInternalForce() {
+//        return internalForce;
+//    }
 
-    public Matrix getDisplacementInGlobalSystem() {
-        return displacementInGlobalSystem;
-    }
 
-    private Matrix displacementInLocalSystem;
-
-    public Matrix getDisplacementInLocalSystem() {
-        return displacementInLocalSystem;
-    }
-
-    private Matrix internalForce;
-
-    public Matrix getInternalForce() {
-        return internalForce;
-    }
-
-
-    public void addInGlobalDisplacementCoordinate(iStrength femElement, double[] localDisplacement) {
+    public void addInGlobalDisplacementCoordinate(FemElement femElement, double[] localDisplacement) {
         double[][] temp = new double[localDisplacement.length][1];
         for (int i = 0; i < localDisplacement.length; i++) {
             temp[i][0] = localDisplacement[i];
         }
-        femElement.setGlobalDisplacementInPoint(localDisplacement);
-        displacementInGlobalSystem = new Matrix(temp);
-        displacementInLocalSystem = femElement.getTr().times(displacementInGlobalSystem);
-        internalForce = femElement.getStiffenerMatrix().times(displacementInLocalSystem);
+        int position = 0;
+        for (int i = 0; i < 2; i++) {
+            double[] deformation = new double[3];
+            for (int j = 0; j < 3; j++) {
+                if (femElement.getAxeAllowable()[i * 3 + j]) {
+                    deformation[j] = localDisplacement[position++];
+                }
+            }
+            globalDeformationPoint.add(new DeformationPoint(
+                    femElement.getPoint()[i].getId(),deformation));
+        }
+//        femElement.setGlobalDisplacementInPoint(localDisplacement);
+        Matrix displacementInGlobalSystem = new Matrix(temp);
+        Matrix displacementInLocalSystem = femElement.getTr().times(displacementInGlobalSystem);
+        position = 0;
+        for (int i = 0; i < 2; i++) {
+            double[] deformation = new double[3];
+            for (int j = 0; j < 3; j++) {
+                if (femElement.getAxeAllowable()[i * 3 + j]) {
+                    deformation[j] = displacementInLocalSystem.getArray()[position++][0];
+                }
+            }
+            localDeformationPoint.add(new DeformationPoint(
+                    femElement.getPoint()[i].getId(),deformation));
+        }
+        Matrix internalForce = femElement.getStiffenerMatrix().times(displacementInLocalSystem);
+        localForces.add(new LocalForce(femElement.getId(),internalForce));
     }
 
+    public List<DeformationPoint> getLocalDeformationPoint() {
+        return localDeformationPoint;
+    }
+
+    public List<DeformationPoint> getGlobalDeformationPoint() {
+        return globalDeformationPoint;
+    }
+
+    public double[] getGlobalDeformationPoint(int id) {
+        for (int i = 0; i < globalDeformationPoint.size(); i++) {
+            if(globalDeformationPoint.get(i).idPoint == id)
+                return globalDeformationPoint.get(i).deformation;
+        }
+        return null;
+    }
+
+    public double[] getGlobalDeformationPoint(FemPoint point) {
+        return getGlobalDeformationPoint(point.getId());
+    }
+
+    public List<LocalForce> getLocalForces() {
+        return localForces;
+    }
 }

@@ -2,10 +2,9 @@ package home.finiteElement;
 
 import Jama.Matrix;
 import home.finiteElement.interfaces.FemElement;
-import home.finiteElement.interfaces.iModal;
 import home.other.FemPoint;
 
-public class FemBending2d extends FemElement implements iModal {
+public class FemBending2d extends FemElement {
     private final double elacity;
     private final double area;
     private final double momentInertia;
@@ -17,10 +16,10 @@ public class FemBending2d extends FemElement implements iModal {
         this.momentInertia = momentInertia;
     }
 
-    @Override
-    protected int getAmountLocalAxes() {
-        return 4;
-    }
+//    @Override
+//    protected int getAmountLocalAxes() {
+//        return 4;
+//    }
 
     @Override
     public Matrix getTr() {
@@ -50,6 +49,11 @@ public class FemBending2d extends FemElement implements iModal {
     }
 
     @Override
+    public Matrix getPotentialMatrix() {
+        return null;
+    }
+
+    @Override
     public Matrix getMatrixMass() {
         double density = 78500;//N/m^3//7833.41*9.81;//76819.5;//78500;
         double[][] stiffener = new double[4][4];
@@ -69,10 +73,15 @@ public class FemBending2d extends FemElement implements iModal {
 
         return new Matrix(stiffener);
     }
+//
+//    @Override
+//    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
+//        point[0].setGlobalDisplacement(new double[]{0, localDisplacement[0], localDisplacement[1]});
+//        point[1].setGlobalDisplacement(new double[]{0, localDisplacement[2], localDisplacement[3]});
+//    }
 
     @Override
-    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
-        point[0].setGlobalDisplacement(new double[]{0, localDisplacement[0], localDisplacement[1]});
-        point[1].setGlobalDisplacement(new double[]{0, localDisplacement[2], localDisplacement[3]});
+    public boolean[] getAxeAllowable() {
+        return new boolean[]{false, true, true, false, true, true};
     }
 }

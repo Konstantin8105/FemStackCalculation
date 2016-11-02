@@ -75,40 +75,40 @@ public class BucklingSolver extends Solver {
             //TODO optimize
             Matrix Z0k = A.times(Z0);
             if (DEBUG) Z0k.print(10, 6);
-
-            if (DEBUG) System.out.println("Start calc localDisplacement");
-            int sizeAxes = femElements[0].getLocalAxes().length;
-            for (int i = 0; i < femElements.length; i++) {
-                double[] localDisplacement = new double[sizeAxes];
-                for (int j = 0; j < localDisplacement.length; j++) {
-                    localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
-                }
-                femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
-            }
-            if (DEBUG) {
-                for (FemElement femElement : femElements) {
-                    System.out.println(femElement);
-                    femElement.getInternalForce().print(10, 1);
-                }
-            }
-
-            if (DEBUG) {
-                Matrix Z01 = K.solve(forceVector);
-                System.out.println("Z01");
-                Z01.print(15, 10);
-                Matrix G0 = K.solve(Z01);
-                System.out.println("G0");
-                G0.print(15, 10);
-            }
-
-            if (DEBUG) {
-                for (int i = 0; i < femPoints.length; i++) {
-                    System.out.println("[" + i + "]");
-                    for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
-                        System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
-                    }
-                }
-            }
+//
+//            if (DEBUG) System.out.println("Start calc localDisplacement");
+//            int sizeAxes = femElements[0].getLocalAxes().length;
+//            for (int i = 0; i < femElements.length; i++) {
+//                double[] localDisplacement = new double[sizeAxes];
+//                for (int j = 0; j < localDisplacement.length; j++) {
+//                    localDisplacement[j] = Z0k.getArray()[i * sizeAxes + j][0];
+//                }
+//                femElements[i].addInGlobalDisplacementCoordinate(localDisplacement);
+//            }
+//            if (DEBUG) {
+//                for (FemElement femElement : femElements) {
+//                    System.out.println(femElement);
+//                    femElement.getInternalForce().print(10, 1);
+//                }
+//            }
+//
+//            if (DEBUG) {
+//                Matrix Z01 = K.solve(forceVector);
+//                System.out.println("Z01");
+//                Z01.print(15, 10);
+//                Matrix G0 = K.solve(Z01);
+//                System.out.println("G0");
+//                G0.print(15, 10);
+//            }
+//
+//            if (DEBUG) {
+//                for (int i = 0; i < femPoints.length; i++) {
+//                    System.out.println("[" + i + "]");
+//                    for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
+//                        System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
+//                    }
+//                }
+//            }
         }
 
         FemElement.dropNumeration();
