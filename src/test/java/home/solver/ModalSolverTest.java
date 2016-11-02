@@ -27,11 +27,7 @@ public class ModalSolverTest {
         double E = 200000e6;
         double I = 15.5E+6 * 1e-12;
         double L = 4;
-
-        //todo different at 10 times kg --> N
-        double mbar = 31.6;// * 10;
-
-        /* [b] : Define (4x4) stiffness matrix for beam element */
+        double mbar = 31.6;
 
         double[][] stiff = new double[4][4];
         stiff[0][0] = 4 * E * I / L;
@@ -168,17 +164,9 @@ public class ModalSolverTest {
         femPoints[4] = new FemPoint(4, 16., 0);
         femPoints[5] = new FemPoint(4, 20., 0);
 
-
-        double E = 200000e6;
-        double I = 15.5E+6 * 1e-12;
-//        double L = 4;
-        double mbar = 31.6 * 9.81;
-
-
-        double elacity = E;
-        double inertia = I;
-        double area = mbar / 78500;
-
+        double elacity = 200000e6;
+        double inertia = 15.5E+6 * 1e-12;
+        double area = 31.6 * 9.81 / 78500;
 
         ModalFemElement[] femElements = new ModalFemElement[5];
         femElements[0] = new FemBending2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
@@ -243,16 +231,9 @@ public class ModalSolverTest {
         femPoints[4] = new FemPoint(4, 16., 0);
         femPoints[5] = new FemPoint(4, 20., 0);
 
-
-        double E = 200000e6;
-        double I = 15.5E+6 * 1e-12;
-//        double L = 4;
-        double mbar = 31.6 * 9.81;
-
-
-        double elacity = E;
-        double inertia = I;
-        double area = mbar / 78500;
+        double elacity = 200000e6;
+        double inertia = 15.5E+6 * 1e-12;
+        double area = 31.6 * 9.81 / 78500;
 
         ModalFemElement[] femElements = new ModalFemElement[5];
         femElements[0] = new FemBeam2d(elacity, area, inertia, new FemPoint[]{femPoints[0], femPoints[1]});
@@ -314,11 +295,8 @@ public class ModalSolverTest {
         // TY = 0.1028431 sec
         // TX = 0.005 sec
         double L = 1;
-        double E = 2e11;
-        double I = 78e-8;
-
-        double elacity = E;
-        double inertia = I;
+        double elacity = 2e11;
+        double inertia = 78e-8;
         double area = 1e-5;
         double Q = 1230;
 
@@ -341,7 +319,7 @@ public class ModalSolverTest {
             };
 
             Force[] forces = new Force[]{
-                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q)// TODO: 01.11.2016 strange 9.8
+                    new Force(femPoints[i - 1], Direction.DIRECTION_Y, Q)
             };
             //=========================//
             Matrix[] values;
