@@ -4,7 +4,6 @@ import home.other.Direction;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
-import home.solver.FemModel;
 import home.solver.StrengthSolver;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,8 +65,9 @@ public class ParametricTestPerformance {
         boolean exception = false;
         StrengthSolver solver = null;
         try {
-            FemModel femModel = new FemModel(femPoints, femElements, supports);
-            solver = new StrengthSolver(femModel, forces);
+            //FemModel femModel = new FemModel(femPoints, femElements, supports);
+            //solver = new StrengthSolver(femModel, forces);
+            solver = new StrengthSolver(femPoints, femElements, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
             exception = true;
@@ -75,7 +75,7 @@ public class ParametricTestPerformance {
 
         assertFalse(exception);
 
-        assertEquals(solver.getGlobalDeformationPoint(femPoints[0])[0], 0.0000, 1e-4);
-        assertEquals(solver.getGlobalDeformationPoint(femPoints[femPoints.length - 1])[1], 0.0249, 1e-4);
+        assertEquals(solver.getGlobalDeformationPoint(femPoints[0]).getX(), 0.0000, 1e-4);
+        assertEquals(solver.getGlobalDeformationPoint(femPoints[femPoints.length - 1]).getY(), 0.0249, 1e-4);
     }
 }

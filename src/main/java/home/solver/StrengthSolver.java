@@ -12,13 +12,23 @@ import java.util.List;
 public class StrengthSolver extends Solver {
 
 
-    class DeformationPoint {
+    public class DeformationPoint {
         int idPoint;
         double[] deformation;
 
         public DeformationPoint(int idPoint, double[] deformation) {
             this.idPoint = idPoint;
             this.deformation = deformation;
+        }
+
+        public double getX(){
+            return deformation[0];
+        }
+        public double getY(){
+            return deformation[1];
+        }
+        public double getRotate(){
+            return deformation[2];
         }
     }
 
@@ -62,11 +72,8 @@ public class StrengthSolver extends Solver {
         Matrix forceVector = generateForceVector(femPoints, forces, femElements[0].getLocalAxes().length / 2);
         //TODO optimize
         Matrix Z0 = K.solve(forceVector);
-
-        if (DEBUG) System.out.println("Start calc Z0k");
         //TODO optimize
         Matrix Z0k = A.times(Z0);
-        if (DEBUG) Z0k.print(10, 6);
 
         if (DEBUG) System.out.println("Start calc localDisplacement");
         for (int i = 0; i < femElements.length; i++) {
@@ -168,15 +175,15 @@ public class StrengthSolver extends Solver {
         return globalDeformationPoint;
     }
 
-    public double[] getGlobalDeformationPoint(int id) {
+    public DeformationPoint getGlobalDeformationPoint(int id) {
         for (int i = 0; i < globalDeformationPoint.size(); i++) {
             if(globalDeformationPoint.get(i).idPoint == id)
-                return globalDeformationPoint.get(i).deformation;
+                return globalDeformationPoint.get(i);
         }
         return null;
     }
 
-    public double[] getGlobalDeformationPoint(FemPoint point) {
+    public DeformationPoint getGlobalDeformationPoint(FemPoint point) {
         return getGlobalDeformationPoint(point.getId());
     }
 
