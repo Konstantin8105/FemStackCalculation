@@ -80,8 +80,10 @@ public class FemBending2d extends FemElement {
 //        point[1].setGlobalDisplacement(new double[]{0, localDisplacement[2], localDisplacement[3]});
 //    }
 
+    final static boolean[] axes = new boolean[]{false, true, true, false, true, true};
+
     @Override
     public boolean[] getAxeAllowable() {
-        return new boolean[]{false, true, true, false, true, true};
+        return axes;
     }
 }

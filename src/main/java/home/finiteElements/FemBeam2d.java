@@ -99,8 +99,10 @@ public class FemBeam2d extends FemElement {
 //        point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
 //    }
 
+    final static boolean[] axes = new boolean[]{true, true, true, true, true, true};
+
     @Override
     public boolean[] getAxeAllowable() {
-        return new boolean[]{true, true, true, true, true, true};
+        return axes;
     }
 }

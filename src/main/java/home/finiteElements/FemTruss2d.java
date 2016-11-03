@@ -54,8 +54,10 @@ public class FemTruss2d extends FemElement {
 //        point[1].setGlobalDisplacement(new double[]{localDisplacement[1], 0, 0});
 //    }
 
+    final static boolean[] axes = new boolean[]{true, false, false, true, false, false};
+
     @Override
     public boolean[] getAxeAllowable() {
-        return new boolean[]{true, false, false, true, false, false};
+        return axes;
     }
 }
