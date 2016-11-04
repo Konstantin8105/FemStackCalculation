@@ -5,6 +5,7 @@ import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
+import home.solver.matrixes.SparseSquareSymmetricMatrix;
 import home.solver.matrixes.SparseZeroOneMatrix;
 
 import java.util.ArrayList;
@@ -67,16 +68,15 @@ public class StrengthSolver extends Solver {
         convertPointGlobalAxeToNumber = convertPointAxeToSequenceAxe(femElements);
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
-        //TODO optimize
         SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
-        Matrix Kok = generateMatrixQuasiStiffener(femElements);
-        Matrix Ko = A.convert().transpose().times(Kok).times(A.convert());
+        //TODO optimize
+        SparseSquareSymmetricMatrix Kok = generateMatrixQuasiStiffener(femElements);
+        Matrix Ko = SparseZeroOneMatrix.multiply(A.transpose().times(Kok), A);
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
         //TODO optimize
         Matrix Z0 = K.solve(forceVector);
-        //TODO optimize
-        Matrix Z0k = A.convert().times(Z0);
+        Matrix Z0k = A.times(Z0);
 
         if (DEBUG) System.out.println("Start calc localDisplacement");
         for (int i = 0; i < femElements.length; i++) {

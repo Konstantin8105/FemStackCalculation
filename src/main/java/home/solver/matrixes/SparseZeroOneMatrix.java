@@ -6,57 +6,210 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SparseZeroOneMatrix {
-    List<Integer>[] array;
-    int rows;
-    int columns;
+
+    private final static int MINIMAL_ARRAY_ALLOCATION = 2;
+    private enum MatrixOrientation {
+        MATRIX_ORIENTATION_ROW,
+        MATRIX_ORIENTATION_COLUMN
+    }
+
+    ;
+
+    private MatrixOrientation orientation;
+    private List<Integer>[] array;
+    private int rows;
+    private int columns;
 
     public SparseZeroOneMatrix(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
-        array = new List[columns];
-        for (int i = 0; i < columns; i++) {
-            array[i] = new ArrayList<>(6);
+        orientation = MatrixOrientation.MATRIX_ORIENTATION_ROW;
+        array = new List[rows];
+        for (int i = 0; i < rows; i++) {
+            array[i] = new ArrayList<>(MINIMAL_ARRAY_ALLOCATION);
         }
     }
 
     public void addOne(int row, int column) {
-        array[column].add(row);
+        switch (orientation) {
+            case MATRIX_ORIENTATION_COLUMN:
+                array[column].add(row);
+                break;
+            case MATRIX_ORIENTATION_ROW:
+                array[row].add(column);
+                break;
+        }
     }
 
     public Matrix convert() {
         double[][] matrix = new double[rows][columns];
-        for (int i = 0; i < columns; i++) {
-            for (int j = 0; j < array[i].size(); j++) {
-                matrix[array[i].get(j)][i] = 1;
+        switch (orientation) {
+            case MATRIX_ORIENTATION_COLUMN: {
+                for (int i = 0; i < columns; i++) {
+                    for (int j = 0; j < array[i].size(); j++) {
+                        matrix[array[i].get(j)][i] = 1;
+                    }
+                }
+                break;
+            }
+            case MATRIX_ORIENTATION_ROW: {
+                for (int i = 0; i < rows; i++) {
+                    for (int j = 0; j < array[i].size(); j++) {
+                        matrix[i][array[i].get(j)] = 1;
+                    }
+                }
+                break;
             }
         }
         return new Matrix(matrix);
     }
 
-//    public Matrix times(Matrix B) {
-//        /** Construct an m-by-n matrix of zeros.
-//         @param m    Number of rows.
-//         @param n    Number of colums.
-//         */
-//
-//        if (B.getRowDimension() != columns) {
-//            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
-//        }
-//        Matrix X = new Matrix(rows, B.getColumnDimension());
-//        double[][] C = X.getArray();
-//        double[] Bcolj = new double[columns];
-//        for (int j = 0; j < B.getColumnDimension(); j++) {
-//            for (int k = 0; k < columns; k++) {
-//                Bcolj[k] = B.getArray()[k][j];
-//            }
-//            for (int i = 0; i < rows; i++) {
-//                double s = 0;
-//                for (int k = 0; k < columns; k++) {
-//                    s += A[i][k] * Bcolj[k];
-//                }
-//                C[i][j] = s;
-//            }
-//        }
-//        return X;
-//    }
+
+    private List<Integer>[] rotateFromColumnToRow() {
+        List<Integer>[] rotateArray = new List[rows];
+        for (int i = 0; i < rows; i++) {
+            rotateArray[i] = new ArrayList<>(MINIMAL_ARRAY_ALLOCATION);
+        }
+        for (int i = 0; i < columns; i++) {
+            for (int j = 0; j < array[i].size(); j++) {
+                int row = array[i].get(j);
+                int column = i;
+                rotateArray[row].add(column);
+            }
+        }
+        return rotateArray;
+    }
+
+    private List<Integer>[] rotateFromRowToColumn() {
+        List<Integer>[] rotateArray = new List[columns];
+        for (int i = 0; i < columns; i++) {
+            rotateArray[i] = new ArrayList<>(MINIMAL_ARRAY_ALLOCATION);
+        }
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < array[i].size(); j++) {
+                int row = i;
+                int column = array[i].get(j);
+                rotateArray[column].add(row);
+            }
+        }
+        return rotateArray;
+    }
+
+    public Matrix times(Matrix B) {
+        if (B.getRowDimension() != columns) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        double[][] result = new double[rows][B.getColumnDimension()];
+
+        List<Integer>[] matrix = null;
+
+        switch (orientation) {
+            case MATRIX_ORIENTATION_ROW: {
+                matrix = array;
+                break;
+            }
+            case MATRIX_ORIENTATION_COLUMN: {
+                matrix = rotateFromColumnToRow();
+                break;
+            }
+        }
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < B.getColumnDimension(); j++) {
+                double sum = 0;
+                for (int h = 0; h < matrix[i].size(); h++) {
+                    sum += B.getArray()[matrix[i].get(h)][j];
+                }
+                result[i][j] = sum;
+            }
+        }
+        return new Matrix(result);
+    }
+
+    public Matrix times(SparseSquareSymmetricMatrix B) {
+        if (B.getRowDimension() != columns) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        double[][] result = new double[rows][B.getColumnDimension()];
+
+        List<Integer>[] matrix = null;
+
+        switch (orientation) {
+            case MATRIX_ORIENTATION_ROW: {
+                matrix = array;
+                break;
+            }
+            case MATRIX_ORIENTATION_COLUMN: {
+                matrix = rotateFromColumnToRow();
+                break;
+            }
+        }
+
+        for (int i = 0; i < matrix.length; i++) {
+            for (int j = 0; j < B.getColumnDimension(); j++) {
+                double sum = 0;
+                for (int h = 0; h < matrix[i].size(); h++) {
+                    sum += B.get(matrix[i].get(h),j);
+                }
+                result[i][j] = sum;
+            }
+        }
+        return new Matrix(result);
+    }
+
+    public SparseZeroOneMatrix transpose() {
+        SparseZeroOneMatrix result = new SparseZeroOneMatrix(rows, columns);
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].size(); j++) {
+                result.array[i].add(array[i].get(j));
+            }
+        }
+        switch (orientation){
+            case MATRIX_ORIENTATION_COLUMN:{
+                result.orientation = MatrixOrientation.MATRIX_ORIENTATION_ROW;
+                break;
+            }
+            case MATRIX_ORIENTATION_ROW:{
+                result.orientation = MatrixOrientation.MATRIX_ORIENTATION_COLUMN;
+            }
+        }
+        result.rows = columns;
+        result.columns = rows;
+        return result;
+    }
+
+
+    public static Matrix multiply(Matrix A, SparseZeroOneMatrix B) {
+        if (B.rows != A.getColumnDimension()) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+
+        double[][] result = new double[A.getRowDimension()][B.columns];
+
+        List<Integer>[] matrix = null;
+
+        switch (B.orientation) {
+            case MATRIX_ORIENTATION_ROW: {
+                matrix = B.rotateFromRowToColumn();
+                break;
+            }
+            case MATRIX_ORIENTATION_COLUMN: {
+                matrix = B.array;
+                break;
+            }
+        }
+
+        for (int i = 0; i < A.getRowDimension(); i++) {
+            for (int j = 0; j < matrix.length; j++) {
+                double sum = 0;
+                for (int k = 0; k < matrix[j].size(); k++) {
+                    sum += A.getArray()[i][matrix[j].get(k)];
+                }
+                result[i][j] = sum;
+            }
+        }
+
+        return new Matrix(result);
+    }
+
 }

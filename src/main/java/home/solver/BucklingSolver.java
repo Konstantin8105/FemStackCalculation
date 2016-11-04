@@ -42,7 +42,7 @@ public class BucklingSolver extends Solver {
         if (DEBUG) A.convert().print(3, 0);
 
         if (DEBUG) System.out.println("Start calc Kok");
-        Matrix Kok = generateMatrixQuasiStiffener(femElements);
+        Matrix Kok = generateMatrixQuasiStiffener(femElements).convert();
         if (DEBUG) Kok.print(15, 1);
 
         if (DEBUG) System.out.println("Start calc Ko");

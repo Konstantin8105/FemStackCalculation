@@ -6,6 +6,7 @@ import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
+import home.solver.matrixes.SparseSquareSymmetricMatrix;
 import home.solver.matrixes.SparseZeroOneMatrix;
 
 import java.util.*;
@@ -139,7 +140,7 @@ public class Solver {
         int pointAxes = FemPoint.AMOUNT_POINT_AXES;
 
 //        double[][] a = new double[elements.length * elementAxes][femPoints.length * pointAxes];
-        SparseZeroOneMatrix a = new SparseZeroOneMatrix(elements.length * elementAxes,femPoints.length * pointAxes);
+        SparseZeroOneMatrix a = new SparseZeroOneMatrix(elements.length * elementAxes, femPoints.length * pointAxes);
 
 //        if (DEBUG) {
 //            System.out.println("Amount fem elements = " + elements.length);
@@ -165,7 +166,7 @@ public class Solver {
                 int point = i / 3;
                 int column = convertPointGlobalAxeToNumber.get(element.getPoint()[point].getNumberGlobalAxe()[axe]);
 //                a[row][column] = 1;
-                a.addOne(row,column);
+                a.addOne(row, column);
             }
         }
 
@@ -245,27 +246,33 @@ public class Solver {
 //        return array;
 //    }
 
-    static Matrix generateMatrixQuasiStiffener(FemElement[] femElements) {
+    static SparseSquareSymmetricMatrix generateMatrixQuasiStiffener(FemElement[] femElements) {
 
         //TODO optimize to diagonal matrix and symmetrical
         int amount = 0;
+        int maxSizeInternalMatrix = 0;
         for (int i = 0; i < femElements.length; i++) {
-            amount += femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
+            int size = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
+            amount += size;
+            maxSizeInternalMatrix = maxSizeInternalMatrix < size ? size : maxSizeInternalMatrix;
         }
 
-        double[][] kok = new double[amount][amount];
+//        double[][] kok = new double[amount][amount];
+        SparseSquareSymmetricMatrix kok = new SparseSquareSymmetricMatrix(amount,maxSizeInternalMatrix);
+
         for (int i = 0; i < femElements.length; i++) {
             int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
             int positionBaseLine = i * sizeAxes;
             Matrix ks = femElements[i].getStiffenerMatrixTr();
-            for (int j = 0; j < sizeAxes; j++) {
-                for (int k = 0; k < sizeAxes; k++) {
-                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-                }
-            }
+            kok.add(positionBaseLine, ks);
+//            for (int j = 0; j < sizeAxes; j++) {
+//                for (int k = 0; k < sizeAxes; k++) {
+//                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
+//                }
+//            }
         }
 
-        return new Matrix(kok);
+        return kok;//new Matrix(kok);
     }
 
     //

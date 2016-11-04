@@ -27,6 +27,40 @@ Amount =     50 : Time =        125 msec.
 Amount =    100 : Time =        242 msec.
 Amount =    200 : Time =       1891 msec.
 Amount =    400 : Time =      13230 msec.
+
+After creating SparseZeroOneMatrix
+
+Amount =      2 : Time =         26 msec.
+Amount =      3 : Time =         16 msec.
+Amount =     10 : Time =         29 msec.
+Amount =     20 : Time =         40 msec.
+Amount =     50 : Time =         55 msec.
+Amount =    100 : Time =         58 msec.
+Amount =    200 : Time =        313 msec.
+Amount =    400 : Time =       1136 msec.
+
+After creating SparseSquareSymmetricMatrix
+
+Amount =      2 : Time =         44 msec.
+Amount =      3 : Time =          1 msec.
+Amount =     10 : Time =         16 msec.
+Amount =     20 : Time =         66 msec.
+Amount =     50 : Time =         71 msec.
+Amount =    100 : Time =        168 msec.
+Amount =    200 : Time =        743 msec.
+Amount =    400 : Time =       3053 msec.
+
+After optimize SparseSquareSymmetricMatrix::findInternalMatrix
+
+Amount =      2 : Time =         17 msec.
+Amount =      3 : Time =          0 msec.
+Amount =     10 : Time =         13 msec.
+Amount =     20 : Time =         12 msec.
+Amount =     50 : Time =         55 msec.
+Amount =    100 : Time =         98 msec.
+Amount =    200 : Time =        239 msec.
+Amount =    400 : Time =       1100 msec.
+
      */
 
     private final int amountIntermediatePoints;
@@ -34,13 +68,15 @@ Amount =    400 : Time =      13230 msec.
     @Parameterized.Parameters
     public static Collection<Integer> primeNumbers() {
         return Arrays.asList(
+                2,
                 3,
                 10,
                 20,
                 50,
                 100,
                 200,
-                400);
+                400
+        );
     }
 
     public ParametricTestPerformance(int amountIntermediatePoints) {
