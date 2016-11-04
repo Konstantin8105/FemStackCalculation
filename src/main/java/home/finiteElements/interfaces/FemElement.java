@@ -24,11 +24,9 @@ public abstract class FemElement {
 
     protected FemElement(FemPoint[] point) {
         this.point = point;
-        localAxes = new int[6];
+        localAxes = new int[FemPoint.AMOUNT_POINT_AXES * point.length];
         for (int i = 0; i < localAxes.length; i++) {
-            if (getAxeAllowable()[i])
-                localAxes[i] = getGlobalNumber();
-            else localAxes[i] = -1;
+            localAxes[i] = getGlobalNumber();
         }
         length = Math.sqrt(Math.pow(point[0].getX() - point[1].getX(), 2.) + Math.pow(point[0].getY() - point[1].getY(), 2.));
         id = global_number_id++;
@@ -37,16 +35,6 @@ public abstract class FemElement {
     protected double getLength() {
         return length;
     }
-
-    public abstract boolean[] getAxeAllowable();//return boolean array with size = 6
-
-//    public int getAmountLocalAxes() {
-//        int amount = 0;
-//        for (int i = 0; i < getAxeAllowable().length; i++) {
-//            amount++;
-//        }
-//        return amount;
-//    }
 
     public int getId() {
         return id;
@@ -74,15 +62,15 @@ public abstract class FemElement {
     }
 
     // Buckling
-
-    public abstract Matrix getPotentialMatrix();
-
-    Matrix getPotentialMatrixTr() {
-        Matrix tr = getTr();
-        Matrix gr = getPotentialMatrix();
-        return ((tr.transpose().times(gr)).times(tr));
-    }
-
+//
+//    public abstract Matrix getPotentialMatrix();
+//
+//    Matrix getPotentialMatrixTr() {
+//        Matrix tr = getTr();
+//        Matrix gr = getPotentialMatrix();
+//        return ((tr.transpose().times(gr)).times(tr));
+//    }
+//
     // Modal
 
     public abstract Matrix getMatrixMass();

@@ -2,13 +2,11 @@ package home.solver;
 
 import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
-import home.finiteElements.FemBeam2d;
-import home.finiteElements.FemBending2d;
-import home.finiteElements.FemTruss2d;
 import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
+import home.solver.matrixes.SparseZeroOneMatrix;
 
 import java.util.*;
 
@@ -102,16 +100,9 @@ public class Solver {
         List<Integer> listOfLineAxes = new ArrayList<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
-                if (element instanceof FemBeam2d) {
-                    for (int j = 0; j < 3; j++) {
-                        listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
-                    }
-                } else if (element instanceof FemBending2d) {
-                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
-                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
-                } else if (element instanceof FemTruss2d) {
-                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
-                } else throw new Exception("ModalSolver element not supported");
+                for (int j = 0; j < FemPoint.AMOUNT_POINT_AXES; j++) {
+                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
+                }
             }
         }
         Collections.sort(listOfLineAxes);
@@ -135,7 +126,7 @@ public class Solver {
         return map;
     }
 
-    static Matrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] lines) throws Exception {
+    static SparseZeroOneMatrix generateMatrixCompliance(FemPoint[] femPoints, FemElement[] elements) throws Exception {
         //Y0
         //...^
         //...|
@@ -144,92 +135,56 @@ public class Solver {
         //...|....0
         //...+---->---> X0
 
-        int elementAxes;//= -1;
-        int pointAxes;// = -1;
+        int elementAxes = 2 * FemPoint.AMOUNT_POINT_AXES;
+        int pointAxes = FemPoint.AMOUNT_POINT_AXES;
 
-        if (lines[0] instanceof FemBeam2d) {
-            elementAxes = 6;
-            pointAxes = 3;
-        } else if (lines[0] instanceof FemBending2d) {
-            elementAxes = 4;
-            pointAxes = 2;
-        } else if (lines[0] instanceof FemTruss2d) {
-            elementAxes = 4;
-            pointAxes = 1;
-        } else throw new Exception("FEM Element is not support");
+//        double[][] a = new double[elements.length * elementAxes][femPoints.length * pointAxes];
+        SparseZeroOneMatrix a = new SparseZeroOneMatrix(elements.length * elementAxes,femPoints.length * pointAxes);
 
-        double[][] a = new double[lines.length * elementAxes][femPoints.length * pointAxes];
+//        if (DEBUG) {
+//            System.out.println("Amount fem elements = " + elements.length);
+//            System.out.println("Amount columns(fem elements*6) = " + elements.length * 6);
+//            System.out.println("Amount points elements = " + femPoints.length);
+//            System.out.println("Amount rows(points elements*3) = " + femPoints.length * 3);
+//            System.out.println("Matrix A size = [" + a.length + "," + a[0].length + "]");
+//            boolean bug = false;
+//            for (double[] anA : a) {
+//                for (int j = 0; j < a[0].length; j++) {
+//                    if (anA[j] != 0 && anA[j] != 1) {
+//                        bug = true;
+//                    }
+//                }
+//            }
+//            System.out.println("All elements A is zero or one? " + !bug);
+//        }
 
-        if (DEBUG) {
-            System.out.println("Amount fem elements = " + lines.length);
-            System.out.println("Amount columns(fem elements*6) = " + lines.length * 6);
-            System.out.println("Amount points elements = " + femPoints.length);
-            System.out.println("Amount rows(points elements*3) = " + femPoints.length * 3);
-            System.out.println("Matrix A size = [" + a.length + "," + a[0].length + "]");
-            boolean bug = false;
-            for (double[] anA : a) {
-                for (int j = 0; j < a[0].length; j++) {
-                    if (anA[j] != 0 && anA[j] != 1) {
-                        bug = true;
-                    }
-                }
+        for (FemElement element : elements) {
+            for (int i = 0; i < element.getPoint().length * FemPoint.AMOUNT_POINT_AXES; i++) {
+                int row = convertLineGlobalAxeToNumber.get(element.getLocalAxes()[i]);
+                int axe = i % 3;
+                int point = i / 3;
+                int column = convertPointGlobalAxeToNumber.get(element.getPoint()[point].getNumberGlobalAxe()[axe]);
+//                a[row][column] = 1;
+                a.addOne(row,column);
             }
-            System.out.println("All elements A is zero or one? " + !bug);
         }
 
-        for (FemElement line : lines) {
-            int row;
-            int column;
-            if (line instanceof FemBeam2d) {
-                for (int i = 0; i < 6; i++) {
-                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[i]);
-                    int axe = i % 3;
-                    int point = i / 3;
-                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[point].getNumberGlobalAxe()[axe]);
-                    a[row][column] = 1;
-                }
-            } else if (line instanceof FemBending2d) {
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
-                a[row][column] = 1;
+//        if (DEBUG) {
+//            long amount = 0;
+//            for (double[] anA : a) {
+//                for (int j = 0; j < a[0].length; j++) {
+//                    if (anA[j] > 0)
+//                        amount++;
+//                }
+//            }
+//            System.out.println(
+//                    "Amount not zero elements :" + amount + " of "
+//                            + "(" + a.length + "," + a[0].length + ") = "
+//                            + (a.length * a[0].length) + " elements");
+//        }
 
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
-                a[row][column] = 1;
-
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[2]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
-                a[row][column] = 1;
-
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[3]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
-                a[row][column] = 1;
-            } else if (line instanceof FemTruss2d) {
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
-                a[row][column] = 1;
-
-                row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
-                column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
-                a[row][column] = 1;
-            } else throw new Exception("FEM Element is not support");
-        }
-
-        if (DEBUG) {
-            long amount = 0;
-            for (double[] anA : a) {
-                for (int j = 0; j < a[0].length; j++) {
-                    if (anA[j] > 0)
-                        amount++;
-                }
-            }
-            System.out.println(
-                    "Amount not zero elements :" + amount + " of "
-                            + "(" + a.length + "," + a[0].length + ") = "
-                            + (a.length * a[0].length) + " elements");
-        }
-
-        return new Matrix(a);
+//        return new Matrix(a);
+        return a;
     }
 //
 //    //TODO use next method for optimization
@@ -293,10 +248,14 @@ public class Solver {
     static Matrix generateMatrixQuasiStiffener(FemElement[] femElements) {
 
         //TODO optimize to diagonal matrix and symmetrical
-        int sizeAxes = femElements[0].getLocalAxes().length;
-
-        double[][] kok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        int amount = 0;
         for (int i = 0; i < femElements.length; i++) {
+            amount += femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
+        }
+
+        double[][] kok = new double[amount][amount];
+        for (int i = 0; i < femElements.length; i++) {
+            int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
             int positionBaseLine = i * sizeAxes;
             Matrix ks = femElements[i].getStiffenerMatrixTr();
             for (int j = 0; j < sizeAxes; j++) {
@@ -369,10 +328,16 @@ public class Solver {
 //
     static Matrix generateQuasiMatrixMass(FemElement[] femElements) {
         //TODO optimize to diagonal matrix
-        int sizeAxes = femElements[0].getLocalAxes().length;
-
-        double[][] gok = new double[femElements.length * sizeAxes][femElements.length * sizeAxes];
+        int amount = 0;
         for (int i = 0; i < femElements.length; i++) {
+            amount += femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
+        }
+
+//        int sizeAxes = femElements[0].getLocalAxes().length;
+
+        double[][] gok = new double[amount][amount];
+        for (int i = 0; i < femElements.length; i++) {
+            int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
             int positionBaseLine = i * sizeAxes;
             Matrix ks = femElements[i].getMatrixMassTr();
             for (int j = 0; j < sizeAxes; j++) {

@@ -9,18 +9,12 @@ public class FemBeam2d extends FemElement {
     private final double area;
     private final double momentInertia;
 
-    @SuppressWarnings("SameParameterValue")
     public FemBeam2d(double elacity, double area, double momentInertia, FemPoint[] point) {
         super(point);
         this.elacity = elacity;
         this.area = area;
         this.momentInertia = momentInertia;
     }
-
-//    @Override
-//    protected int getAmountLocalAxes() {
-//        return 6;
-//    }
 
     @Override
     public Matrix getTr() {
@@ -56,24 +50,6 @@ public class FemBeam2d extends FemElement {
     }
 
     @Override
-    public Matrix getPotentialMatrix() {
-        double[][] stiffener = new double[6][6];
-        double l = getLength();
-        //todo only if compress
-//        double axialForce = -1;
-//        stiffener[1][1] = stiffener[4][4] = axialForce * (6. / 5.0 / l);
-//        stiffener[2][2] = stiffener[5][5] = axialForce * (2. * l / 15.);
-//        stiffener[1][2] = stiffener[2][1] = axialForce * (0.1);
-//        stiffener[2][4] = stiffener[4][2] = axialForce * (-0.1);
-//        stiffener[4][5] = stiffener[5][4] = axialForce * (-0.1);
-//        stiffener[4][1] = stiffener[1][4] = axialForce * (-6. / 5. / l);
-//        stiffener[5][2] = stiffener[2][5] = axialForce * (-l / 30.);
-//        stiffener[1][5] = stiffener[5][1] = axialForce * (0.1);
-        return new Matrix(stiffener);
-    }
-
-
-    @Override
     public Matrix getMatrixMass() {
         double density = 78500;// N/m^3
         double[][] stiffener = new double[6][6];
@@ -91,18 +67,5 @@ public class FemBeam2d extends FemElement {
         stiffener[1][5] = stiffener[5][1] = -13. * l * l / 420. * mu + rz / 10.;
         stiffener[2][5] = stiffener[5][2] = -l * l * l / 140. * mu - rz * l / 30.;
         return new Matrix(stiffener);
-    }
-
-//    @Override
-//    public void setGlobalDisplacementInPoint(double[] localDisplacement) {
-//        point[0].setGlobalDisplacement(new double[]{localDisplacement[0], localDisplacement[1], localDisplacement[2]});
-//        point[1].setGlobalDisplacement(new double[]{localDisplacement[3], localDisplacement[4], localDisplacement[5]});
-//    }
-
-    final static boolean[] axes = new boolean[]{true, true, true, true, true, true};
-
-    @Override
-    public boolean[] getAxeAllowable() {
-        return axes;
     }
 }

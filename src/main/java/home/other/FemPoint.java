@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 public class FemPoint {
 
+    public static int AMOUNT_POINT_AXES = 3;
+
     static private int global_number_id = -1;
 
     static private int global_number = 0;
@@ -18,7 +20,7 @@ public class FemPoint {
     }
 
     private final int number;
-    private final int[] numberGlobalAxe = new int[3];
+    private final int[] numberGlobalAxe = new int[AMOUNT_POINT_AXES];
     private double x;
     private double y;
     private int id;

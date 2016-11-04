@@ -5,6 +5,7 @@ import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
+import home.solver.matrixes.SparseZeroOneMatrix;
 
 public class BucklingSolver extends Solver {
 
@@ -36,9 +37,9 @@ public class BucklingSolver extends Solver {
 
         if (DEBUG) System.out.println("Start calc A");
         //TODO optimize
-        Matrix A = generateMatrixCompliance(femPoints, femElements);
+        SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
         //List<Integer>[] A2 = generateMatrixCompliance2(femPoints, femElements);
-        if (DEBUG) A.print(3, 0);
+        if (DEBUG) A.convert().print(3, 0);
 
         if (DEBUG) System.out.println("Start calc Kok");
         Matrix Kok = generateMatrixQuasiStiffener(femElements);
@@ -47,7 +48,7 @@ public class BucklingSolver extends Solver {
         if (DEBUG) System.out.println("Start calc Ko");
         //Matrix Ko = calculate(A2, Kok);
         //TODO optimize
-        Matrix Ko = (A.transpose().times(Kok)).times(A);
+        Matrix Ko = (A.convert().transpose().times(Kok)).times(A.convert());
         if (DEBUG) Ko.print(15, 1);
 
         if (DEBUG) System.out.println("Start calc K");
@@ -73,7 +74,7 @@ public class BucklingSolver extends Solver {
 
             if (DEBUG) System.out.println("Start calc Z0k");
             //TODO optimize
-            Matrix Z0k = A.times(Z0);
+            Matrix Z0k = A.convert().times(Z0);
             if (DEBUG) Z0k.print(10, 6);
 //
 //            if (DEBUG) System.out.println("Start calc localDisplacement");

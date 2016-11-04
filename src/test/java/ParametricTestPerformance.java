@@ -19,16 +19,28 @@ import static org.junit.Assert.assertFalse;
 @RunWith(Parameterized.class)
 public class ParametricTestPerformance {
 
+    /*
+Amount =      3 : Time =         15 msec.
+Amount =     10 : Time =         12 msec.
+Amount =     20 : Time =         21 msec.
+Amount =     50 : Time =        125 msec.
+Amount =    100 : Time =        242 msec.
+Amount =    200 : Time =       1891 msec.
+Amount =    400 : Time =      13230 msec.
+     */
+
     private final int amountIntermediatePoints;
 
     @Parameterized.Parameters
     public static Collection<Integer> primeNumbers() {
         return Arrays.asList(
+                3,
                 10,
                 20,
                 50,
                 100,
-                200);
+                200,
+                400);
     }
 
     public ParametricTestPerformance(int amountIntermediatePoints) {
@@ -38,6 +50,8 @@ public class ParametricTestPerformance {
     @Test
     public void test() {
         Assert.assertTrue(amountIntermediatePoints > 0);
+
+        long start = System.currentTimeMillis();
 
         FemPoint[] femPoints = new FemPoint[amountIntermediatePoints];
         for (int i = 0; i < femPoints.length; i++) {
@@ -77,5 +91,10 @@ public class ParametricTestPerformance {
 
         assertEquals(solver.getGlobalDeformationPoint(femPoints[0]).getX(), 0.0000, 1e-4);
         assertEquals(solver.getGlobalDeformationPoint(femPoints[femPoints.length - 1]).getY(), 0.0249, 1e-4);
+
+        long finish = System.currentTimeMillis();
+
+        System.out.println("Amount = " + String.format("%6d", amountIntermediatePoints)
+                + " : Time = " + String.format("%10d",(finish - start)) + " msec.");
     }
 }
