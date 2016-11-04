@@ -61,6 +61,16 @@ Amount =    100 : Time =         98 msec.
 Amount =    200 : Time =        239 msec.
 Amount =    400 : Time =       1100 msec.
 
+After optimize SparseZeroOneMatrix::multiplyWithSquareSymmetric
+
+Amount =      2 : Time =         17 msec.
+Amount =      3 : Time =          1 msec.
+Amount =     10 : Time =          6 msec.
+Amount =     20 : Time =         30 msec.
+Amount =     50 : Time =         75 msec.
+Amount =    100 : Time =        130 msec.
+Amount =    200 : Time =        198 msec.
+Amount =    400 : Time =       1187 msec.
      */
 
     private final int amountIntermediatePoints;

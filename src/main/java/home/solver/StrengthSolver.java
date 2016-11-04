@@ -69,16 +69,15 @@ public class StrengthSolver extends Solver {
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
         SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
-        //TODO optimize
         SparseSquareSymmetricMatrix Kok = generateMatrixQuasiStiffener(femElements);
-        Matrix Ko = SparseZeroOneMatrix.multiply(A.transpose().times(Kok), A);
+        Matrix Ko = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Kok), A);
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
         //TODO optimize
         Matrix Z0 = K.solve(forceVector);
         Matrix Z0k = A.times(Z0);
 
-        if (DEBUG) System.out.println("Start calc localDisplacement");
+        // Start calc localDisplacement
         for (int i = 0; i < femElements.length; i++) {
             int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
             double[] localDisplacement = new double[sizeAxes];
@@ -87,53 +86,10 @@ public class StrengthSolver extends Solver {
             }
             addInGlobalDisplacementCoordinate(femElements[i], localDisplacement);
         }
-//        if (DEBUG) {
-//            for (FemElement femElement : femElements) {
-//                System.out.println(femElement);
-//                femElement.getInternalForce().print(10, 1);
-//            }
-//        }
-//
-//        if (DEBUG) {
-//            Matrix Z01 = K.solve(forceVector);
-//            System.out.println("Z01");
-//            Z01.print(15, 10);
-//            Matrix G0 = K.solve(Z01);
-//            System.out.println("G0");
-//            G0.print(15, 10);
-//        }
-//
-//        if (DEBUG) {
-//            for (int i = 0; i < femPoints.length; i++) {
-//                System.out.println("[" + i + "]");
-//                for (int j = 0; j < femPoints[i].getGlobalDisplacement().length; j++) {
-//                    System.out.println("\t " + femPoints[i].getGlobalDisplacement()[j]);
-//                }
-//            }
-//        }
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
     }
-
-
-//    private Matrix displacementInGlobalSystem;
-//
-//    public Matrix getDisplacementInGlobalSystem() {
-//        return displacementInGlobalSystem;
-//    }
-//
-//    private Matrix displacementInLocalSystem;
-//
-//    public Matrix getDisplacementInLocalSystem() {
-//        return displacementInLocalSystem;
-//    }
-//
-//    private Matrix internalForce;
-//
-//    public Matrix getInternalForce() {
-//        return internalForce;
-//    }
 
 
     public void addInGlobalDisplacementCoordinate(FemElement femElement, double[] localDisplacement) {

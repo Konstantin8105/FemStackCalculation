@@ -8,12 +8,11 @@ import java.util.List;
 public class SparseZeroOneMatrix {
 
     private final static int MINIMAL_ARRAY_ALLOCATION = 2;
+
     private enum MatrixOrientation {
         MATRIX_ORIENTATION_ROW,
         MATRIX_ORIENTATION_COLUMN
     }
-
-    ;
 
     private MatrixOrientation orientation;
     private List<Integer>[] array;
@@ -206,6 +205,49 @@ public class SparseZeroOneMatrix {
                     sum += A.getArray()[i][matrix[j].get(k)];
                 }
                 result[i][j] = sum;
+            }
+        }
+
+        return new Matrix(result);
+    }
+
+
+    public static Matrix multiplyWithSquareSymmetric(Matrix A, SparseZeroOneMatrix B) {
+        if (A.getColumnDimension() != B.rows) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+        if(A.getRowDimension() != B.columns) {
+            throw new IllegalArgumentException("Matrix inner dimensions must agree.");
+        }
+
+        int size = A.getRowDimension();
+        double[][] result = new double[size][size];
+
+        List<Integer>[] matrix = null;
+
+        switch (B.orientation) {
+            case MATRIX_ORIENTATION_ROW: {
+                matrix = B.rotateFromRowToColumn();
+                break;
+            }
+            case MATRIX_ORIENTATION_COLUMN: {
+                matrix = B.array;
+                break;
+            }
+        }
+
+        for (int i = 0; i < size; i++) {
+            for (int j = i; j < size; j++) {
+                double sum = 0;
+                for (int k = 0; k < matrix[j].size(); k++) {
+                    sum += A.getArray()[i][matrix[j].get(k)];
+                }
+                result[i][j] = sum;
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < i; j++) {
+                result[i][j] = result[j][i];
             }
         }
 
