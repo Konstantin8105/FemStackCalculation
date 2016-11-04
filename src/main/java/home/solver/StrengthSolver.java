@@ -73,10 +73,15 @@ public class StrengthSolver extends Solver {
         Matrix Ko = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Kok), A);
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
-        //TODO optimize
-        Matrix Z0 = K.solve(forceVector);
-        Matrix Z0k = A.times(Z0);
 
+        long start = System.currentTimeMillis();
+
+        //TODO big problem - optimize
+        Matrix Z0 = K.solve(forceVector);
+
+        System.out.println("Solve time = " + (System.currentTimeMillis() - start) + " msec.");
+
+        Matrix Z0k = A.times(Z0);
         // Start calc localDisplacement
         for (int i = 0; i < femElements.length; i++) {
             int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
@@ -132,7 +137,7 @@ public class StrengthSolver extends Solver {
 
     public Matrix getLocalForces(FemElement femElement) {
         for (int i = 0; i < localForces.size(); i++) {
-            if(localForces.get(i).idElement == femElement.getId())
+            if (localForces.get(i).idElement == femElement.getId())
                 return localForces.get(i).forces;
         }
         return null;
