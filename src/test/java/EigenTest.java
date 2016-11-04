@@ -121,10 +121,7 @@ public class EigenTest {
                 {0, 0, 0, 3}
         };
         Matrix massM = new Matrix(mass);
-        massM = massM.times(1500);// * 10
-
-        System.out.println("Matrix mass");
-        massM.print(8, 0);
+        massM = massM.times(1500);
 
         double[][] stiff = new double[][]{
                 {1., -1, 0., 0.},
@@ -136,13 +133,7 @@ public class EigenTest {
         Matrix stiffM = new Matrix(stiff);
         stiffM = stiffM.times(800 * 1000);
 
-//        System.out.println("Matrix stiff");
-//        stiffM.print(8, 0);
-//
         Matrix[] values = Solver.calculateEigen(stiffM, massM);
-//        for (int i = 0; i < values[0].getArray().length; i++) {
-//            System.out.println(i + " = " + values[0].getArray()[i][0]);
-//        }
 
         Assert.assertEquals(values[0].getArray()[0][0], 117.8, 1e-1);
         Assert.assertEquals(values[0].getArray()[1][0], 586.5, 1e-1);
@@ -222,17 +213,6 @@ public class EigenTest {
         Matrix M = new Matrix(m);
 
         Matrix[] values = Solver.calculateEigen(K, M);
-
-//        System.out.println("Eigenvalue:");
-//        for (int i = 0; i < values[0].getArray().length; i++) {
-//            System.out.println(
-//                    i
-//                    + " == "
-//                    + values[0].getArray()[i][0]
-//            );
-//        }
-//        System.out.println("Eigenvector:");
-//        values[1].print(10,6);
 
         Assert.assertEquals(values[0].getArray()[0][0], 7.63932e-01, 1e-1);
         Assert.assertEquals(values[0].getArray()[1][0], 5.23607e0, 1e-1);

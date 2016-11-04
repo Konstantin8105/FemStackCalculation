@@ -122,27 +122,19 @@ public class StrengthSolver extends Solver {
         localForces.add(new LocalForce(femElement.getId(), internalForce));
     }
 
-    public List<DeformationPoint> getLocalDeformationPoint() {
-        return localDeformationPoint;
-    }
-
-    public List<DeformationPoint> getGlobalDeformationPoint() {
-        return globalDeformationPoint;
-    }
-
-    public DeformationPoint getGlobalDeformationPoint(int id) {
+    public DeformationPoint getGlobalDeformationPoint(FemPoint point) {
         for (int i = 0; i < globalDeformationPoint.size(); i++) {
-            if (globalDeformationPoint.get(i).idPoint == id)
+            if (globalDeformationPoint.get(i).idPoint == point.getId())
                 return globalDeformationPoint.get(i);
         }
         return null;
     }
 
-    public DeformationPoint getGlobalDeformationPoint(FemPoint point) {
-        return getGlobalDeformationPoint(point.getId());
-    }
-
-    public List<LocalForce> getLocalForces() {
-        return localForces;
+    public Matrix getLocalForces(FemElement femElement) {
+        for (int i = 0; i < localForces.size(); i++) {
+            if(localForces.get(i).idElement == femElement.getId())
+                return localForces.get(i).forces;
+        }
+        return null;
     }
 }
