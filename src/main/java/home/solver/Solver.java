@@ -17,46 +17,6 @@ public class Solver {
 
     static Map<Integer, Integer> convertPointGlobalAxeToNumber;
     static Map<Integer, Integer> convertLineGlobalAxeToNumber;
-//    static Map<Integer, Integer> convertPointGlobalAxeToLineGlobalAxe;
-//
-//    static void convertPointGlobalAxeToLineGlobalAxe(){
-//        for (int i = 0; i < 1; i++) {
-//
-//        }
-//    }
-
-//    static Matrix calculate(List<Integer>[] a, Matrix kok) {
-//        //TODO create beautiful method
-//        // A.transpose().times(Kok)
-//        Matrix aK = new Matrix(a.length, kok.getColumnDimension());
-//        for (int i = 0; i < aK.getRowDimension(); i++) {
-//            for (int j = 0; j < aK.getColumnDimension(); j++) {
-//                aK.getArray()[i][j] = 0.0;
-//            }
-//        }
-//        for (int i = 0; i < a.length; i++) {
-//            for (int j = 0; j < kok.getColumnDimension(); j++) {
-//                //a[i].get(j) is row. After transpose - this is column.
-//                double sum = 0;
-//                for (int k = 0; k < a[i].size(); k++) {
-//                    sum += kok.getArray()[j][a[i].get(k)];
-//                }
-//                aK.getArray()[i][j] = sum;
-//            }
-//        }
-//        Matrix aKa = new Matrix(a.length, a.length);
-//        for (int i = 0; i < a.length; i++) {
-//            for (int j = 0; j < a.length; j++) {
-//                //a[i].get(j) is row.
-//                double sum = 0;
-//                for (int k = 0; k < a[i].size(); k++) {
-//                    sum += aK.getArray()[j][a[i].get(k)];
-//                }
-//                aKa.getArray()[i][j] = sum;
-//            }
-//        }
-//        return aKa;
-//    }
 
     static Map<Integer, Integer> convertLineAxeToSequenceAxe(FemElement[] femElements) {
         Set<Integer> listOfLineAxes = new HashSet<>();
@@ -77,27 +37,6 @@ public class Solver {
     }
 
     static Map<Integer, Integer> convertPointAxeToSequenceAxe(FemElement[] femElements) throws Exception {
-//        Set<Integer> listOfLineAxes = new HashSet<>();
-//        for (FemElement element : femElements) {
-//            for (int i = 0; i < element.getPoint().length; i++) {
-//                if (element instanceof FemBeam2d) {
-//                    for (int j = 0; j < 3; j++) {
-//                        listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[j]);
-//                    }
-//                } else if (element instanceof FemBending2d) {
-//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[1]);
-//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[2]);
-//                } else if(element instanceof FemTruss2d){
-//                    listOfLineAxes.add(element.getPoint()[i].getNumberGlobalAxe()[0]);
-//                }else throw new Exception("ModalSolver element not supported");
-//            }
-//        }
-//        Map<Integer, Integer> map = new TreeMap<>();
-//        int position = 0;
-//        for (Integer number : listOfLineAxes) {
-//            map.put(number, position++);
-//        }
-//        return map;
         List<Integer> listOfLineAxes = new ArrayList<>();
         for (FemElement element : femElements) {
             for (int i = 0; i < element.getPoint().length; i++) {
@@ -139,25 +78,7 @@ public class Solver {
         int elementAxes = 2 * FemPoint.AMOUNT_POINT_AXES;
         int pointAxes = FemPoint.AMOUNT_POINT_AXES;
 
-//        double[][] a = new double[elements.length * elementAxes][femPoints.length * pointAxes];
         SparseZeroOneMatrix a = new SparseZeroOneMatrix(elements.length * elementAxes, femPoints.length * pointAxes);
-
-//        if (DEBUG) {
-//            System.out.println("Amount fem elements = " + elements.length);
-//            System.out.println("Amount columns(fem elements*6) = " + elements.length * 6);
-//            System.out.println("Amount points elements = " + femPoints.length);
-//            System.out.println("Amount rows(points elements*3) = " + femPoints.length * 3);
-//            System.out.println("Matrix A size = [" + a.length + "," + a[0].length + "]");
-//            boolean bug = false;
-//            for (double[] anA : a) {
-//                for (int j = 0; j < a[0].length; j++) {
-//                    if (anA[j] != 0 && anA[j] != 1) {
-//                        bug = true;
-//                    }
-//                }
-//            }
-//            System.out.println("All elements A is zero or one? " + !bug);
-//        }
 
         for (FemElement element : elements) {
             for (int i = 0; i < element.getPoint().length * FemPoint.AMOUNT_POINT_AXES; i++) {
@@ -165,90 +86,14 @@ public class Solver {
                 int axe = i % 3;
                 int point = i / 3;
                 int column = convertPointGlobalAxeToNumber.get(element.getPoint()[point].getNumberGlobalAxe()[axe]);
-//                a[row][column] = 1;
                 a.addOne(row, column);
             }
         }
 
-//        if (DEBUG) {
-//            long amount = 0;
-//            for (double[] anA : a) {
-//                for (int j = 0; j < a[0].length; j++) {
-//                    if (anA[j] > 0)
-//                        amount++;
-//                }
-//            }
-//            System.out.println(
-//                    "Amount not zero elements :" + amount + " of "
-//                            + "(" + a.length + "," + a[0].length + ") = "
-//                            + (a.length * a[0].length) + " elements");
-//        }
-
-//        return new Matrix(a);
         return a;
     }
-//
-//    //TODO use next method for optimization
-//    static List<Integer>[] generateMatrixCompliance2(FemPoint[] femPoints, FemElement[] lines) throws Exception {
-//        //Y0
-//        //...^
-//        //...|
-//        //...|
-//        //...^1
-//        //...|....0
-//        //...+---->---> X0
-//
-//        int sizeAxes = lines[0].getLocalAxes().length / 2;
-//
-//        List<Integer>[] array = new List[sizeAxes * femPoints.length];
-//        for (int i = 0; i < array.length; i++) {
-//            array[i] = new ArrayList<>();
-//        }
-//
-//        for (FemElement line : lines) {
-//            int row;
-//            int column;
-//
-//            if (line instanceof FemBeam2d) {
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[0]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[0]);
-//                    array[column].add(row);
-//                }
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[1]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[1]);
-//                    array[column].add(row);
-//                }
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[2]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[0].getNumberGlobalAxe()[2]);
-//                    array[column].add(row);
-//                }
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[3]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[0]);
-//                    array[column].add(row);
-//                }
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[4]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[1]);
-//                    array[column].add(row);
-//                }
-//                {
-//                    row = convertLineGlobalAxeToNumber.get(line.getLocalAxes()[5]);
-//                    column = convertPointGlobalAxeToNumber.get(line.getPoint()[1].getNumberGlobalAxe()[2]);
-//                    array[column].add(row);
-//                }
-//            } else throw new Exception("FEM Element is not support");
-//        }
-//
-//        return array;
-//    }
 
     static SparseSquareSymmetricMatrix generateMatrixQuasiStiffener(FemElement[] femElements) {
-
-        //TODO optimize to diagonal matrix and symmetrical
         int amount = 0;
         int maxSizeInternalMatrix = 0;
         for (int i = 0; i < femElements.length; i++) {
@@ -257,22 +102,15 @@ public class Solver {
             maxSizeInternalMatrix = maxSizeInternalMatrix < size ? size : maxSizeInternalMatrix;
         }
 
-//        double[][] kok = new double[amount][amount];
-        SparseSquareSymmetricMatrix kok = new SparseSquareSymmetricMatrix(amount,maxSizeInternalMatrix);
-
+        SparseSquareSymmetricMatrix kok = new SparseSquareSymmetricMatrix(amount, maxSizeInternalMatrix);
         for (int i = 0; i < femElements.length; i++) {
             int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
             int positionBaseLine = i * sizeAxes;
             Matrix ks = femElements[i].getStiffenerMatrixTr();
             kok.add(positionBaseLine, ks);
-//            for (int j = 0; j < sizeAxes; j++) {
-//                for (int k = 0; k < sizeAxes; k++) {
-//                    kok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-//                }
-//            }
         }
 
-        return kok;//new Matrix(kok);
+        return kok;
     }
 
     //
@@ -356,16 +194,6 @@ public class Solver {
 
         return new Matrix(gok);
     }
-
-//
-//    static Matrix addPointMass(Matrix mo, Force[] forces) {
-//        for (Force force : forces) {
-//            FemPoint point = force.getFemPoint();
-//            mo.getArray()[point.getNumberGlobalAxe()[0]][point.getNumberGlobalAxe()[0]] += force.getAmplitude();
-//            mo.getArray()[point.getNumberGlobalAxe()[1]][point.getNumberGlobalAxe()[1]] += force.getAmplitude();
-//        }
-//        return mo;
-//    }
 
     static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
