@@ -74,12 +74,17 @@ public class StrengthSolver extends Solver {
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
 
-        long start = System.currentTimeMillis();
-
+//        long start = System.currentTimeMillis();
+//        for (int i = 0; i < K.getColumnDimension(); i++) {
+//            if(K.get(i,i) == 0.){
+//                System.out.println("Вырожденная");
+//                break;
+//            }
+//        }
         //TODO big problem - optimize
         Matrix Z0 = K.solve(forceVector);
 
-        System.out.println("Solve time = " + (System.currentTimeMillis() - start) + " msec.");
+//        System.out.println("Solve time = " + (System.currentTimeMillis() - start) + " msec.");
 
         Matrix Z0k = A.times(Z0);
         // Start calc localDisplacement
