@@ -30,11 +30,35 @@ public class ModalSolver extends Solver {
 
     List<Mode> modes = new ArrayList<>();
 
+    enum SelfWeightState {
+        WITHOUT_SELF_WEIGHT,
+        WITH_SELF_WEIGHT
+    }
+
     public ModalSolver(
             FemPoint[] femPoints,
             FemElement[] femElements,
             MassPoint[] massPoints,
             Support[] supports) throws Exception {
+        calculate(femPoints, femElements,
+                massPoints, supports, SelfWeightState.WITH_SELF_WEIGHT);
+    }
+
+    public ModalSolver(
+            FemPoint[] femPoints,
+            FemElement[] femElements,
+            MassPoint[] massPoints,
+            Support[] supports,
+            SelfWeightState state) throws Exception {
+        calculate(femPoints, femElements,
+                massPoints, supports, state);
+    }
+
+    private void calculate(
+            FemPoint[] femPoints, FemElement[] femElements,
+            MassPoint[] massPoints, Support[] supports,
+            SelfWeightState state) throws Exception {
+
 
         FemElement.dropNumeration();
         FemPoint.dropNumeration();
@@ -45,8 +69,20 @@ public class ModalSolver extends Solver {
         SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
         Matrix Ko = Solver.matrixStiffeners(femPoints, femElements);
 
-        SparseSquareSymmetricMatrix Mok = generateQuasiMatrixMass(femElements);
-        Matrix Mo = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Mok), A);
+        Matrix Mo = null;
+
+        switch (state) {
+            case WITH_SELF_WEIGHT:
+                SparseSquareSymmetricMatrix Mok = generateQuasiMatrixMass(femElements);
+                Mo = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Mok), A);
+                break;
+            case WITHOUT_SELF_WEIGHT:
+                Mo = new Matrix(A.getColumns(), A.getColumns());
+                for (int i = 0; i < A.getColumns(); i++) {
+                    Mo.getArray()[i][i] = 1e-6;
+                }
+                break;
+        }
 
         if (massPoints != null) {
             for (MassPoint massPoint : massPoints) {
@@ -82,7 +118,6 @@ public class ModalSolver extends Solver {
             modes.add(mode);
         }
     }
-
 
     static private SparseSquareSymmetricMatrix generateQuasiMatrixMass(final FemElement[] femElements) {
         int amount = 0;
