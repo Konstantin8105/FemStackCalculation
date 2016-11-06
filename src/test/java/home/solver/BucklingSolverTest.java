@@ -8,6 +8,8 @@ import home.loads.Force;
 import home.other.Support;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class BucklingSolverTest {
 
     @Test
@@ -18,7 +20,7 @@ public class BucklingSolverTest {
                 new FemPoint(1, 5, 0),
         };
 
-        FemElement[] lines = new FemElement[]{
+        FemElement[] femElements = new FemElement[]{
                 new FemBeam2d(2.05e11, 0.0314159, 7.85398e-5, new FemPoint[]{femPoints[0], femPoints[1]}),
         };
 
@@ -35,23 +37,23 @@ public class BucklingSolverTest {
 
         //=========================//
         try {
-            BucklingSolver.calculate(femPoints, lines, forces, supports);
+            BucklingSolver.calculate(femPoints, femElements, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        assertEquals(lines[0].getInternalForce().get(0, 0), 7000, 1e-5);
-        assertEquals(lines[0].getInternalForce().get(1, 0), -25000, 1e-5);
-        assertEquals(lines[0].getInternalForce().get(2, 0), -25000 * 5, 1e-5);
-        assertEquals(lines[0].getDisplacementInGlobalSystem().get(4, 0), 0.064754, 1e-4);
-        assertEquals(lines[0].getDisplacementInLocalSystem().get(4, 0), 0.064754, 1e-4);
+        assertEquals(femElements[0].getInternalForce().get(0, 0), 7000, 1e-5);
+        assertEquals(femElements[0].getInternalForce().get(1, 0), -25000, 1e-5);
+        assertEquals(femElements[0].getInternalForce().get(2, 0), -25000 * 5, 1e-5);
+        assertEquals(femElements[0].getDisplacementInGlobalSystem().get(4, 0), 0.064754, 1e-4);
+        assertEquals(femElements[0].getDisplacementInLocalSystem().get(4, 0), 0.064754, 1e-4);
 
         assertEquals(femPoints[0].getGlobalDisplacement()[0], 0.0000, 1e-4);
         assertEquals(femPoints[1].getGlobalDisplacement()[0], -5e-6, 1e-6);
         assertEquals(femPoints[1].getGlobalDisplacement()[1], 0.064754, 1e-4);
 
         // Buckling factor = 228.569
-//        assertEquals(lines[0].getBucklingAxialLoad(), 228.569*7000, 1e-5);//critical
+        assertEquals(femElements[0].getBucklingAxialLoad(), 228.569*7000, 1e-5);//critical
     }
 
 /*
