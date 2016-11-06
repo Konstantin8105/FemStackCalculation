@@ -1,4 +1,6 @@
-package home.other;
+package home.loads;
+
+import home.other.FemPoint;
 
 public class MassPoint {
     private final FemPoint femPoint;

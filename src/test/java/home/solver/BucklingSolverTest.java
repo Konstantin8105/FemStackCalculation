@@ -1,7 +1,15 @@
 package home.solver;
 
+import home.finiteElements.FemBeam2d;
+import home.finiteElements.interfaces.FemElement;
+import home.loads.Direction;
+import home.other.FemPoint;
+import home.loads.Force;
+import home.other.Support;
+import org.junit.Test;
+
 public class BucklingSolverTest {
-/*
+
     @Test
     public void testBuckling() {
 
@@ -45,6 +53,8 @@ public class BucklingSolverTest {
         // Buckling factor = 228.569
 //        assertEquals(lines[0].getBucklingAxialLoad(), 228.569*7000, 1e-5);//critical
     }
+
+/*
     @Test
     public void testBuckling5() {
         // E = 2e11

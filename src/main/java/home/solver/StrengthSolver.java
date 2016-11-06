@@ -3,7 +3,7 @@ package home.solver;
 import Jama.Matrix;
 import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
-import home.other.Force;
+import home.loads.Force;
 import home.other.Support;
 import home.solver.matrixes.SparseZeroOneMatrix;
 

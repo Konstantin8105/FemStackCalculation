@@ -1,5 +1,7 @@
 package home.other;
 
+import home.loads.Direction;
+
 public class Support {
     private final FemPoint femPoint;
     private final Direction direction;

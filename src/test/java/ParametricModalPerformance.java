@@ -1,8 +1,8 @@
 import home.finiteElements.FemBeam2d;
 import home.finiteElements.interfaces.FemElement;
-import home.other.Direction;
+import home.loads.Direction;
 import home.other.FemPoint;
-import home.other.MassPoint;
+import home.loads.MassPoint;
 import home.other.Support;
 import home.solver.ModalSolver;
 import org.junit.Assert;
@@ -18,26 +18,25 @@ import static org.junit.Assert.assertFalse;
 
 @RunWith(Parameterized.class)
 public class ParametricModalPerformance {
-/*
-Amount =      2 : Time =         18 msec.
-Amount =      3 : Time =         10 msec.
-Amount =     10 : Time =         35 msec.
-Amount =     20 : Time =         80 msec.
-Amount =     50 : Time =        253 msec.
-Amount =    100 : Time =       1296 msec.
-Amount =    200 : Time =       5944 msec.
+    /*
+    Amount =      2 : Time =         18 msec.
+    Amount =      3 : Time =         10 msec.
+    Amount =     10 : Time =         35 msec.
+    Amount =     20 : Time =         80 msec.
+    Amount =     50 : Time =        253 msec.
+    Amount =    100 : Time =       1296 msec.
+    Amount =    200 : Time =       5944 msec.
 
-After optimize At*Mok*A
-Amount =      2 : Time =         17 msec.
-Amount =      3 : Time =          1 msec.
-Amount =     10 : Time =         34 msec.
-Amount =     20 : Time =         58 msec.
-Amount =     50 : Time =        237 msec.
-Amount =    100 : Time =       1054 msec.
-Amount =    200 : Time =       4030 msec.
+    After optimize At*Mok*A
+    Amount =      2 : Time =         17 msec.
+    Amount =      3 : Time =          1 msec.
+    Amount =     10 : Time =         34 msec.
+    Amount =     20 : Time =         58 msec.
+    Amount =     50 : Time =        237 msec.
+    Amount =    100 : Time =       1054 msec.
+    Amount =    200 : Time =       4030 msec.
 
-
- */
+     */
     private final int amountIntermediatePoints;
 
     @Parameterized.Parameters
@@ -107,7 +106,7 @@ Amount =    200 : Time =       4030 msec.
         // T = 0.102 sec.
         // f = 9.832 Hz.
         double T = 0.1028431;
-       // assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 20);
+        // assertEquals(w2.get(w2.size() - 1), Math.pow(2. * Math.PI / T, 2.), 20);
         double T2 = solver.getModes().get(0).getPeriod();
         assertEquals(T2, T, 1e-3);
 

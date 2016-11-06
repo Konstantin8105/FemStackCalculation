@@ -62,15 +62,15 @@ public abstract class FemElement {
     }
 
     // Buckling
-//
-//    public abstract Matrix getPotentialMatrix();
-//
-//    Matrix getPotentialMatrixTr() {
-//        Matrix tr = getTr();
-//        Matrix gr = getPotentialMatrix();
-//        return ((tr.transpose().times(gr)).times(tr));
-//    }
-//
+
+    public abstract Matrix getPotentialMatrix(double axialForce);
+
+    Matrix getPotentialMatrixTr(double axialForce) {
+        Matrix tr = getTr();
+        Matrix gr = getPotentialMatrix(axialForce);
+        return ((tr.transpose().times(gr)).times(tr));
+    }
+
     // Modal
 
     public abstract Matrix getMatrixMass();

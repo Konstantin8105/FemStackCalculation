@@ -1,8 +1,8 @@
 import home.finiteElements.FemBeam2d;
 import home.finiteElements.interfaces.FemElement;
-import home.other.Direction;
+import home.loads.Direction;
 import home.other.FemPoint;
-import home.other.Force;
+import home.loads.Force;
 import home.other.Support;
 import home.solver.StrengthSolver;
 import org.junit.Assert;
@@ -126,8 +126,6 @@ Amount =    400 : Time =       1187 msec.
         boolean exception = false;
         StrengthSolver solver = null;
         try {
-            //FemModel femModel = new FemModel(femPoints, femElements, supports);
-            //solver = new StrengthSolver(femModel, forces);
             solver = new StrengthSolver(femPoints, femElements, forces, supports);
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,9 +3,9 @@ package home.solver;
 import Jama.Matrix;
 import home.finiteElements.FemBeam2d;
 import home.finiteElements.interfaces.FemElement;
-import home.other.Direction;
+import home.loads.Direction;
 import home.other.FemPoint;
-import home.other.MassPoint;
+import home.loads.MassPoint;
 import home.other.Support;
 import org.junit.Test;
 
@@ -422,8 +422,8 @@ public class ModalSolverTest {
             assertFalse(exception);
         }
 
-        System.out.println("periodElement = "+periodElement+ " sec.");
-        System.out.println("periodPoint   = "+periodPoint+ " sec.");
+        System.out.println("periodElement = " + periodElement + " sec.");
+        System.out.println("periodPoint   = " + periodPoint + " sec.");
         assertEquals(periodElement, periodPoint, 1e-2);
 
         // in according to STAAD:

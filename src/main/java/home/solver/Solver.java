@@ -4,7 +4,7 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
-import home.other.Force;
+import home.loads.Force;
 import home.other.Support;
 import home.solver.matrixes.SparseSquareSymmetricMatrix;
 import home.solver.matrixes.SparseZeroOneMatrix;
