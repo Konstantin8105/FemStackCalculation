@@ -3,6 +3,7 @@ package home;
 public class main {
     public static void main(String[] args) {
 
+        // test of iteration solver
         double x = 1.;
         double y = 0.5 * x;
         for (int i = 0; i < 20; i++) {

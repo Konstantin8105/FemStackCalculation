@@ -171,29 +171,6 @@ public class Solver {
 //        return new Matrix(gok);
 //    }
 //
-    static Matrix generateQuasiMatrixMass(FemElement[] femElements) {
-        //TODO optimize to diagonal matrix
-        int amount = 0;
-        for (int i = 0; i < femElements.length; i++) {
-            amount += femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
-        }
-
-//        int sizeAxes = femElements[0].getLocalAxes().length;
-
-        double[][] gok = new double[amount][amount];
-        for (int i = 0; i < femElements.length; i++) {
-            int sizeAxes = femElements[i].getPoint().length * FemPoint.AMOUNT_POINT_AXES;
-            int positionBaseLine = i * sizeAxes;
-            Matrix ks = femElements[i].getMatrixMassTr();
-            for (int j = 0; j < sizeAxes; j++) {
-                for (int k = 0; k < sizeAxes; k++) {
-                    gok[positionBaseLine + j][positionBaseLine + k] = ks.getArray()[j][k];
-                }
-            }
-        }
-
-        return new Matrix(gok);
-    }
 
     static Matrix generateForceVector(FemPoint[] femPoints, Force[] forces, int amountAxesInPoint) {
         double[][] displacementVector = new double[femPoints.length * amountAxesInPoint][1];
@@ -311,13 +288,14 @@ public class Solver {
     public static Matrix[] calculateEigen(Matrix K, Matrix M) {
 
         // TODO: 26.10.2016 eigenvector --- divide each element to maximal
-        // TODO: 26.10.2016 eigenvalue at 10 times less
 
+        //TODO optimize
         Matrix input = M.solve(K);
 
         if (DEBUG) System.out.println("input = M.solve(K)");
         if (DEBUG) input.print(12, 1);
 
+        //TODO optimize
         EigenvalueDecomposition ei = input.eig();
         class Eigen {
             double value;
@@ -376,4 +354,14 @@ public class Solver {
 //        }
 //        return array;
 //    }
+
+
+    // Create the matrix of stiffeners
+    protected static Matrix matrixStiffeners(FemPoint[] femPoints,
+                                             FemElement[] femElements) throws Exception {
+        SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
+        SparseSquareSymmetricMatrix Kok = generateMatrixQuasiStiffener(femElements);
+        Matrix Ko = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Kok), A);
+        return Ko;
+    }
 }

@@ -5,14 +5,12 @@ import home.finiteElements.interfaces.FemElement;
 import home.other.FemPoint;
 import home.other.Force;
 import home.other.Support;
-import home.solver.matrixes.SparseSquareSymmetricMatrix;
 import home.solver.matrixes.SparseZeroOneMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class StrengthSolver extends Solver {
-
 
     public class DeformationPoint {
         int idPoint;
@@ -69,22 +67,13 @@ public class StrengthSolver extends Solver {
         convertLineGlobalAxeToNumber = convertLineAxeToSequenceAxe(femElements);
 
         SparseZeroOneMatrix A = generateMatrixCompliance(femPoints, femElements);
-        SparseSquareSymmetricMatrix Kok = generateMatrixQuasiStiffener(femElements);
-        Matrix Ko = SparseZeroOneMatrix.multiplyWithSquareSymmetric(A.transpose().times(Kok), A);
+        Matrix Ko = Solver.matrixStiffeners(femPoints, femElements);
         Matrix K = putZeroInSupportRowColumns(Ko, supports);
+
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
 
-//        long start = System.currentTimeMillis();
-//        for (int i = 0; i < K.getColumnDimension(); i++) {
-//            if(K.get(i,i) == 0.){
-//                System.out.println("Вырожденная");
-//                break;
-//            }
-//        }
-        //TODO big problem - optimize
+        //TODO big problem - optimize - 80% of calculation time is here
         Matrix Z0 = K.solve(forceVector);
-
-//        System.out.println("Solve time = " + (System.currentTimeMillis() - start) + " msec.");
 
         Matrix Z0k = A.times(Z0);
         // Start calc localDisplacement
@@ -116,7 +105,7 @@ public class StrengthSolver extends Solver {
             globalDeformationPoint.add(new DeformationPoint(
                     femElement.getPoint()[i].getId(), deformation));
         }
-//        femElement.setGlobalDisplacementInPoint(localDisplacement);
+
         Matrix displacementInGlobalSystem = new Matrix(temp);
         Matrix displacementInLocalSystem = femElement.getTr().times(displacementInGlobalSystem);
         position = 0;

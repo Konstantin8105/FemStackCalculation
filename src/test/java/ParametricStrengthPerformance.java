@@ -17,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 @RunWith(Parameterized.class)
-public class ParametricTestPerformance {
+public class ParametricStrengthPerformance {
 
     /*
 Amount =      3 : Time =         15 msec.
@@ -90,7 +90,7 @@ Amount =    400 : Time =       1187 msec.
         );
     }
 
-    public ParametricTestPerformance(int amountIntermediatePoints) {
+    public ParametricStrengthPerformance(int amountIntermediatePoints) {
         this.amountIntermediatePoints = amountIntermediatePoints;
     }
 
