@@ -9,7 +9,7 @@ import home.solver.matrixes.SparseZeroOneMatrix;
 
 public class BucklingSolver extends Solver {
 
-    public static void calculate(
+    public BucklingSolver(
             FemPoint[] femPoints,
             FemElement[] femElements,
             Force[] forces,

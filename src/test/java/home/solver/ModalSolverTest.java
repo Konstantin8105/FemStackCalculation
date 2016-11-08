@@ -143,9 +143,6 @@ public class ModalSolverTest {
         // by STAAD: T1 = 0.519 sec/ T2 = 0.161 sec.
         assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]), 0.519, 1e-2);
         assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[1][0]), 0.161, 1e-2);
-
-//        assertEquals(values[1].getArray()[5][0], 1, 1e-2);
-//        assertEquals(values[1].getArray()[7][1], 1, 1e-2);
     }
 
 
@@ -190,31 +187,9 @@ public class ModalSolverTest {
 
         assertFalse(exception);
 
-//        System.out.println("Eigenvalue:");
-//        for (int i = 0; i < values[0].getArray().length; i++) {
-//            System.out.println(i
-//                    + " == "
-//                    + String.format("%.3e", values[0].getArray()[i][0])
-//                    + " rad.sec^-2.0"
-//                    + " : T = "
-//                    + String.format("%.3e", 2 * Math.PI / Math.sqrt(values[0].getArray()[i][0]))
-//                    + " sec."
-//            );
-//        }
-//        System.out.println("Eigenvector:");
-//        values[1].print(10, 6);
-
-//        assertEquals(values[0].getArray()[0][0], 145.8, 1e-1);
-//        assertEquals(values[0].getArray()[1][0], 1539., 1);
-
         // by STAAD: T1 = 0.519 sec/ T2 = 0.161 sec.
-//        assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]), 0.519, 1e-2);
-//        assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[1][0]), 0.161, 1e-2);
         assertEquals(solver.getModes().get(0).getPeriod(), 0.519, 1e-2);
         assertEquals(solver.getModes().get(1).getPeriod(), 0.161, 1e-2);
-
-//        assertEquals(values[1].getArray()[5][0], 1, 1e-2);
-//        assertEquals(values[1].getArray()[7][1], 1, 1e-2);
     }
 
 
@@ -260,31 +235,9 @@ public class ModalSolverTest {
 
         assertFalse(exception);
 
-//        System.out.println("Eigenvalue:");
-//        for (int i = 0; i < values[0].getArray().length; i++) {
-//            System.out.println(i
-//                    + " == "
-//                    + String.format("%.3e", values[0].getArray()[i][0])
-//                    + " rad.sec^-2.0"
-//                    + " : T = "
-//                    + String.format("%.3e", 2 * Math.PI / Math.sqrt(values[0].getArray()[i][0]))
-//                    + " sec."
-//            );
-//        }
-//        System.out.println("Eigenvector:");
-//        values[1].print(10, 6);
-//
-//        assertEquals(values[0].getArray()[0][0], 145.8, 1);
-//        assertEquals(values[0].getArray()[1][0], 1539., 10);
-
         // by STAAD: T1 = 0.519 sec/ T2 = 0.161 sec.
-//        assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[0][0]), 0.519, 1e-2);
-//        assertEquals(2 * Math.PI / Math.sqrt(values[0].getArray()[1][0]), 0.161, 1e-2);
         assertEquals(solver.getModes().get(0).getPeriod(), 0.519, 1e-2);
         assertEquals(solver.getModes().get(1).getPeriod(), 0.161, 1e-2);
-
-//        assertEquals(values[1].getArray()[5][0], 1, 1e-2);
-//        assertEquals(values[1].getArray()[7][1], 1, 1e-2);
     }
 
 
@@ -478,12 +431,8 @@ public class ModalSolverTest {
         // T1 = 0.4450378 sec.
         // T2 = 0.1473405 sec.
         double T1 = 0.4450378;
-//        assertEquals(values[0].getArray()[0][0], Math.pow(2. * Math.PI / T1, 2.), 100);
-//        assertEquals(2. * Math.PI / Math.sqrt(values[0].getArray()[0][0]), T1, 1e-1);
-        assertEquals(solver.getModes().get(0).getPeriod(), T1, 1e-1);
         double T2 = 0.1473405;
-//        assertEquals(values[0].getArray()[1][0], Math.pow(2. * Math.PI / T2, 2.), 100);
-//        assertEquals(2. * Math.PI / Math.sqrt(values[0].getArray()[1][0]), T2, 1e-2);
+        assertEquals(solver.getModes().get(0).getPeriod(), T1, 1e-1);
         assertEquals(solver.getModes().get(1).getPeriod(), T2, 1e-2);
     }
 }

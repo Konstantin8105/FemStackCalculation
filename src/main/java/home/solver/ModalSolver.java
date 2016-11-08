@@ -79,7 +79,7 @@ public class ModalSolver extends Solver {
             case WITHOUT_SELF_WEIGHT:
                 Mo = new Matrix(A.getColumns(), A.getColumns());
                 for (int i = 0; i < A.getColumns(); i++) {
-                    Mo.getArray()[i][i] = 1e-6;
+                    Mo.getArray()[i][i] = 1e-7;// TODO: 08.11.2016 strange Костыль
                 }
                 break;
         }
