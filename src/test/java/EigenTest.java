@@ -13,14 +13,7 @@ public class EigenTest {
         };
         Matrix A = new Matrix(m);
         EigenvalueDecomposition ei = new EigenvalueDecomposition(A);
-//        ei.getD().print(10, 5);
-//        ei.getV().print(10, 5);
-//        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//            System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-//        }
-//        for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//            System.out.println("Image " + ei.getImagEigenvalues()[i]);
-//        }
+
         Assert.assertEquals(ei.getD().getArray()[0][0], 2., 1e-5);
         Assert.assertEquals(ei.getD().getArray()[1][1], 3., 1e-5);
     }
@@ -33,14 +26,7 @@ public class EigenTest {
         };
         Matrix A = new Matrix(m);
         EigenvalueDecomposition ei = new EigenvalueDecomposition(A);
-//        ei.getD().print(10, 5);
-//        ei.getV().print(10, 5);
-//        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//            System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-//        }
-//        for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//            System.out.println("Image " + ei.getImagEigenvalues()[i]);
-//        }
+
         Assert.assertEquals(ei.getD().getArray()[0][0], 0.5, 1e-5);
         Assert.assertEquals(ei.getD().getArray()[1][1], 2.0, 1e-5);
     }
@@ -54,14 +40,7 @@ public class EigenTest {
         };
         Matrix A = new Matrix(m);
         EigenvalueDecomposition ei = new EigenvalueDecomposition(A);
-//        ei.getD().print(10, 5);
-//        ei.getV().print(10, 5);
-//        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//            System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-//        }
-//        for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//            System.out.println("Image " + ei.getImagEigenvalues()[i]);
-//        }
+
         Assert.assertEquals(ei.getD().getArray()[0][0], 2., 1e-5);
         Assert.assertEquals(ei.getD().getArray()[1][1], 0., 1e-5);
         Assert.assertEquals(ei.getD().getArray()[2][2], -4., 1e-5);
@@ -76,14 +55,7 @@ public class EigenTest {
         };
         Matrix A = new Matrix(m);
         EigenvalueDecomposition ei = new EigenvalueDecomposition(A);
-//        ei.getD().print(10, 5);
-//        ei.getV().print(10, 5);
-//        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//            System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-//        }
-//        for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//            System.out.println("Image " + ei.getImagEigenvalues()[i]);
-//        }
+
         Assert.assertEquals(ei.getD().getArray()[0][0], 0.5, 1e-5);
         Assert.assertEquals(ei.getD().getArray()[1][1], 5, 1e-5);
         Assert.assertEquals(ei.getD().getArray()[2][2], 5, 1e-5);
@@ -98,14 +70,7 @@ public class EigenTest {
         };
         Matrix A = new Matrix(m);
         EigenvalueDecomposition ei = new EigenvalueDecomposition(A);
-//        ei.getD().print(10, 5);
-//        ei.getV().print(10, 5);
-//        for (int i = 0; i < ei.getRealEigenvalues().length; i++) {
-//            System.out.println("Real  " + ei.getRealEigenvalues()[i]);
-//        }
-//        for (int i = 0; i < ei.getImagEigenvalues().length; i++) {
-//            System.out.println("Image " + ei.getImagEigenvalues()[i]);
-//        }
+
         Assert.assertEquals(ei.getRealEigenvalues()[0], 0.9999999, 1e-3);
         Assert.assertEquals(ei.getRealEigenvalues()[2], 2.9998854, 1e-3);
     }
