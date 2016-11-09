@@ -2,6 +2,7 @@ package home.solver;
 
 import Jama.Matrix;
 import home.finiteElements.interfaces.FemElement;
+import home.linearAlgebra.SolversLA;
 import home.other.FemPoint;
 import home.loads.Force;
 import home.other.Support;
@@ -73,7 +74,7 @@ public class StrengthSolver extends Solver {
         Matrix forceVector = generateForceVector(femPoints, forces, FemPoint.AMOUNT_POINT_AXES);
 
         //TODO big problem - optimize - 80% of calculation time is here
-        Matrix Z0 = K.solve(forceVector);
+        Matrix Z0 = SolversLA.bestSolverLA.solve(K, forceVector);
 
         Matrix Z0k = A.times(Z0);
         // Start calc localDisplacement
