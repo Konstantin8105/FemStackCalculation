@@ -56,7 +56,7 @@ public class StrengthSolverTest {
 
 
     @Test
-    public void testBendingWithIntermediantPoints() {
+    public void testBendingWithIntermediatePoints() {
         // E = 2e11
         // J = 1e-5
         // A = 1
