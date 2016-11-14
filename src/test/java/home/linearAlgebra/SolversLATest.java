@@ -60,10 +60,50 @@ public class SolversLATest {
     @Test
     public void matrix6() {
         double[][] a = new double[][]{
-                {1e-200, 1e200},
-                {1e200, 1e-200}
+                {1e-100, 1e100},
+                {1e100, 1e-100}
         };
-        double[][] v = new double[][]{{1e200 + 1e-200}, {1e200 + 1e-200}};
+        double[][] v = new double[][]{{1e100 + 1e-100}, {1e100 + 1e-100}};
+        solve(a, v);
+    }
+
+    @Test
+    public void matrix6a() {
+        double[][] a = new double[][]{
+                {-1e-100, 1},
+                {1e-100, 1}
+        };
+        double[][] v = new double[][]{{0}, {2}};
+        solve(a, v);
+    }
+
+    @Test
+    public void matrix6b() {
+        double[][] a = new double[][]{
+                {1, 1e-10},
+                {1, -1e-10}
+        };
+        double[][] v = new double[][]{{1e10+1}, {1e10-1}};
+        solve(a, v);
+    }
+
+    @Test
+    public void matrix6c() {
+        double[][] a = new double[][]{
+                {1e-20, 1},
+                {1, 1e-20}
+        };
+        double[][] v = new double[][]{{1e-20+1}, {1e-20+1}};
+        solve(a, v);
+    }
+
+    @Test
+    public void matrix6d() {
+        double[][] a = new double[][]{
+                {1, 1e-20},
+                {1e-20, 1}
+        };
+        double[][] v = new double[][]{{1e-20+1}, {1e-20+1}};
         solve(a, v);
     }
 
