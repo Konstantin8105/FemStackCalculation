@@ -16,7 +16,7 @@ public class PerpendSolver implements SolverSystemOfLinearEquations {
             factors[i] = 1;
         }
 
-        A.print(15,1);
+//        A.print(15,1);
 
         for (int i = 0; i < size; i++) {
             double min = +Double.MAX_VALUE;
@@ -28,7 +28,7 @@ public class PerpendSolver implements SolverSystemOfLinearEquations {
                 min = Math.min(min, value);
                 max = Math.max(max, value);
             }
-            System.out.println("||" + min + "," + max + "||");
+//            System.out.println("||" + min + "," + max + "||");
             min = Math.log10(min);
             max = Math.log10(max);
             int average = (int)((min + max) / 2.);
@@ -36,10 +36,10 @@ public class PerpendSolver implements SolverSystemOfLinearEquations {
             for (int j = 0; j < size; j++) {
                 A.set(j, i, A.get(j, i) * Math.pow(10, -factors[i]));
             }
-            System.out.println("Log10 = ||" + min + "," + max + "|| -- >"+factors[i]);
+//            System.out.println("Log10 = ||" + min + "," + max + "|| -- >"+factors[i]);
         }
 
-        A.print(10,1);
+//        A.print(10,1);
 
         for (int i = 0; i < 25; i++) {
             double[] x_last = new double[size];
@@ -47,12 +47,12 @@ public class PerpendSolver implements SolverSystemOfLinearEquations {
                 x_last[j] = x[j];
             }
 //            print
-            System.out.println("------------------------");
-            System.out.println("Iteration :" + i);
-            for (int h = 0; h < size; h++) {
-                System.out.println("[" + x[h] + "]");
-            }
-            System.out.println("------------------------");
+//            System.out.println("------------------------");
+//            System.out.println("Iteration :" + i);
+//            for (int h = 0; h < size; h++) {
+//                System.out.println("[" + x[h] + "]");
+//            }
+//            System.out.println("------------------------");
 //
 
             for (int j = 0; j < size; j++) {

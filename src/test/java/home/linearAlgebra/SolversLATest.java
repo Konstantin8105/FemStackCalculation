@@ -17,6 +17,17 @@ public class SolversLATest {
     }
 
     @Test
+    public void matrix1a() {
+        double[][] a = new double[][]{
+                {6, -2, 3},
+                {-2, 8, 2},
+                {3, 2, 10}
+        };
+        double[][] v = new double[][]{{7}, {8}, {15}};
+        solve(a, v);
+    }
+
+    @Test
     public void matrix2() {
         double[][] a = new double[][]{
                 {0, 1, -2},
