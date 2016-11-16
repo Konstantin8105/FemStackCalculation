@@ -3,6 +3,8 @@ package home.linearAlgebra;
 import Jama.Matrix;
 import org.junit.Test;
 
+import static org.junit.Assert.assertTrue;
+
 public class SolversLATest {
 
     @Test
@@ -13,7 +15,7 @@ public class SolversLATest {
                 {3, 7, 5}
         };
         double[][] v = new double[][]{{2}, {7}, {15}};
-        solve(a, v);
+        solve(a, v, 1, 1, 1);
     }
 
     @Test
@@ -24,7 +26,7 @@ public class SolversLATest {
                 {3, 2, 10}
         };
         double[][] v = new double[][]{{7}, {8}, {15}};
-        solve(a, v);
+        solve(a, v, 1, 1, 1);
     }
 
     @Test
@@ -35,7 +37,7 @@ public class SolversLATest {
                 {-2, 3, 4}
         };
         double[][] v = new double[][]{{-1}, {8}, {5}};
-        solve(a, v);
+        solve(a, v, 1, 1, 1);
     }
 
     @Test
@@ -45,7 +47,7 @@ public class SolversLATest {
                 {1e-100, 1}
         };
         double[][] v = new double[][]{{1 + 1e-100}, {1 + 1e-100}};
-        solve(a, v);
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -55,7 +57,7 @@ public class SolversLATest {
                 {1e-100, 1e100}
         };
         double[][] v = new double[][]{{1e100 + 1e-100}, {1e100 + 1e-100}};
-        solve(a, v);
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -65,7 +67,7 @@ public class SolversLATest {
                 {1e100, 1e-100}
         };
         double[][] v = new double[][]{{1e100 + 1e-100}, {1e100 + 1e-100}};
-        solve(a, v);
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -75,7 +77,7 @@ public class SolversLATest {
                 {1e100, 1e-100}
         };
         double[][] v = new double[][]{{1e100 + 1e-100}, {1e100 + 1e-100}};
-        solve(a, v);
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -85,17 +87,17 @@ public class SolversLATest {
                 {1e-100, 1}
         };
         double[][] v = new double[][]{{0}, {2}};
-        solve(a, v);
+        solve(a, v, 1e100, 1);
     }
 
     @Test
     public void matrix6b() {
         double[][] a = new double[][]{
-                {1, 1e-10},
-                {1, -1e-10}
+                {1, 1e-5},
+                {1, -1e-5}
         };
-        double[][] v = new double[][]{{1e10+1}, {1e10-1}};
-        solve(a, v);
+        double[][] v = new double[][]{{1e5 + 1}, {1e5 - 1}};
+        solve(a, v, 1e5, 1e5);
     }
 
     @Test
@@ -104,8 +106,8 @@ public class SolversLATest {
                 {1e-20, 1},
                 {1, 1e-20}
         };
-        double[][] v = new double[][]{{1e-20+1}, {1e-20+1}};
-        solve(a, v);
+        double[][] v = new double[][]{{1e-20 + 1}, {1e-20 + 1}};
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -114,8 +116,8 @@ public class SolversLATest {
                 {1, 1e-20},
                 {1e-20, 1}
         };
-        double[][] v = new double[][]{{1e-20+1}, {1e-20+1}};
-        solve(a, v);
+        double[][] v = new double[][]{{1e-20 + 1}, {1e-20 + 1}};
+        solve(a, v, 1, 1);
     }
 
     @Test
@@ -187,14 +189,33 @@ public class SolversLATest {
         solve(a, v);
     }
 
-    public void solve(double[][] a, double[][] v) {
+    public void solve(double[][] a, double[][] v, double... result) {
+        boolean allIsOk = true;
         for (SolverSystemOfLinearEquations solver : SolversLA.solvers) {
+            System.out.println(solver.getClass().toString());
             try {
-                solver.solve(new Matrix(a), new Matrix(v)).print(5, 12);
+                Matrix actual = solver.solve(new Matrix(a), new Matrix(v));
+                actual.print(5, 12);
+                if (result.length > 0) {
+                    boolean isOk = true;
+                    for (int i = 0; i < actual.getRowDimension(); i++) {
+                        if (Math.abs(actual.get(i, 0) - result[i]) / result[i] > 1e-9) {
+                            isOk = false;
+                        }
+                    }
+                    if (isOk)
+                        System.out.println("Correct");
+                    else {
+                        System.out.println("Wrong answer");
+                        allIsOk = false;
+                    }
+                    System.out.println("==================");
+                }
             } catch (Exception e) {
                 System.out.println(solver.getClass().toString() + " is error");
                 e.printStackTrace();
             }
         }
+        assertTrue(allIsOk);
     }
 }

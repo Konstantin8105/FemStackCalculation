@@ -6,7 +6,8 @@ public class SolversLA {
 
     public static SolverSystemOfLinearEquations solvers[] = new SolverSystemOfLinearEquations[]{
             new JamaSolver(),
-            new PerpendSolver(),
-            new SimpleIterationSolver()
+            new PlanarMovingSolver(),
+            new VectorSolver()
+//            new SimpleIterationSolver()
     };
 }

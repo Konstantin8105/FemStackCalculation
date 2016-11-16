@@ -19,12 +19,12 @@ public class SimpleIterationSolver implements SolverSystemOfLinearEquations {
             }
         }
 
-        System.out.println("------------------------");
-        System.out.println("Result:");
-        for (int h = 0; h < size; h++) {
-            System.out.println("[" + String.format("%.10f", x[h]) + "]");
-        }
-        System.out.println("------------------------");
+//        System.out.println("------------------------");
+//        System.out.println("Result:");
+//        for (int h = 0; h < size; h++) {
+//            System.out.println("[" + String.format("%.10f", x[h]) + "]");
+//        }
+//        System.out.println("------------------------");
 
         double[][] result = new double[size][1];
         for (int i = 0; i < size; i++) {
