@@ -8,6 +8,15 @@ import static org.junit.Assert.assertTrue;
 public class SolversLATest {
 
     @Test
+    public void matrix0() {
+        double[][] a = new double[][]{
+                { -0.5,1},
+                { -2,1}
+        };
+        double[][] v = new double[][]{{0.5}, {-1}};
+        solve(a, v,1,1);
+    }
+    @Test
     public void matrix1() {
         double[][] a = new double[][]{
                 {1, -2, 3},
@@ -200,6 +209,21 @@ public class SolversLATest {
                     boolean isOk = true;
                     for (int i = 0; i < actual.getRowDimension(); i++) {
                         if (Math.abs(actual.get(i, 0) - result[i]) / result[i] > 1e-9) {
+                            isOk = false;
+                        }
+                    }
+                    if (isOk)
+                        System.out.println("Correct");
+                    else {
+                        System.out.println("Wrong answer");
+                        allIsOk = false;
+                    }
+                    System.out.println("==================");
+                } else {
+                    Matrix expect = (new JamaSolver()).solve(new Matrix(a), new Matrix(v));
+                    boolean isOk = true;
+                    for (int i = 0; i < expect.getRowDimension(); i++) {
+                        if (Math.abs(actual.get(i, 0) - expect.get(i, 0)) / expect.get(i, 0) > 1e-9) {
                             isOk = false;
                         }
                     }

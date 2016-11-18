@@ -14,8 +14,12 @@ public class VectorSolver implements SolverSystemOfLinearEquations {
                 ro += A.get(i, j) * x[j];
             }
             ro = ro - v.get(i, 0);
-            averageRo += ro / A.getRowDimension();
+            System.out.println("ro[" + i + "] = " + ro);
+//            averageRo = Math.max(Math.abs(ro), averageRo);//+= ro / A.getRowDimension();
+            averageRo += ro * ro;
         }
+        averageRo = Math.sqrt(averageRo);
+        System.out.println("Max = " + averageRo + "\n");
         return averageRo;
     }
 
@@ -35,44 +39,149 @@ public class VectorSolver implements SolverSystemOfLinearEquations {
             }
         }
 
+        double[] x_last = null;
         for (int i = 0; i < 25; i++) {
             // Calculate next point //
+            x = calculateNextPoint(x, A, v);
+            if (x_last == null) {
+                x_last = x;
+            } else {
+                x = calculatePrecisionPoint(
+                        x, errorRo(x, A, v),
+                        x_last, errorRo(x_last, A, v));
+//                x_last = calculatePrecisionPoint(
+//                        x, errorRo(x, A, v),
+//                        x_last, errorRo(x_last, A, v));
+//                if(errorRo(x_last,A,v) < errorRo(x, A, v))
+//                    x = x_last;
+                x_last = null;
+            }
+            if (errorRo(x, A, v) < 1e-9)
+                break;
 
-            double[] x1 = calculateNextPoint(x, A, v);
-
-            // Calculate errors ro //
-
-            double ro_0 = errorRo(x, A, v);
-            double ro_1 = errorRo(x1, A, v);
-
-            x = calculatePrecisionPoint(x, ro_0, x1, ro_1);
+            System.out.println("ERROR : " + errorRo(x, A, v));
         }
 
         double[][] result = new double[size][1];
         for (int i = 0; i < size; i++) {
             result[i][0] = x[i];
         }
+        System.out.println("ERROR : " + errorRo(x, A, v));
         return new Matrix(result);
     }
 
-    private double[] calculateNextPoint(double[] x, Matrix a, Matrix v) {
-        int size = a.getColumnDimension();
-        double[][] roots = new double[size][size];
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                double xTemp = 0;
-                for (int k = 0; k < size; k++) {
-                    xTemp = x[k] + a.get(j, k);
-                }
-                roots[j][i] = xTemp;
+    private double[] calculatePrecisionPoint(double[] x, double v, double[] x1, double v1) {
+        boolean isSame = true;
+        for (int i = 0; i < x.length; i++) {
+            if (x[i] != x1[i]) {
+                isSame = false;
+                break;
+            }
+        }
+        if (isSame) {
+            return x1;
+        }
+
+
+        double factor = 1;//.01;//0.75;// must be 1
+
+        double[] result = new double[x.length];
+        for (int i = 0; i < result.length; i++) {
+            double a = (v1 - v) / (x[i] - x1[i]);
+//            double b = v + a * x[i];
+//            result[i] = b / a;
+            result[i] = v / a * factor + x[i];
+        }
+
+        for (int i = 0; i < result.length; i++) {
+            if (result[i] == Double.NaN || result[i] == Double.POSITIVE_INFINITY || result[i] == Double.NEGATIVE_INFINITY) {
+                System.out.println("Wrong result");
+                return x;
             }
         }
 
 
-        return new double[0];
+//        int size = x.length;
+//        System.out.println("calculatePrecisionPoint()");
+//        for (int i = 0; i < size; i++) {
+//            System.out.println(
+//                    "x [" + i + "] == " + x[i] + "\t" +
+//                            "x1[" + i + "] == " + x1[i] + "\t" +
+//                            "res[" + i + "] == " + result[i]
+//            );
+//        }
+        System.out.println("shoot");
+        return result;
     }
 
-    private double[] calculatePrecisionPoint(double[] x, double ro_0, double[] x1, double ro_1) {
-        ;
+    private double[] calculateNextPoint(double[] x, Matrix a, Matrix v) {
+
+//        if (Math.abs(errorRo(x, a, v)) < 1e-10)
+//            return x;
+
+        int size = a.getColumnDimension();
+
+
+//        for (int i = 0; i < size; i++) {
+//            System.out.println("BEGIN : Coordinate " + i + " == " + x[i]);
+//        }
+
+
+        for (int i = 0; i < size; i++) {
+            double up = 0;
+            for (int j = 0; j < size; j++) {
+                up += a.get(i, j) * x[j];
+            }
+            up -= v.get(i, 0);
+            double down = 0;
+            for (int j = 0; j < size; j++) {
+                down += Math.pow(a.get(i, j), 2.);
+            }
+            double distance = up / Math.sqrt(down);
+//            System.out.println("Distance " + i + " = " + distance);
+        }
+        double[] result = new double[size];
+        for (int i = 0; i < size; i++) {
+            double up = 0;
+            for (int j = 0; j < size; j++) {
+                up += a.get(i, j) * x[j];
+            }
+            up -= v.get(i, 0);
+            double down = 0;
+            for (int j = 0; j < size; j++) {
+                down += Math.pow(a.get(i, j), 2.);
+            }
+            double t = -up / down;
+//            System.out.println("Factor " + i + " = " + t);
+//            System.out.println("Coordinates:");
+            for (int j = 0; j < size; j++) {
+                result[j] += (a.get(i, j) * t + x[j]);
+//                System.out.println("[x" + j + "] = " + (a.get(i, j) * t + x[j]));
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            result[i] /= (double) size;
+//            System.out.println("END: Coordinate " + i + " == " + result[i]);
+        }
+//        double[][] roots = new double[size][size];
+//        for (int i = 0; i < size; i++) {
+//            for (int j = 0; j < size; j++) {
+//                double xTemp = 0;
+//                for (int k = 0; k < size; k++) {
+//                    xTemp = x[k] + a.get(j, k);
+//                }
+//                roots[j][i] = xTemp;
+//            }
+//        }
+//        double[] result = new double[size];
+//        for (int i = 0; i < size; i++) {
+//            result[i] = 0;
+//            for (int j = 0; j < size; j++) {
+//                result[i] += roots[i][j] / (double) size;
+//            }
+//        }
+//        System.out.println("\n\n\n\n");
+        return result;
     }
+
 }
