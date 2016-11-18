@@ -14,12 +14,12 @@ public class VectorSolver implements SolverSystemOfLinearEquations {
                 ro += A.get(i, j) * x[j];
             }
             ro = ro - v.get(i, 0);
-            System.out.println("ro[" + i + "] = " + ro);
+//            System.out.println("ro[" + i + "] = " + ro);
 //            averageRo = Math.max(Math.abs(ro), averageRo);//+= ro / A.getRowDimension();
             averageRo += ro * ro;
         }
         averageRo = Math.sqrt(averageRo);
-        System.out.println("Max = " + averageRo + "\n");
+//        System.out.println("Max = " + averageRo + "\n");
         return averageRo;
     }
 
@@ -40,22 +40,22 @@ public class VectorSolver implements SolverSystemOfLinearEquations {
         }
 
         double[] x_last = null;
-        for (int i = 0; i < 25; i++) {
+        for (int i = 0; i < 250; i++) {
             // Calculate next point //
             x = calculateNextPoint(x, A, v);
-            if (x_last == null) {
-                x_last = x;
-            } else {
-                x = calculatePrecisionPoint(
-                        x, errorRo(x, A, v),
-                        x_last, errorRo(x_last, A, v));
-//                x_last = calculatePrecisionPoint(
+//            if (x_last == null) {
+//                x_last = x;
+//            } else {
+//                x = calculatePrecisionPoint(
 //                        x, errorRo(x, A, v),
 //                        x_last, errorRo(x_last, A, v));
-//                if(errorRo(x_last,A,v) < errorRo(x, A, v))
-//                    x = x_last;
-                x_last = null;
-            }
+////                x_last = calculatePrecisionPoint(
+////                        x, errorRo(x, A, v),
+////                        x_last, errorRo(x_last, A, v));
+////                if(errorRo(x_last,A,v) < errorRo(x, A, v))
+////                    x = x_last;
+//                x_last = null;
+//            }
             if (errorRo(x, A, v) < 1e-9)
                 break;
 
@@ -122,9 +122,9 @@ public class VectorSolver implements SolverSystemOfLinearEquations {
         int size = a.getColumnDimension();
 
 
-//        for (int i = 0; i < size; i++) {
-//            System.out.println("BEGIN : Coordinate " + i + " == " + x[i]);
-//        }
+        for (int i = 0; i < size; i++) {
+            System.out.println("BEGIN : Coordinate " + i + " == " + x[i]);
+        }
 
 
         for (int i = 0; i < size; i++) {

@@ -7,6 +7,18 @@ import static org.junit.Assert.assertTrue;
 
 public class SolversLATest {
 
+
+    @Test
+    public void matrixAddPerpLine() {
+        double[][] a = new double[][]{
+                {1, -1, 0},
+                {-1, 0, 0},
+                {1, 1, 1},
+        };
+        double[][] v = new double[][]{{-1}, {-1}, {0}};
+        solve(a, v, 1, 2, -3);
+    }
+
     @Test
     public void matrix0() {
         double[][] a = new double[][]{
@@ -16,6 +28,7 @@ public class SolversLATest {
         double[][] v = new double[][]{{0.5}, {-1}};
         solve(a, v,1,1);
     }
+
     @Test
     public void matrix1() {
         double[][] a = new double[][]{
